@@ -36,6 +36,7 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinWebpackRulesContainer
 import org.jetbrains.kotlin.gradle.targets.js.dsl.WebpackRulesDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.WebpackRulesDsl.Companion.webpackRulesContainer
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin.Companion.kotlinNodeJsExtension
 import org.jetbrains.kotlin.gradle.targets.js.npm.RequiresNpmDependencies
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode
@@ -55,9 +56,8 @@ constructor(
     private val objects: ObjectFactory
 ) : DefaultTask(), RequiresNpmDependencies, WebpackRulesDsl {
     @Transient
-    private val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
+    private val nodeJs = project.rootProject.kotlinNodeJsExtension
     private val versions = nodeJs.versions
-    private val resolutionManager = nodeJs.npmResolutionManager
     private val rootPackageDir by lazy { nodeJs.rootPackageDir }
 
     private val npmProject = compilation.npmProject
@@ -207,9 +207,6 @@ constructor(
     @Internal
     var generateConfigOnly: Boolean = false
 
-    @Input
-    val webpackMajorVersion = PropertiesProvider(project).webpackMajorVersion
-
     fun webpackConfigApplier(body: Action<KotlinWebpackConfig>) {
         webpackConfigAppliers.add(body)
     }
@@ -239,7 +236,6 @@ constructor(
         devtool = devtool,
         sourceMaps = sourceMaps,
         resolveFromModulesFirst = resolveFromModulesFirst,
-        webpackMajorVersion = webpackMajorVersion
     )
 
     private fun createRunner(): KotlinWebpackRunner {
@@ -267,9 +263,6 @@ constructor(
         )
     }
 
-    override val nodeModulesRequired: Boolean
-        @Internal get() = true
-
     override val requiredNpmDependencies: Set<RequiredKotlinJsDependency>
         @Internal get() = createWebpackConfig(true).getRequiredDependencies(versions)
 
@@ -277,8 +270,6 @@ constructor(
 
     @TaskAction
     fun doExecute() {
-        resolutionManager.checkRequiredDependencies(task = this)
-
         val runner = createRunner()
 
         if (generateConfigOnly) {

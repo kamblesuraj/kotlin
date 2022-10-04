@@ -12,7 +12,7 @@ import java.io.File
 /**
  * Cache for storing already created [GradleNodeModule]s
  */
-internal abstract class CompositeNodeModulesCache : AbstractNodeModulesCache() {
+abstract class CompositeNodeModulesCache : AbstractNodeModulesCache() {
     override val type: String
         get() = "composite"
 

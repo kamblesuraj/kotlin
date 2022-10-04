@@ -6,9 +6,12 @@
 package org.jetbrains.kotlin.gradle.targets.js.npm.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.hash.FileHasher
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
+import org.jetbrains.kotlin.gradle.targets.js.npm.CompositeNodeModulesCache
+import org.jetbrains.kotlin.gradle.targets.js.npm.GradleNodeModulesCache
 import javax.inject.Inject
 
 abstract class KotlinNpmCachesSetup : DefaultTask() {
@@ -16,10 +19,11 @@ abstract class KotlinNpmCachesSetup : DefaultTask() {
     open val fileHasher: FileHasher
         get() = throw UnsupportedOperationException()
 
-    @Transient
-    private val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
-    private val gradleNodeModules = nodeJs.npmResolutionManager.resolver.gradleNodeModulesProvider
-    private val compositeNodeModules = nodeJs.npmResolutionManager.resolver.compositeNodeModulesProvider
+    @get:Internal
+    internal abstract val gradleNodeModules: Property<GradleNodeModulesCache>
+
+    @get:Internal
+    internal abstract val compositeNodeModules: Property<CompositeNodeModulesCache>
 
     @TaskAction
     fun setup() {

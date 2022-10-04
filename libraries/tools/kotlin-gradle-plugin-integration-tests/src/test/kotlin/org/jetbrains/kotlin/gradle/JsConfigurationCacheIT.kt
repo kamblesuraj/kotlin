@@ -88,7 +88,6 @@ abstract class AbstractJsConfigurationCacheIT(protected val irBackend: Boolean) 
                     ":packageJson",
                     ":publicPackageJson",
                     ":rootPackageJson",
-                    ":kotlinNpmInstall",
                     ":compileKotlinJs",
                     ":nodeTest",
                 ) + if (irBackend) listOf(":compileProductionExecutableKotlinJs") else emptyList()
@@ -111,7 +110,6 @@ abstract class AbstractJsConfigurationCacheIT(protected val irBackend: Boolean) 
                     ":packageJson",
                     ":publicPackageJson",
                     ":rootPackageJson",
-                    ":kotlinNpmInstall",
                     ":compileKotlinJs",
                     ":nodeTest",
                 ) + if (irBackend) listOf(":compileProductionExecutableKotlinJs") else emptyList()
@@ -127,7 +125,7 @@ abstract class AbstractJsConfigurationCacheIT(protected val irBackend: Boolean) 
             assertSimpleConfigurationCacheScenarioWorks(
                 "assemble", "kotlinStoreYarnLock",
                 buildOptions = defaultBuildOptions,
-                executedTaskNames = listOf(":kotlinNpmInstall")
+                executedTaskNames = listOf(":rootPackageJson")
             )
         }
     }
