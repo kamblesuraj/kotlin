@@ -400,6 +400,7 @@ private val jvmFilePhases = listOf(
 
     renameFieldsPhase,
     fakeInliningLocalVariablesLowering,
+    fakeInliningLocalVariablesAfterInlineLowering,
 
     // makePatchParentsPhase()
 )
