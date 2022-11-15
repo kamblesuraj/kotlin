@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
+import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.platform.jvm.isJvm
@@ -83,6 +84,10 @@ open class SerializationResolveExtension @JvmOverloads constructor(val metadataP
         if (thisDescriptor.shouldHaveGeneratedMethodsInCompanion && !thisDescriptor.isSerializableObject)
             SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT
         else null
+
+    override fun getSyntheticCompanionAnnotations(thisDescriptor: ClassDescriptor): Annotations {
+        return Annotations.create(listOfNotNull(thisDescriptor.jsExportIgnore()))
+    }
 
     override fun addSyntheticSupertypes(thisDescriptor: ClassDescriptor, supertypes: MutableList<KotlinType>) {
         KSerializerDescriptorResolver.addSerializerSupertypes(thisDescriptor, supertypes)

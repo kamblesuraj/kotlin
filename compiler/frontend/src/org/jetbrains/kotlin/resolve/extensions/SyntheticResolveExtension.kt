@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.resolve.extensions
 
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.extensions.ProjectExtensionDescriptor
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -141,6 +142,8 @@ interface SyntheticResolveExtension {
     }
 
     fun getSyntheticCompanionObjectNameIfNeeded(thisDescriptor: ClassDescriptor): Name? = null
+
+    fun getSyntheticCompanionAnnotations(thisDescriptor: ClassDescriptor): Annotations = Annotations.EMPTY
 
     fun getSyntheticFunctionNames(thisDescriptor: ClassDescriptor): List<Name> = emptyList()
 

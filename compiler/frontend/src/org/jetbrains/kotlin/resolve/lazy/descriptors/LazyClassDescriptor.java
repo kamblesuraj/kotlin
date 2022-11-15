@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.psi.psiUtil.KtPsiUtilKt;
 import org.jetbrains.kotlin.psi.psiUtil.PsiUtilsKt;
 import org.jetbrains.kotlin.psi.synthetics.SyntheticClassOrObjectDescriptor;
 import org.jetbrains.kotlin.resolve.*;
+import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension;
 import org.jetbrains.kotlin.resolve.lazy.ForceResolveUtil;
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext;
 import org.jetbrains.kotlin.resolve.lazy.LazyEntity;
@@ -548,14 +549,15 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
     }
 
     private ClassDescriptorWithResolutionScopes createSyntheticCompanionObjectDescriptor() {
-        Name syntheticCompanionName = c.getSyntheticResolveExtension().getSyntheticCompanionObjectNameIfNeeded(this);
+        SyntheticResolveExtension extension = c.getSyntheticResolveExtension();
+        Name syntheticCompanionName = extension.getSyntheticCompanionObjectNameIfNeeded(this);
         if (syntheticCompanionName == null)
             return null;
         SyntheticClassOrObjectDescriptor companionDescriptor = new SyntheticClassOrObjectDescriptor(c,
                 /* parentClassOrObject= */ classOrObject,
                 this, syntheticCompanionName, getSource(),
                 /* outerScope= */ getOuterScope(),
-                Modality.FINAL, PUBLIC, Annotations.Companion.getEMPTY(), PRIVATE, ClassKind.OBJECT, true);
+                Modality.FINAL, PUBLIC, extension.getSyntheticCompanionAnnotations(this), PRIVATE, ClassKind.OBJECT, true);
         companionDescriptor.initialize();
         return companionDescriptor;
     }

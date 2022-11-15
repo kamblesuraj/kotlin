@@ -196,6 +196,10 @@ object SerializationDependencies {
     val LAZY_PUBLICATION_MODE_NAME = Name.identifier("PUBLICATION")
 }
 
+object SerializationJsDependenciesClassIds {
+    val jsExportIgnore = ClassId.fromString("kotlin/js/JsExport.Ignore")
+}
+
 object SerializersClassIds {
     val kSerializerId = ClassId(SerializationPackages.packageFqName, SerialEntityNames.KSERIALIZER_NAME)
     val enumSerializerId = ClassId(SerializationPackages.internalPackageFqName, Name.identifier(SpecialBuiltins.enumSerializer))

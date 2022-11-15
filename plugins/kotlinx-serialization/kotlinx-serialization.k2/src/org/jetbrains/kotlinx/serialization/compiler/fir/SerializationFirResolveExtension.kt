@@ -171,7 +171,7 @@ class SerializationFirResolveExtension(session: FirSession) : FirDeclarationGene
             symbol = FirNamedFunctionSymbol(callableId)
             origin = SerializationPluginKey.origin
             status = original.status.copy(modality = Modality.FINAL)
-
+            excludeFromJsExport()
         }
         return listOf(copy.symbol)
     }
@@ -202,6 +202,8 @@ class SerializationFirResolveExtension(session: FirSession) : FirDeclarationGene
                     }
                 )
             }
+
+            excludeFromJsExport()
         }
 
         return function.symbol
@@ -218,7 +220,9 @@ class SerializationFirResolveExtension(session: FirSession) : FirDeclarationGene
             SerializationPluginKey,
             callableId.callableName,
             target.resolvedReturnType
-        )
+        ) {
+            excludeFromJsExport()
+        }
 
         return listOf(property.symbol)
     }
@@ -263,6 +267,7 @@ class SerializationFirResolveExtension(session: FirSession) : FirDeclarationGene
                     isNullable = false
                 )
             }
+            excludeFromJsExport()
         }
         // TODO: add deprecate hidden
         // serializerFirClass.replaceAnnotations(listOf(Annotations.create(listOf(KSerializerDescriptorResolver.createDeprecatedHiddenAnnotation(thisDescriptor.module)))))
@@ -277,6 +282,8 @@ class SerializationFirResolveExtension(session: FirSession) : FirDeclarationGene
                 val serializerFactoryClassId = ClassId(SerializationPackages.internalPackageFqName, SERIALIZER_FACTORY_INTERFACE_NAME)
                 superType(serializerFactoryClassId.constructClassLikeType(emptyArray(), false))
             }
+
+            excludeFromJsExport()
         }
         return companion.symbol
     }
