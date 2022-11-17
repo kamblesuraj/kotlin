@@ -6,15 +6,15 @@ class Derived : Base {
   }
 
   init {
-    <this>.#value = 0
+    <this>(super<Base>).#value = 0
   }
 
   fun getValue(): Int {
-    return <this>.#value
+    return <this>(super<Base>).#value
   }
 
   fun setValue(value: Int) {
-    <this>.#value = value
+    <this>(super<Base>).#value = value
   }
 
 }

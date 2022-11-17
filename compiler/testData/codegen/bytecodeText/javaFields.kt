@@ -1,3 +1,4 @@
+// IGNORE_BACKEND_K1: JVM_IR
 // FILE: Java1.java
 public class Java1 { 
   public int f;
@@ -16,8 +17,18 @@ open class Kotlin2 : Java2() {
 
 fun test1(j: Kotlin2) = j.f
 
+// JVM_IR_TEMPLATES
+// @Kotlin2.class:
+// 2 GETFIELD Java2.f : I
+
+// JVM_IR_TEMPLATES
+// @TestKt.class:
+// 2 GETFIELD Java2.f : I
+
+// JVM_TEMPLATES
 // @Kotlin2.class:
 // 1 GETFIELD Java2.f : I
 
+// JVM_TEMPLATES
 // @TestKt.class:
-// 1 GETFIELD Kotlin2.f : I
+// 1 GETFIELD Java2.f : I

@@ -1,4 +1,5 @@
-// IGNORE_BACKEND_K1: JVM_IR
+// TARGET_BACKEND: JVM_IR
+// IGNORE_BACKEND_K2: JVM_IR
 // FILE: JFieldOwner.java
 
 public class JFieldOwner {
@@ -31,18 +32,8 @@ fun test(b : Boolean) {
 
 }
 
-// JVM_IR_TEMPLATES
-// 2 PUTFIELD JFieldOwner.f : I
-// 0 PUTFIELD Mid.f : I
-
-// JVM_TEMPLATES
-// 1 PUTFIELD JFieldOwner.f : I
-// 1 PUTFIELD Mid.f : I
-
-// JVM_IR_TEMPLATES
-// 2 GETFIELD JFieldOwner.f : I
-// 0 GETFIELD Mid.f : I
-
-// JVM_TEMPLATES
+// @TestKt.class:
 // 1 GETFIELD JFieldOwner.f : I
+// 1 PUTFIELD JFieldOwner.f : I
 // 1 GETFIELD Mid.f : I
+// 1 PUTFIELD Mid.f : I

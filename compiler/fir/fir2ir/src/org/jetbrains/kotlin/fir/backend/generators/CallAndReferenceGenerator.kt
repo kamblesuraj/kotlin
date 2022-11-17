@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.fir.backend.generators
 
 import org.jetbrains.kotlin.KtFakeSourceElementKind
+import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.fir.backend.*
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.utils.isCompanion
@@ -17,6 +18,7 @@ import org.jetbrains.kotlin.fir.references.*
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
 import org.jetbrains.kotlin.fir.render
 import org.jetbrains.kotlin.fir.resolve.calls.FirSyntheticFunctionSymbol
+import org.jetbrains.kotlin.fir.resolve.dfa.unwrapSmartcastExpression
 import org.jetbrains.kotlin.fir.resolve.fullyExpandedType
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutorByMap
@@ -34,10 +36,7 @@ import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.*
-import org.jetbrains.kotlin.ir.util.dump
-import org.jetbrains.kotlin.ir.util.isFunctionTypeOrSubtype
-import org.jetbrains.kotlin.ir.util.isInterface
-import org.jetbrains.kotlin.ir.util.isMethodOfAny
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi2ir.generators.hasNoSideEffects
 import org.jetbrains.kotlin.psi2ir.generators.isUnchanging
@@ -224,6 +223,30 @@ class CallAndReferenceGenerator(
             }
         }
         return null
+    }
+
+    // Note: I don't like using super qualifier symbols to determine field receivers in bytecode properly.
+    // Would be much better to use super qualifiers only in case when it's used explicitly.
+    // However, FE 1.0 does it, and currently we have no better way to provide these receivers.
+    // See KT-49507 and KT-48954 as good examples for cases we try to handle here
+    private fun FirExpression.superQualifierSymbolForField(fieldSymbol: IrFieldSymbol): IrClassSymbol? {
+        val unwrapped = this.unwrapSmartcastExpression()
+        if (unwrapped !is FirQualifiedAccess) return null
+        if (unwrapped.calleeReference is FirSuperReference) return superQualifierSymbol()
+        if (fieldSymbol.owner.correspondingPropertySymbol != null) return null
+        val originalContainingClass = fieldSymbol.owner.parentClassOrNull ?: return null
+        val ownContainingClass = typeRef.toIrType().classifierOrNull?.owner as? IrClass ?: return null
+        // For static field, we shouldn't unwrap fake override in any case
+        if (fieldSymbol.owner.isStatic) return ownContainingClass.symbol
+        // Find first Java super class to avoid possible visibility exposure & separate compilation problems
+        var superQualifierClass = ownContainingClass
+        while (!superQualifierClass.isFromJava() && superQualifierClass !== originalContainingClass) {
+            superQualifierClass = superQualifierClass.superTypes.find {
+                val kind = it.getClass()?.kind
+                kind == ClassKind.CLASS || kind == ClassKind.ENUM_CLASS
+            }?.getClass() ?: break
+        }
+        return superQualifierClass.symbol
     }
 
     private fun FirExpression.superQualifierSymbol(): IrClassSymbol? {
@@ -452,7 +475,7 @@ class CallAndReferenceGenerator(
                         IrGetFieldImpl(
                             startOffset, endOffset, symbol, type,
                             origin = IrStatementOrigin.GET_PROPERTY.takeIf { calleeReference !is FirDelegateFieldReference },
-                            superQualifierSymbol = dispatchReceiver.superQualifierSymbol()
+                            superQualifierSymbol = dispatchReceiver.superQualifierSymbolForField(symbol)
                         )
                     }
 
@@ -524,8 +547,9 @@ class CallAndReferenceGenerator(
                 )
             }
 
+            val dispatchReceiver = variableAssignment.dispatchReceiver
             val symbol = calleeReference.toSymbolForCall(
-                variableAssignment.dispatchReceiver,
+                dispatchReceiver,
                 conversionScope,
                 explicitReceiver = variableAssignment.explicitReceiver,
                 preferGetter = false,
@@ -534,7 +558,10 @@ class CallAndReferenceGenerator(
 
             return variableAssignment.convertWithOffsets { startOffset, endOffset ->
                 when (symbol) {
-                    is IrFieldSymbol -> IrSetFieldImpl(startOffset, endOffset, symbol, type, origin).apply {
+                    is IrFieldSymbol -> IrSetFieldImpl(
+                        startOffset, endOffset, symbol, type, origin,
+                        superQualifierSymbol = dispatchReceiver.superQualifierSymbolForField(symbol)
+                    ).apply {
                         value = assignedValue
                     }
 
@@ -546,7 +573,7 @@ class CallAndReferenceGenerator(
                                 typeArgumentsCount = setter.typeParameters.size,
                                 valueArgumentsCount = setter.valueParameters.size,
                                 origin = origin,
-                                superQualifierSymbol = variableAssignment.dispatchReceiver.superQualifierSymbol()
+                                superQualifierSymbol = dispatchReceiver.superQualifierSymbol()
                             ).apply {
                                 putContextReceiverArguments(variableAssignment)
                                 putValueArgument(0, assignedValue)
@@ -566,7 +593,7 @@ class CallAndReferenceGenerator(
                                 typeArgumentsCount = setter.typeParameters.size,
                                 valueArgumentsCount = setter.valueParameters.size,
                                 origin = origin,
-                                superQualifierSymbol = variableAssignment.dispatchReceiver.superQualifierSymbol()
+                                superQualifierSymbol = dispatchReceiver.superQualifierSymbol()
                             ).apply {
                                 putValueArgument(putContextReceiverArguments(variableAssignment), assignedValue)
                             }
@@ -574,7 +601,7 @@ class CallAndReferenceGenerator(
                             backingField != null -> IrSetFieldImpl(
                                 startOffset, endOffset, backingField.symbol, type,
                                 origin = null, // NB: to be consistent with PSI2IR, origin should be null here
-                                superQualifierSymbol = variableAssignment.dispatchReceiver.superQualifierSymbol()
+                                superQualifierSymbol = dispatchReceiver.superQualifierSymbol()
                             ).apply {
                                 value = assignedValue
                             }

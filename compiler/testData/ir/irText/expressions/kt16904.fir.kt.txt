@@ -47,7 +47,7 @@ class Test2 : J {
   }
 
   init {
-    <this>.#field = 42
+    <this>(super<J>).#field = 42
   }
 
 }
