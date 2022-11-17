@@ -1,23 +1,20 @@
 // TARGET_BACKEND: JVM_IR
 // IGNORE_BACKEND_K1: JVM_IR
-// Field VS property: case "reference"
-// DUMP_IR
+// Field VS property: case "reference", protected field, visible property
 
 // FILE: BaseJava.java
 public class BaseJava {
-    public String a = "O";
-
-    String b = "K";
+    protected String a = "FAIL";
 }
 
 // FILE: Derived.kt
 class Derived : BaseJava() {
-    private val a = "FAIL"
+    private val a = "OK"
 
-    private val b = "FAIL"
+    fun foo() = this::a.get()
 }
 
 fun box(): String {
     val d = Derived()
-    return d::a.get() + d::b.get()
+    return d.foo()
 }

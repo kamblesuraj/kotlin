@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.fir.backend.generators
 
 import org.jetbrains.kotlin.KtFakeSourceElementKind
 import org.jetbrains.kotlin.descriptors.ClassKind
+import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.fir.backend.*
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.utils.isCompanion
@@ -37,6 +38,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.load.java.JavaDescriptorVisibilities
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi2ir.generators.hasNoSideEffects
 import org.jetbrains.kotlin.psi2ir.generators.isUnchanging
@@ -239,6 +241,10 @@ class CallAndReferenceGenerator(
         // For static field, we shouldn't unwrap fake override in any case
         if (fieldSymbol.owner.isStatic) return ownContainingClass.symbol
         // Find first Java super class to avoid possible visibility exposure & separate compilation problems
+        return getJavaFieldContainingClassSymbol(ownContainingClass, originalContainingClass)
+    }
+
+    private fun getJavaFieldContainingClassSymbol(ownContainingClass: IrClass, originalContainingClass: IrClass): IrClassSymbol {
         var superQualifierClass = ownContainingClass
         while (!superQualifierClass.isFromJava() && superQualifierClass !== originalContainingClass) {
             superQualifierClass = superQualifierClass.superTypes.find {
@@ -1044,24 +1050,40 @@ class CallAndReferenceGenerator(
                 val ownerFunction =
                     symbol.owner as? IrFunction
                         ?: (symbol.owner as? IrProperty)?.getter
-                if (ownerFunction?.dispatchReceiverParameter != null) {
+                val ownerDispatchReceiverParameter = ownerFunction?.dispatchReceiverParameter
+                if (ownerDispatchReceiverParameter != null) {
                     val baseDispatchReceiver = qualifiedAccess.findIrDispatchReceiver(explicitReceiverExpression)
-                    dispatchReceiver =
-                        if (!ownerFunction.isMethodOfAny() || baseDispatchReceiver?.type?.classOrNull?.owner?.isInterface != true) {
-                            baseDispatchReceiver
-                        } else {
-                            // NB: for FE 1.0, this type cast is added by InterfaceObjectCallsLowering
-                            // However, it doesn't work for FIR due to different f/o structure
-                            // (FIR calls Any method directly, but FE 1.0 calls its interface f/o instead)
+                    if (baseDispatchReceiver != null) {
+                        val dispatchReceiverCastType =
+                            when {
+                                ownerFunction.isMethodOfAny() && baseDispatchReceiver.type.classOrNull?.owner?.isInterface == true -> {
+                                    // NB: for FE 1.0, this type cast is added by InterfaceObjectCallsLowering
+                                    // However, it doesn't work for FIR due to different f/o structure
+                                    // (FIR calls Any method directly, but FE 1.0 calls its interface f/o instead)
+                                    irBuiltIns.anyType
+                                }
+                                this is IrPropertyReference && field?.isEligibleForDispatchReceiverCasting() == true -> {
+                                    // Why should we do this type cast at all?
+                                    //     to avoid accessing invisible backing field in bytecode
+                                    ownerDispatchReceiverParameter.type
+                                }
+                                else -> {
+                                    null
+                                }
+                            }
+                        dispatchReceiver = if (dispatchReceiverCastType != null) {
                             IrTypeOperatorCallImpl(
                                 baseDispatchReceiver.startOffset,
                                 baseDispatchReceiver.endOffset,
-                                irBuiltIns.anyType,
+                                dispatchReceiverCastType,
                                 IrTypeOperator.IMPLICIT_CAST,
-                                irBuiltIns.anyType,
+                                dispatchReceiverCastType,
                                 baseDispatchReceiver
                             )
+                        } else {
+                            baseDispatchReceiver
                         }
+                    }
                 }
                 if (ownerFunction?.extensionReceiverParameter != null) {
                     extensionReceiver = qualifiedAccess.findIrExtensionReceiver(explicitReceiverExpression)?.let {
@@ -1092,6 +1114,20 @@ class CallAndReferenceGenerator(
             }
         }
         return this
+    }
+
+    private fun IrFieldSymbol.isEligibleForDispatchReceiverCasting(): Boolean {
+        // Relevant test: javaProtectedFieldAndKotlinInvisiblePropertyReference.kt
+        //     protected visibility, test crashes if we do type cast here
+        // Relevant test: javaFieldAndKotlinPropertyReference.kt
+        //     works with both public and package-private visibility
+        return when (owner.visibility) {
+            DescriptorVisibilities.PUBLIC -> true
+            JavaDescriptorVisibilities.PACKAGE_VISIBILITY -> true
+            JavaDescriptorVisibilities.PROTECTED_AND_PACKAGE ->
+                this.owner.parentClassOrNull?.classId?.packageFqName == conversionScope.containingFileIfAny()?.fqName
+            else -> false
+        }
     }
 
     private fun generateErrorCallExpression(

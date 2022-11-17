@@ -18024,9 +18024,45 @@ public class IrBlackBoxCodegenTestGenerated extends AbstractIrBlackBoxCodegenTes
         }
 
         @Test
+        @TestMetadata("javaFieldAndKotlinPropertyReferenceFromInner.kt")
+        public void testJavaFieldAndKotlinPropertyReferenceFromInner() throws Exception {
+            runTest("compiler/testData/codegen/box/fieldRename/javaFieldAndKotlinPropertyReferenceFromInner.kt");
+        }
+
+        @Test
         @TestMetadata("javaInvisibleFieldAndKotlinProperty.kt")
         public void testJavaInvisibleFieldAndKotlinProperty() throws Exception {
             runTest("compiler/testData/codegen/box/fieldRename/javaInvisibleFieldAndKotlinProperty.kt");
+        }
+
+        @Test
+        @TestMetadata("javaInvisibleFieldAndKotlinPropertyReference.kt")
+        public void testJavaInvisibleFieldAndKotlinPropertyReference() throws Exception {
+            runTest("compiler/testData/codegen/box/fieldRename/javaInvisibleFieldAndKotlinPropertyReference.kt");
+        }
+
+        @Test
+        @TestMetadata("javaProtectedFieldAndKotlinInvisibleProperty.kt")
+        public void testJavaProtectedFieldAndKotlinInvisibleProperty() throws Exception {
+            runTest("compiler/testData/codegen/box/fieldRename/javaProtectedFieldAndKotlinInvisibleProperty.kt");
+        }
+
+        @Test
+        @TestMetadata("javaProtectedFieldAndKotlinInvisiblePropertyReference.kt")
+        public void testJavaProtectedFieldAndKotlinInvisiblePropertyReference() throws Exception {
+            runTest("compiler/testData/codegen/box/fieldRename/javaProtectedFieldAndKotlinInvisiblePropertyReference.kt");
+        }
+
+        @Test
+        @TestMetadata("javaProtectedFieldAndKotlinInvisiblePropertyWrite.kt")
+        public void testJavaProtectedFieldAndKotlinInvisiblePropertyWrite() throws Exception {
+            runTest("compiler/testData/codegen/box/fieldRename/javaProtectedFieldAndKotlinInvisiblePropertyWrite.kt");
+        }
+
+        @Test
+        @TestMetadata("javaProtectedFieldAndKotlinPropertyReference.kt")
+        public void testJavaProtectedFieldAndKotlinPropertyReference() throws Exception {
+            runTest("compiler/testData/codegen/box/fieldRename/javaProtectedFieldAndKotlinPropertyReference.kt");
         }
 
         @Test
