@@ -1,5 +1,6 @@
 // WITH_STDLIB
 // SKIP_KT_DUMP
+// SKIP_KLIB_TEST
 
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract

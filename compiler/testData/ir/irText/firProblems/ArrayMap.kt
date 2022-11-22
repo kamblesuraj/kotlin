@@ -1,4 +1,5 @@
 // WITH_STDLIB
+// SKIP_KLIB_TEST
 
 sealed class ArrayMap<T : Any> : Iterable<T> {
     abstract val size: Int

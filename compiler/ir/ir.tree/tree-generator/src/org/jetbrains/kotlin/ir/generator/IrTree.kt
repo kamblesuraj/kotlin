@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.ir.generator.config.ElementConfig.Category.*
 import org.jetbrains.kotlin.ir.generator.config.ListFieldConfig.Mutability.List
 import org.jetbrains.kotlin.ir.generator.config.ListFieldConfig.Mutability.Var
 import org.jetbrains.kotlin.ir.generator.config.SimpleFieldConfig
+import org.jetbrains.kotlin.ir.generator.model.Element
 import org.jetbrains.kotlin.ir.generator.print.toPoet
 import org.jetbrains.kotlin.ir.generator.util.*
 import org.jetbrains.kotlin.name.FqName
@@ -167,7 +168,17 @@ object IrTree : AbstractTreeBuilder() {
             type<ValueClassRepresentation<*>>().withArgs(type(Packages.types, "IrSimpleType")),
             nullable = true,
         )
-        +listField("sealedSubclasses", classSymbolType, mutability = Var)
+        +listField("sealedSubclasses", classSymbolType, mutability = Var) {
+            generationCallback = {
+                addKdoc(
+                    """
+                    If this is a sealed class or interface, this list contains symbols of all its immediate subclasses.
+                    
+                    NOTE: If this [${Element.elementName2typeName(this@element.name)}] was deserialized from a klib, this list will be empty!
+                    """.trimIndent()
+                )
+            }
+        }
     }
     val attributeContainer: ElementConfig by element(Declaration) {
         +field("attributeOwnerId", attributeContainer)

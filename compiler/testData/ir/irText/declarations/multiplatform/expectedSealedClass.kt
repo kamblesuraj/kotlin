@@ -1,5 +1,6 @@
 // IGNORE_BACKEND_K2: JVM_IR
 // !LANGUAGE: +MultiPlatformProjects
+// SKIP_KLIB_TEST
 
 expect sealed class Ops()
 expect class Add() : Ops
