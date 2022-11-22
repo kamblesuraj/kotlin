@@ -1,0 +1,7 @@
+warning: ATTENTION!
+ This build uses experimental K2 compiler:
+  -Xuse-k2
+compiler/testData/cli/jvm/firFriendlyErrorIfNoJdkOptionIsSet.kt:2:11: error: unresolved reference: NullPointerException
+    throw NullPointerException()
+          ^
+COMPILATION_ERROR

@@ -1,0 +1,5 @@
+$TESTDATA_DIR$/firFriendlyErrorIfNoJdkOptionIsSet.kt
+-Xuse-k2
+-d
+$TEMP_DIR$
+-no-jdk
