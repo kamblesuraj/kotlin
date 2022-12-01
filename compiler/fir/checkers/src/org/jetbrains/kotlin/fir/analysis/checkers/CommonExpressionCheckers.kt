@@ -114,7 +114,8 @@ object CommonExpressionCheckers : ExpressionCheckers() {
 
     override val blockCheckers: Set<FirBlockChecker>
         get() = setOf(
-            FirForLoopChecker
+            FirForLoopChecker,
+            FirConflictsExpressionChecker
         )
 
     override val checkNotNullCallCheckers: Set<FirCheckNotNullCallChecker>
