@@ -1120,10 +1120,8 @@ class ExpressionsConverter(
                 // So, prepare the loop target after building the condition.
                 target = prepareTarget(forLoop)
             }.configure(target) {
-                // NB: just body.toFirBlock() isn't acceptable here because we need to add some statements
                 buildBlock block@{
                     source = blockNode?.toFirSourceElement()
-                    statements += convertLoopBody(blockNode).statements
                     val valueParameter = parameter ?: return@block
                     val multiDeclaration = valueParameter.destructuringDeclaration
                     val firLoopParameter = generateTemporaryVariable(
@@ -1147,10 +1145,11 @@ class ExpressionsConverter(
                             firLoopParameter,
                             tmpVariable = true
                         )
-                        statements.addAll(0, destructuringBlock.statements)
+                        statements.addAll(destructuringBlock.statements)
                     } else {
-                        statements.add(0, firLoopParameter)
+                        statements.add(firLoopParameter)
                     }
+                    statements += convertLoopBody(blockNode)
                 }
             }
         }
