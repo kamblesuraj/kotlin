@@ -41,9 +41,9 @@ fun targetSdk(target: String): String {
 }
 
 val sdkNames = mapOf(
-    KonanTarget.MACOS_X64 to "macosx",
-    KonanTarget.IOS_X64 to "iphonesimulator",
-    KonanTarget.IOS_ARM64 to "iphoneos"
+        KonanTarget.MACOS_X64 to "macosx",
+        KonanTarget.IOS_X64 to "iphonesimulator",
+        KonanTarget.IOS_ARM64 to "iphoneos"
 )
 
 fun developerFrameworks(): Map<KonanTarget, String> =
@@ -52,9 +52,10 @@ fun developerFrameworks(): Map<KonanTarget, String> =
 
 kotlin {
     val nativeTargets = listOf(
-        macosX64(KonanTarget.MACOS_X64.name),
-        iosX64(KonanTarget.IOS_X64.name),
-        iosArm64(KonanTarget.IOS_ARM64.name))
+            macosX64(KonanTarget.MACOS_X64.name),
+            iosX64(KonanTarget.IOS_X64.name),
+            iosArm64(KonanTarget.IOS_ARM64.name)
+    )
     val devFrameworks = developerFrameworks()
 
     nativeTargets.forEach {
@@ -87,11 +88,6 @@ kotlin {
         all {
             languageSettings.apply {
                 optIn("kotlin.RequiresOptIn")
-            }
-        }
-        val nativeMain by creating {
-            dependencies {
-                commonMain
             }
         }
     }
