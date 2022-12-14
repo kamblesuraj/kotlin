@@ -122,18 +122,19 @@ fun Project.configureKotlinCompilationOptions() {
                 freeCompilerArgs += commonCompilerArgs
             }
 
-            val relativePathBaseArg: String? =
-                "-Xklib-relative-path-base=$buildDir,$projectDir,$rootDir".takeIf {
-                    !kotlinBuildProperties.getBoolean("kotlin.build.use.absolute.paths.in.klib")
-                }
+//            val relativePathBaseArg: String? =
+//                "-Xklib-relative-path-base=$buildDir,$projectDir,$rootDir".takeIf {
+//                    !kotlinBuildProperties.getBoolean("kotlin.build.use.absolute.paths.in.klib")
+//                }
 
             // Workaround to avoid remote build cache misses due to absolute paths in relativePathBaseArg
-            doFirst {
-                if (relativePathBaseArg != null) {
-                    @Suppress("DEPRECATION")
-                    kotlinOptions.freeCompilerArgs += relativePathBaseArg
-                }
-            }
+            // Broken go nocode. Makes build fail with "The value for property 'freeCompilerArgs' is final and cannot be changed any further"
+//            doFirst {
+//                if (relativePathBaseArg != null) {
+//                    @Suppress("DEPRECATION")
+//                    kotlinOptions.freeCompilerArgs += relativePathBaseArg
+//                }
+//            }
         }
 
         val jvmCompilerArgs = listOf(
