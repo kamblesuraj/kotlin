@@ -12,11 +12,11 @@ import kotlin.native.internal.test.TopLevelSuite
 
 @ExportObjCClass(name = "Kotlin/Native @Test")
 class TestCaseRunner(
-    invocation: NSInvocation,
-    private val testName: String,
-    private val beforeTest: Collection<() -> Unit>,
-    private val method: () -> Unit = { },
-    private val afterTest: Collection<() -> Unit>
+        invocation: NSInvocation,
+        private val testName: String,
+        private val beforeTest: Collection<() -> Unit>,
+        private val method: () -> Unit = { },
+        private val afterTest: Collection<() -> Unit>
 ) : XCTestCase(invocation) {
     // TODO: ignored TestCases should be skipped
     //  as for now these are defaultTest created by the testCaseWithInvocation
@@ -39,15 +39,15 @@ class TestCaseRunner(
             }
         } catch (throwable: Throwable) {
             val issue = XCTIssue(
-                type = XCTIssueTypeUncaughtException,
-                compactDescription = "${throwable.message} in $testName",
-                detailedDescription = "Caught exception ${throwable.message} in $testName",
-                sourceCodeContext = XCTSourceCodeContext(
-                    callStackAddresses = throwable.getStackTraceAddresses(),
-                    location = XCTSourceCodeLocation() // TODO: provide with file path and line from stacktrace[1]
-                ),
-                associatedError = NSError.errorWithDomain("???", 10, null),
-                attachments = emptyList<XCTAttachment>()
+                    type = XCTIssueTypeUncaughtException,
+                    compactDescription = "${throwable.message} in $testName",
+                    detailedDescription = "Caught exception ${throwable.message} in $testName",
+                    sourceCodeContext = XCTSourceCodeContext(
+                            callStackAddresses = throwable.getStackTraceAddresses(),
+                            location = XCTSourceCodeLocation() // TODO: provide with file path and line from stacktrace[1]
+                    ),
+                    associatedError = NSError.errorWithDomain("???", 10, null),
+                    attachments = emptyList<XCTAttachment>()
             )
             _XCTSkipFailureException
             testRun?.recordIssue(issue)
@@ -108,17 +108,17 @@ class TestCaseRunner(
          */
         override fun testCaseWithInvocation(invocation: NSInvocation?): XCTestCase {
             println(
-                "Got invocation: ${invocation?.description} " +
-                        "@sel(${NSStringFromSelector(invocation?.selector)})"
+                    "Got invocation: ${invocation?.description} " +
+                            "@sel(${NSStringFromSelector(invocation?.selector)})"
             )
             // FIXME: creates default test, but should get one from testInvocations
             val inv = invocation ?: NSInvocation()
             return TestCaseRunner(
-                invocation = inv,
-                testName = "defaultTest",
-                beforeTest = listOf({ println("Default before test was invoked") }),
-                method = { println("Default test was invoked") },
-                afterTest = listOf({ println("Default after test was invoked") }),
+                    invocation = inv,
+                    testName = "defaultTest",
+                    beforeTest = listOf({ println("Default before test was invoked") }),
+                    method = { println("Default test was invoked") },
+                    afterTest = listOf({ println("Default after test was invoked") }),
             )
         }
 
@@ -126,10 +126,10 @@ class TestCaseRunner(
         private fun createRunMethod(selector: SEL) {
             // Note: must be disposed off with imp_removeBlock
             val result = class_addMethod(
-                cls = this.`class`(),
-                name = selector,
-                imp = imp_implementationWithBlock(this::runner),
-                types = "v@:"
+                    cls = this.`class`(),
+                    name = selector,
+                    imp = imp_implementationWithBlock(this::runner),
+                    types = "v@:"
             )
             check(result) {
                 "Was unable to add method with selector $selector"
@@ -138,8 +138,8 @@ class TestCaseRunner(
 
         private fun dispose(selector: SEL) {
             val imp = class_getMethodImplementation(
-                cls = this.`class`(),
-                name = selector
+                    cls = this.`class`(),
+                    name = selector
             )
             imp_removeBlock(imp)
         }
@@ -159,11 +159,11 @@ class TestCaseRunner(
 
         @OptIn(ExperimentalStdlibApi::class)
         private fun createTestMethodsNames(): List<String> = GeneratedSuites.suites
-            .flatMap { testSuite ->
-                testSuite.testCases.values
-                    .filterNot { it.ignored }
-                    .map { "$testSuite.${it.name}" }
-            }
+                .flatMap { testSuite ->
+                    testSuite.testCases.values
+                            .filterNot { it.ignored }
+                            .map { "$testSuite.${it.name}" }
+                }
 
         /**
          * Create Test invocations for each test method to make them resolvable by the XCTest's
@@ -187,58 +187,58 @@ internal typealias SEL = COpaquePointer?
 internal fun createTestSuites(): List<XCTestSuite> {
     val testInvocations = TestCaseRunner.testInvocations()
     return GeneratedSuites.suites
-        .filterNot { it.ignored }
-        .map {
-            val suite = XCTestSuite.testSuiteWithName(it.name)
-            when (it) {
-                is TopLevelSuite -> {
-                    it.testCases.values.map { testCase ->
-                        testInvocations
-                            .filter { nsInvocation ->
-                                NSStringFromSelector(nsInvocation.selector) == "${suite.name}.${testCase.name}"
-                            }
-                            .map { inv ->
-                                TestCaseRunner(
-                                    invocation = inv,
-                                    testName = "${suite.name}.${testCase.name}",
-                                    beforeTest = it.before,
-                                    method = testCase.testFunction,
-                                    afterTest = it.after
-                                )
-                            }.single()
-                    }.forEach { t ->
-                        suite.addTest(t)
+            .filterNot { it.ignored }
+            .map {
+                val suite = XCTestSuite.testSuiteWithName(it.name)
+                when (it) {
+                    is TopLevelSuite -> {
+                        it.testCases.values.map { testCase ->
+                            testInvocations
+                                    .filter { nsInvocation ->
+                                        NSStringFromSelector(nsInvocation.selector) == "${suite.name}.${testCase.name}"
+                                    }
+                                    .map { inv ->
+                                        TestCaseRunner(
+                                                invocation = inv,
+                                                testName = "${suite.name}.${testCase.name}",
+                                                beforeTest = it.before,
+                                                method = testCase.testFunction,
+                                                afterTest = it.after
+                                        )
+                                    }.single()
+                        }.forEach { t ->
+                            suite.addTest(t)
+                        }
                     }
-                }
 
-                is BaseClassSuite<*, *> -> {
-                    // Something wrong is going on here with type parameters
-                    //  ¯\_(ツ)_/¯
-                    @Suppress("UNCHECKED_CAST")
-                    val testSuite = it as BaseClassSuite<Any, Any>
-                    val testInstance = testSuite.createInstance()
+                    is BaseClassSuite<*, *> -> {
+                        // Something wrong is going on here with type parameters
+                        //  ¯\_(ツ)_/¯
+                        @Suppress("UNCHECKED_CAST")
+                        val testSuite = it as BaseClassSuite<Any, Any>
+                        val testInstance = testSuite.createInstance()
 
-                    it.testCases.values.map { testCase ->
-                        testInvocations
-                            .filter { inv ->
-                                NSStringFromSelector(inv.selector) == "${suite.name}.${testCase.name}"
-                            }
-                            .map { inv ->
-                                TestCaseRunner(
-                                    invocation = inv,
-                                    testName = "${suite.name}.${testCase.name}",
-                                    beforeTest = testSuite.before.map { b -> { b.invoke(testInstance) } },
-                                    method = { testCase.testFunction.invoke(testInstance) },
-                                    afterTest = testSuite.after.map { a -> { a.invoke(testInstance) } }
-                                )
-                            }.single() // there is only one run method
-                    }.forEach { t ->
-                        suite.addTest(t)
+                        it.testCases.values.map { testCase ->
+                            testInvocations
+                                    .filter { inv ->
+                                        NSStringFromSelector(inv.selector) == "${suite.name}.${testCase.name}"
+                                    }
+                                    .map { inv ->
+                                        TestCaseRunner(
+                                                invocation = inv,
+                                                testName = "${suite.name}.${testCase.name}",
+                                                beforeTest = testSuite.before.map { b -> { b.invoke(testInstance) } },
+                                                method = { testCase.testFunction.invoke(testInstance) },
+                                                afterTest = testSuite.after.map { a -> { a.invoke(testInstance) } }
+                                        )
+                                    }.single() // there is only one run method
+                        }.forEach { t ->
+                            suite.addTest(t)
+                        }
                     }
-                }
 
-                else -> error("This is unknown type of test suite ${it.name} of ${it::class.simpleName}")
+                    else -> error("This is unknown type of test suite ${it.name} of ${it::class.simpleName}")
+                }
+                suite
             }
-            suite
-        }
 }

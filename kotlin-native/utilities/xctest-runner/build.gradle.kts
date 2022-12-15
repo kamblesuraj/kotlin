@@ -126,27 +126,25 @@ listOf(KonanTarget.MACOS_X64, KonanTarget.IOS_X64, KonanTarget.IOS_ARM64).forEac
         doFirst {
             project.exec {
                 executable = "clang"
-                args(
-                        // TODO: I just did that by throwing options in til it started working
-                        listOf(
-                                "-isysroot", sdkFrameworks,
-                                "--target=$targetTriple",
-                                "-lobjc", "-fobjc-arc", "-fPIC",
-                                "-iframework", sdkFrameworks.resolve("System/Library/Frameworks").toString(),
-                                "-iframework", developerFrameworks,
-                                "-iframework", framework.parent,
-                                "-framework", "xctest_runner",
-                                "-framework", "XCTest",
-                                "-Xlinker", "-rpath", developerFrameworks,
-                                "-Xlinker", "-rpath", framework.parent,
-                                "-Xlinker", "-syslibroot", sysroot,
-                                "-Xlinker", "-v",
-                                "-L${framework.absoluteFile.parent}",
-                                "-L${developerFrameworks}",
-                                "-v",
-                                launcher.absolutePath,
-                                "-bundle", "-o", "build/testBundle-${it.name}"
-                        )
+                args(listOf(
+                        "-isysroot", sdkFrameworks,
+                        "--target=$targetTriple",
+                        "-lobjc", "-fobjc-arc", "-fPIC",
+                        "-iframework", sdkFrameworks.resolve("System/Library/Frameworks").toString(),
+                        "-iframework", developerFrameworks,
+                        "-iframework", framework.parent,
+                        "-framework", "xctest_runner",
+                        "-framework", "XCTest",
+                        "-Xlinker", "-rpath", developerFrameworks,
+                        "-Xlinker", "-rpath", framework.parent,
+                        "-Xlinker", "-syslibroot", sysroot,
+                        "-Xlinker", "-v",
+                        "-L${framework.absoluteFile.parent}",
+                        "-L${developerFrameworks}",
+                        "-v",
+                        launcher.absolutePath,
+                        "-bundle", "-o", "build/testBundle-${it.name}"
+                )
                 )
             }
         }
