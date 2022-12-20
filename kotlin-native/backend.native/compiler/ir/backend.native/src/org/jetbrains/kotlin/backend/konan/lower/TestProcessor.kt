@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.backend.common.ir.*
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.backend.common.reportWarning
 import org.jetbrains.kotlin.backend.konan.Context
+import org.jetbrains.kotlin.backend.konan.KonanConfigKeys
 import org.jetbrains.kotlin.backend.konan.descriptors.isAbstract
 import org.jetbrains.kotlin.backend.konan.descriptors.synthesizedName
 import org.jetbrains.kotlin.backend.konan.getIncludedLibraryDescriptors
@@ -63,6 +64,8 @@ internal class TestProcessor (val context: Context) {
     private val baseClassSuite = symbols.baseClassSuite.owner
 
     private val topLevelSuiteNames = mutableSetOf<String>()
+
+    private val xcTestRunner = context.config.configuration.getNotNull(KonanConfigKeys.XCTEST_RUNNER)
 
     // region Useful extensions.
     private var testSuiteCnt = 0
