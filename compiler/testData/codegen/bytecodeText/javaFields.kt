@@ -19,11 +19,11 @@ fun test1(j: Kotlin2) = j.f
 
 // JVM_IR_TEMPLATES
 // @Kotlin2.class:
-// 2 GETFIELD Java2.f : I
+// 0 GETFIELD Java2.f : I
 
 // JVM_IR_TEMPLATES
 // @TestKt.class:
-// 2 GETFIELD Java2.f : I
+// 2 GETFIELD Java1.f : I
 
 // JVM_TEMPLATES
 // @Kotlin2.class:

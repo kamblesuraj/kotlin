@@ -19,7 +19,6 @@ import org.jetbrains.kotlin.fir.references.*
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
 import org.jetbrains.kotlin.fir.render
 import org.jetbrains.kotlin.fir.resolve.calls.FirSyntheticFunctionSymbol
-import org.jetbrains.kotlin.fir.resolve.dfa.unwrapSmartcastExpression
 import org.jetbrains.kotlin.fir.resolve.fullyExpandedType
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutorByMap
@@ -232,9 +231,6 @@ class CallAndReferenceGenerator(
     // However, FE 1.0 does it, and currently we have no better way to provide these receivers.
     // See KT-49507 and KT-48954 as good examples for cases we try to handle here
     private fun FirExpression.superQualifierSymbolForField(fieldSymbol: IrFieldSymbol): IrClassSymbol? {
-        val unwrapped = this.unwrapSmartcastExpression()
-        if (unwrapped !is FirQualifiedAccess) return null
-        if (unwrapped.calleeReference is FirSuperReference) return superQualifierSymbol()
         if (fieldSymbol.owner.correspondingPropertySymbol != null) return null
         val originalContainingClass = fieldSymbol.owner.parentClassOrNull ?: return null
         val ownContainingClass = typeRef.toIrType().classifierOrNull?.owner as? IrClass ?: return null
@@ -244,15 +240,28 @@ class CallAndReferenceGenerator(
         return getJavaFieldContainingClassSymbol(ownContainingClass, originalContainingClass)
     }
 
+    // Note: ownContainingClass here is the use-site receiver class,
+    // and originalContainingClass is the class which contains Java field we are trying to access
+    // ! Interfaces are out of our interests here !
+    // This function returns a class symbol which:
+    // - is the most derived Java class in hierarchy which has no Kotlin base classes (including transitive ones)
+    // E.g. K2 <: J3 <: K1 <: J2 <: J1 ==> J2 is chosen
     private fun getJavaFieldContainingClassSymbol(ownContainingClass: IrClass, originalContainingClass: IrClass): IrClassSymbol {
         var superQualifierClass = ownContainingClass
-        while (!superQualifierClass.isFromJava() && superQualifierClass !== originalContainingClass) {
+        var superQualifierClassFromJava: IrClass? = ownContainingClass.takeIf { it.isFromJava() }
+        while (superQualifierClass !== originalContainingClass) {
             superQualifierClass = superQualifierClass.superTypes.find {
                 val kind = it.getClass()?.kind
                 kind == ClassKind.CLASS || kind == ClassKind.ENUM_CLASS
             }?.getClass() ?: break
+            val isFromJava = superQualifierClass.isFromJava()
+            if (superQualifierClassFromJava == null) {
+                superQualifierClassFromJava = superQualifierClass.takeIf { isFromJava }
+            } else if (!isFromJava) {
+                superQualifierClassFromJava = null
+            }
         }
-        return superQualifierClass.symbol
+        return superQualifierClassFromJava?.symbol ?: originalContainingClass.symbol
     }
 
     private fun FirExpression.superQualifierSymbol(): IrClassSymbol? {
@@ -1056,6 +1065,8 @@ class CallAndReferenceGenerator(
                     if (baseDispatchReceiver != null) {
                         val dispatchReceiverCastType =
                             when {
+                                // TODO: delete this branch together with KT-55116 implementation
+                                // (we already have similar f/o structure)
                                 ownerFunction.isMethodOfAny() && baseDispatchReceiver.type.classOrNull?.owner?.isInterface == true -> {
                                     // NB: for FE 1.0, this type cast is added by InterfaceObjectCallsLowering
                                     // However, it doesn't work for FIR due to different f/o structure
