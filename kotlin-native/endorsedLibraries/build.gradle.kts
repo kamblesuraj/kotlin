@@ -12,7 +12,10 @@ plugins {
     base
 }
 
-val endorsedLibraries = listOf(EndorsedLibraryInfo(project("kotlinx.cli"), "org.jetbrains.kotlinx.kotlinx-cli"))
+val endorsedLibraries = listOf(
+        EndorsedLibraryInfo(project("kotlinx.cli"), "org.jetbrains.kotlinx.kotlinx-cli"),
+        EndorsedLibraryInfo(project("xctest"), "org.jetbrains.kotlin.native.xctest")
+)
 
 extra["endorsedLibraries"] = endorsedLibraries.associateBy { it.project }
 

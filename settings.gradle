@@ -831,6 +831,7 @@ project(':kotlin-scripting-ide-common').projectDir = "$rootDir/plugins/scripting
 if (buildProperties.isKotlinNativeEnabled) {
     include ':kotlin-native:dependencies'
     include ':kotlin-native:endorsedLibraries:kotlinx.cli'
+    include ':kotlin-native:endorsedLibraries:xctest'
     include ':kotlin-native:endorsedLibraries'
     include ':kotlin-native:Interop:StubGenerator'
     include ':kotlin-native:backend.native'
