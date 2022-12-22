@@ -257,6 +257,7 @@ import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.INAPPLICABLE_TARG
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.INAPPLICABLE_TARGET_PROPERTY_HAS_NO_BACKING_FIELD
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.INAPPLICABLE_TARGET_PROPERTY_HAS_NO_DELEGATE
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.INAPPLICABLE_TARGET_PROPERTY_IMMUTABLE
+import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.INAPPLICABLE_TYPED_EQUALS_ANNOTATION
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.INCOMPATIBLE_ENUM_COMPARISON_ERROR
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.INCOMPATIBLE_MODIFIERS
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.INCOMPATIBLE_TYPES
@@ -516,7 +517,6 @@ import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.TYPEALIAS_SHOULD_
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.TYPECHECKER_HAS_RUN_INTO_RECURSIVE_PROBLEM
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.TYPE_ARGUMENTS_NOT_ALLOWED
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.TYPE_ARGUMENTS_REDUNDANT_IN_SUPER_QUALIFIER
-import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.TYPE_ARGUMENT_ON_TYPED_VALUE_CLASS_EQUALS
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.TYPE_CANT_BE_USED_FOR_CONST_VAL
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.TYPE_INFERENCE_ONLY_INPUT_TYPES_ERROR
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.TYPE_MISMATCH
@@ -1320,7 +1320,6 @@ object FirErrorsDefaultMessages : BaseDiagnosticRendererFactory() {
             "Secondary constructors with bodies are reserved for for future releases"
         )
         map.put(RESERVED_MEMBER_INSIDE_VALUE_CLASS, "Member with the name ''{0}'' is reserved for future releases", TO_STRING)
-        map.put(TYPE_ARGUMENT_ON_TYPED_VALUE_CLASS_EQUALS, "Type arguments for typed value class equals must be only star projections")
         map.put(INNER_CLASS_INSIDE_VALUE_CLASS, "Value class cannot have inner classes")
         map.put(VALUE_CLASS_CANNOT_BE_CLONEABLE, "Value class cannot be Cloneable")
         map.put(
@@ -2079,6 +2078,8 @@ object FirErrorsDefaultMessages : BaseDiagnosticRendererFactory() {
             INEFFICIENT_EQUALS_OVERRIDING_IN_VALUE_CLASS,
             "Overriding ''equals'' from ''Any'' in value class without typed equals leads to boxing on every equality comparison"
         )
+
+        map.put(INAPPLICABLE_TYPED_EQUALS_ANNOTATION, "@TypedEquals annotation is inapplicable: {0}", TO_STRING)
 
         //imports
         map.put(

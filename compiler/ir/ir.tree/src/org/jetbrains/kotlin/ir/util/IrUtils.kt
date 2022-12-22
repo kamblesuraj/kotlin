@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
+import org.jetbrains.kotlin.name.StandardClassIds.Annotations.TypedEquals
 import org.jetbrains.kotlin.util.OperatorNameConventions
 import org.jetbrains.kotlin.utils.DFS
 import org.jetbrains.kotlin.utils.addIfNotNull
@@ -1364,17 +1365,8 @@ fun IrFunction.isEquals() =
             extensionReceiverParameter == null && contextReceiverParametersCount == 0 &&
             valueParameters.singleOrNull()?.type?.isNullableAny() == true
 
-val IrFunction.isValueClassTypedEquals: Boolean
-    get() {
-        val parentClass = parent as? IrClass ?: return false
-        val enclosingClassStartProjection = parentClass.symbol.starProjectedType
-        return name == OperatorNameConventions.EQUALS
-                && (returnType.isBoolean() || returnType.isNothing())
-                && valueParameters.size == 1
-                && (valueParameters[0].type == enclosingClassStartProjection)
-                && contextReceiverParametersCount == 0 && extensionReceiverParameter == null
-                && (parentClass.isValue)
-    }
+val IrFunction.isTypedEquals: Boolean
+    get() = hasAnnotation(TypedEquals.asSingleFqName())
 
 // This code is partially duplicated in jvm FunctionReferenceLowering::adapteeCall
 // The difference is jvm version doesn't support ReturnableBlock, but returns call node instead of called function.
