@@ -9,25 +9,19 @@ import platform.objc.*
 import kotlin.native.internal.test.BaseClassSuite
 import kotlin.native.internal.test.GeneratedSuites
 import kotlin.native.internal.test.TopLevelSuite
+import kotlin.native.internal.test.TestCase
 
 @ExportObjCClass(name = "Kotlin/Native @Test")
 class TestCaseRunner(
         invocation: NSInvocation,
         private val testName: String,
-        private val beforeTest: Collection<() -> Unit>,
-        private val method: () -> Unit = { },
-        private val afterTest: Collection<() -> Unit>
+        private val testCase: TestCase
 ) : XCTestCase(invocation) {
-    // TODO: ignored TestCases should be skipped
-    //  as for now these are defaultTest created by the testCaseWithInvocation
     private val shouldSkip: Boolean
-        get() {
-            return testName == "defaultTest"
-        }
+        get() = testCase.ignored
 
     /**
-     * Sets XCTest to continue running.
-     * TODO: should be controlled by the option
+     * Sets XCTest to continue running after failure
      */
     override fun continueAfterFailure(): Boolean = true
 
@@ -39,7 +33,7 @@ class TestCaseRunner(
                 //  or maybe a wrapper as we need file name and line
                 _XCTSkipHandler("FILE", 0, "Test is ignored")
             } else {
-                method()
+                testCase.run()
             }
         } catch (throwable: Throwable) {
             val issue = XCTIssue(
@@ -53,23 +47,18 @@ class TestCaseRunner(
                     associatedError = NSError.errorWithDomain("???", 10, null),
                     attachments = emptyList<XCTAttachment>()
             )
-            _XCTSkipFailureException
-            testRun?.recordIssue(issue)
-            // TODO: Should we also do something here?
-            //
-            //  XCTFail() is not available, see https://youtrack.jetbrains.com/issue/KT-43719
-            // _XCTSkipHandler("FILE", 100, "Failure recorded")
-            // throw throwable
+//            _XCTSkipFailureException  ???
+            testRun?.recordIssue(issue) ?: error("No TestRun for the test found")
         }
     }
 
     override fun setUp() {
         super.setUp()
-        beforeTest.forEach { it() }
+        if (!shouldSkip) testCase.doBefore()
     }
 
     override fun tearDown() {
-        afterTest.forEach { it() }
+        if (!shouldSkip) testCase.doAfter()
         super.tearDown()
     }
 
@@ -180,8 +169,6 @@ internal typealias SEL = COpaquePointer?
 
 fun defaultTestSuiteRunner(): XCTestSuite {
     XCTestObservationCenter.sharedTestObservationCenter.addTestObserver(XCSimpleTestListener())
-    val bundlePath = NSBundle.mainBundle.bundlePath
-    println(":::: Bundle path = $bundlePath")
     val nativeTestSuite = XCTestSuite.testSuiteWithName("Kotlin/Native test suite")
 
     println(":::: Create test suites ::::")
@@ -200,57 +187,22 @@ fun defaultTestSuiteRunner(): XCTestSuite {
 internal fun createTestSuites(): List<XCTestSuite> {
     val testInvocations = TestCaseRunner.testInvocations()
     return GeneratedSuites.suites
-            .filterNot { it.ignored }
             .map {
                 val suite = XCTestSuite.testSuiteWithName(it.name)
-                when (it) {
-                    is TopLevelSuite -> {
-                        it.testCases.values.map { testCase ->
-                            testInvocations
-                                    .filter { nsInvocation ->
-                                        NSStringFromSelector(nsInvocation.selector) == "${suite.name}.${testCase.name}"
-                                    }
-                                    .map { inv ->
-                                        TestCaseRunner(
-                                                invocation = inv,
-                                                testName = "${suite.name}.${testCase.name}",
-                                                beforeTest = it.before,
-                                                method = testCase.testFunction,
-                                                afterTest = it.after
-                                        )
-                                    }.single()
-                        }.forEach { t ->
-                            suite.addTest(t)
-                        }
-                    }
-
-                    is BaseClassSuite<*, *> -> {
-                        // Something wrong is going on here with type parameters
-                        //  ¯\_(ツ)_/¯
-                        @Suppress("UNCHECKED_CAST")
-                        val testSuite = it as BaseClassSuite<Any, Any>
-                        val testInstance = testSuite.createInstance()
-
-                        it.testCases.values.map { testCase ->
-                            testInvocations
-                                    .filter { inv ->
-                                        NSStringFromSelector(inv.selector) == "${suite.name}.${testCase.name}"
-                                    }
-                                    .map { inv ->
-                                        TestCaseRunner(
-                                                invocation = inv,
-                                                testName = "${suite.name}.${testCase.name}",
-                                                beforeTest = testSuite.before.map { b -> { b.invoke(testInstance) } },
-                                                method = { testCase.testFunction.invoke(testInstance) },
-                                                afterTest = testSuite.after.map { a -> { a.invoke(testInstance) } }
-                                        )
-                                    }.single() // there is only one run method
-                        }.forEach { t ->
-                            suite.addTest(t)
-                        }
-                    }
-
-                    else -> error("This is unknown type of test suite ${it.name} of ${it::class.simpleName}")
+                it.testCases.values.map { testCase ->
+                    testInvocations
+                            .filter { nsInvocation ->
+                                NSStringFromSelector(nsInvocation.selector) == "${it.name}.${testCase.name}"
+                            }
+                            .map { inv ->
+                                TestCaseRunner(
+                                        invocation = inv,
+                                        testName = "${it.name}.${testCase.name}",
+                                        testCase = testCase
+                                )
+                            }.single()
+                }.forEach { t ->
+                    suite.addTest(t)
                 }
                 suite
             }

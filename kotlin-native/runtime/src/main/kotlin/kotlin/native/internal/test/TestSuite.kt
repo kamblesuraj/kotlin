@@ -14,7 +14,11 @@ public interface TestCase {
     val ignored: Boolean
     val suite: TestSuite
 
+    fun doBefore()
+
     fun run()
+
+    fun doAfter()
 }
 
 internal val TestCase.prettyName get() = "${suite.name}.$name"
@@ -78,13 +82,22 @@ public abstract class BaseClassSuite<INSTANCE, COMPANION>(name: String, ignored:
                                         ignored: Boolean)
         : BasicTestCase<INSTANCE.() -> Unit>(name, suite, testFunction, ignored) {
 
+        internal var instance: INSTANCE by lazy { suite.createInstance() }
+
+        override fun doBefore() {
+            suite.before.forEach { instance.it() }
+        }
+
+        override fun doAfter() {
+            suite.after.forEach { instance.it() }
+        }
+
         override fun run() {
-            val instance = suite.createInstance()
             try {
-                suite.before.forEach { instance.it() }
+                doBefore()
                 instance.testFunction()
             } finally {
-                suite.after.forEach { instance.it() }
+                doAfter()
             }
         }
     }
@@ -138,13 +151,20 @@ public class TopLevelSuite(name: String): AbstractTestSuite<TopLevelFun>(name, f
 
     class TestCase(name: String, override val suite: TopLevelSuite, testFunction: TopLevelFun, ignored: Boolean)
         : BasicTestCase<TopLevelFun>(name, suite, testFunction, ignored) {
+        override fun doBefore() {
+            suite.before.forEach { it() }
+        }
+
+        override fun doAfter() {
+            suite.after.forEach { it() }
+        }
 
         override fun run() {
             try {
-                suite.before.forEach { it() }
+                doBefore()
                 testFunction()
             } finally {
-                suite.after.forEach { it() }
+                doAfter()
             }
         }
     }

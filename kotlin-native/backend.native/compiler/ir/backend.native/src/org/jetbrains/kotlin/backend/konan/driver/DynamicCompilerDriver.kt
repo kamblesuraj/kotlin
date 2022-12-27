@@ -32,6 +32,7 @@ internal class DynamicCompilerDriver : CompilerDriver() {
                         CompilerOutputKind.DYNAMIC_CACHE -> produceBinary(engine, config, environment)
                         CompilerOutputKind.STATIC_CACHE -> produceBinary(engine, config, environment)
                         CompilerOutputKind.PRELIMINARY_CACHE -> TODO()
+                        CompilerOutputKind.TEST_BUNDLE -> TODO() // produceBinary()
                     }
                 }
             }

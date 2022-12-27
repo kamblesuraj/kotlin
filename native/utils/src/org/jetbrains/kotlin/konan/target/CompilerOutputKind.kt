@@ -37,6 +37,9 @@ enum class CompilerOutputKind {
     },
     PRELIMINARY_CACHE {
         override fun suffix(target: KonanTarget?) = ""
+    },
+    TEST_BUNDLE {
+        override fun suffix(target: KonanTarget?): String = ""
     };
 
     abstract fun suffix(target: KonanTarget? = null): String
