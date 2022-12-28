@@ -85,7 +85,7 @@ interface IrDeclarationOrigin {
 
     object SHARED_VARIABLE_IN_EVALUATOR_FRAGMENT : IrDeclarationOriginImpl("SHARED_VARIABLE_IN_EVALUATOR_FRAGMENT", isSynthetic = true)
 
-    class GeneratedByPlugin(val pluginKey: GeneratedDeclarationKey) : IrDeclarationOriginImpl(pluginKey.toString()) {
+    class GeneratedByPlugin(val pluginKey: GeneratedDeclarationKey) : IrDeclarationOrigin {
         override fun toString(): String {
             return "GENERATED[${pluginKey}]"
         }
