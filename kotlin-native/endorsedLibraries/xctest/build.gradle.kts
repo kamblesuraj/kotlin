@@ -29,9 +29,14 @@ konanArtifacts {
                 "-module-name", moduleName,
         )
         srcDir(nativeSrc)
-//        appleTargets.forEach { dependsOn(":kotlin-native:${it}PlatformLibs") }
+        // Cyclic dependency
+//        appleTargets.forEach {
+//            project.findKonanBuildTask(library.name, it)
+//                    .configure { dependsOn(":kotlin-native:${it}PlatformLibs") }
+//        }
     }
 }
+
 
 val targetList: List<String> by project
 val hostName: String by project

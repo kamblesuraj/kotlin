@@ -6,9 +6,7 @@ import platform.Foundation.*
 import platform.XCTest.*
 import platform.objc.*
 
-import kotlin.native.internal.test.BaseClassSuite
 import kotlin.native.internal.test.GeneratedSuites
-import kotlin.native.internal.test.TopLevelSuite
 import kotlin.native.internal.test.TestCase
 
 @ExportObjCClass(name = "Kotlin/Native @Test")
@@ -31,23 +29,27 @@ class TestCaseRunner(
             if (shouldSkip) {
                 // TODO: XCTFail should be used instead, but https://youtrack.jetbrains.com/issue/KT-43719
                 //  or maybe a wrapper as we need file name and line
-                _XCTSkipHandler("FILE", 0, "Test is ignored")
+                _XCTSkipHandler(testName, 0, "Test $testName is ignored")
             } else {
-                testCase.run()
+                testCase.doRun()
             }
         } catch (throwable: Throwable) {
+            val type = when (throwable) {
+                is AssertionError -> XCTIssueTypeAssertionFailure
+                else -> XCTIssueTypeUncaughtException
+            }
+
             val issue = XCTIssue(
-                    type = XCTIssueTypeUncaughtException,
+                    type = type,
                     compactDescription = "${throwable.message} in $testName",
                     detailedDescription = "Caught exception ${throwable.message} in $testName",
                     sourceCodeContext = XCTSourceCodeContext(
                             callStackAddresses = throwable.getStackTraceAddresses(),
                             location = XCTSourceCodeLocation() // TODO: provide with file path and line from stacktrace[1]
                     ),
-                    associatedError = NSError.errorWithDomain("???", 10, null),
+                    associatedError = null,
                     attachments = emptyList<XCTAttachment>()
             )
-//            _XCTSkipFailureException  ???
             testRun?.recordIssue(issue) ?: error("No TestRun for the test found")
         }
     }
@@ -84,11 +86,10 @@ class TestCaseRunner(
         // TODO: setUp() and tearDown() methods are required for tests with @Before/AfterClass annotations
         //  testSuites should be generated one-to-one with each suite run by the own TestCaseRunner
         override fun setUp() {
-//            MyTest.beforeClass()
+
         }
 
         override fun tearDown() {
-//            MyTest.afterClass()
             disposeRunMethods()
         }
         //endregion
@@ -113,7 +114,7 @@ class TestCaseRunner(
                     cls = this.`class`(),
                     name = selector,
                     imp = imp_implementationWithBlock(this::runner),
-                    types = "v@:"
+                    types = "v@:" // replace with method_getTypeEncoding()
             )
             check(result) {
                 "Was unable to add method with selector $selector"
@@ -145,7 +146,6 @@ class TestCaseRunner(
         private fun createTestMethodsNames(): List<String> = GeneratedSuites.suites
                 .flatMap { testSuite ->
                     testSuite.testCases.values
-                            .filterNot { it.ignored }
                             .map { "$testSuite.${it.name}" }
                 }
 
@@ -170,6 +170,10 @@ internal typealias SEL = COpaquePointer?
 fun defaultTestSuiteRunner(): XCTestSuite {
     XCTestObservationCenter.sharedTestObservationCenter.addTestObserver(XCSimpleTestListener())
     val nativeTestSuite = XCTestSuite.testSuiteWithName("Kotlin/Native test suite")
+
+    NSBundle.allBundles.forEach {
+        println("Bundle: $it with principal = ${(it as? NSBundle)?.principalClass()}")
+    }
 
     println(":::: Create test suites ::::")
     createTestSuites().forEach {

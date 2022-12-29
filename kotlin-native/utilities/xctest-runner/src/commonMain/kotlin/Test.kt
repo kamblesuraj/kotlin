@@ -33,6 +33,12 @@ fun testTopTwo() {
     println("Top level TWO")
 }
 
+@Test
+@Ignore
+fun testTopIgnored() {
+    println("Top level IGNORED")
+}
+
 class MyTest {
     companion object {
         @BeforeClass
@@ -43,6 +49,17 @@ class MyTest {
         @AfterClass
         fun afterClass() {
             println("After @AfterClass")
+        }
+
+        @Test
+        fun companionTest() {
+            println("Companion test")
+        }
+
+        @Test
+        @Ignore
+        fun companionIgnoreTest() {
+            println("Companion ignored test")
         }
     }
 
@@ -68,6 +85,12 @@ class MyTest {
         println("Failed started")
         assertTrue(false, "Kotlin assertion failed")
         println("Failed ended")
+    }
+
+    @Test
+    @Ignore
+    fun testIgnored() {
+        println("Ignored test")
     }
 
     @AfterTest

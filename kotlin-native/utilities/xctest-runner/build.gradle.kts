@@ -60,15 +60,15 @@ kotlin {
 
     nativeTargets.forEach {
         it.compilations.all {
-            cinterops {
-                @Suppress("UNUSED_VARIABLE")
-                val xctest by creating {
-                    devFrameworks[konanTarget]?.let { path ->
-                        compilerOpts("-iframework", path)
-                    }
-                    extraOpts = listOf("-Xshort-module-name", "XCTest")
-                }
-            }
+//            cinterops {
+//                @Suppress("UNUSED_VARIABLE")
+//                val xctest by creating {
+//                    devFrameworks[konanTarget]?.let { path ->
+//                        compilerOpts("-iframework", path)
+//                    }
+//                    extraOpts = listOf("-Xshort-module-name", "XCTest")
+//                }
+//            }
         }
         it.binaries {
             // TODO: XCTest.framework should be copied to @rpath/Frameworks instead of adding rpath
@@ -144,8 +144,7 @@ listOf(KonanTarget.MACOS_X64, KonanTarget.IOS_X64, KonanTarget.IOS_ARM64).forEac
                         "-v",
                         launcher.absolutePath,
                         "-bundle", "-o", "build/testBundle-${it.name}"
-                )
-                )
+                ))
             }
         }
     }

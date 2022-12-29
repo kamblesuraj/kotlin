@@ -16,6 +16,8 @@ public interface TestCase {
 
     fun doBefore()
 
+    fun doRun()
+
     fun run()
 
     fun doAfter()
@@ -82,7 +84,7 @@ public abstract class BaseClassSuite<INSTANCE, COMPANION>(name: String, ignored:
                                         ignored: Boolean)
         : BasicTestCase<INSTANCE.() -> Unit>(name, suite, testFunction, ignored) {
 
-        internal var instance: INSTANCE by lazy { suite.createInstance() }
+        internal val instance: INSTANCE by lazy { suite.createInstance() }
 
         override fun doBefore() {
             suite.before.forEach { instance.it() }
@@ -92,10 +94,14 @@ public abstract class BaseClassSuite<INSTANCE, COMPANION>(name: String, ignored:
             suite.after.forEach { instance.it() }
         }
 
+        override fun doRun() {
+            instance.testFunction()
+        }
+
         override fun run() {
             try {
                 doBefore()
-                instance.testFunction()
+                doRun()
             } finally {
                 doAfter()
             }
@@ -159,10 +165,14 @@ public class TopLevelSuite(name: String): AbstractTestSuite<TopLevelFun>(name, f
             suite.after.forEach { it() }
         }
 
+        override fun doRun() {
+            testFunction()
+        }
+
         override fun run() {
             try {
                 doBefore()
-                testFunction()
+                doRun()
             } finally {
                 doAfter()
             }

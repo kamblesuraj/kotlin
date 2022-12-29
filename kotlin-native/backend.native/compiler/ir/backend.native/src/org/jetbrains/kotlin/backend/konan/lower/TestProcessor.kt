@@ -696,7 +696,7 @@ internal class TestProcessor(val context: Context) {
         irFile.acceptChildrenVoid(annotationCollector)
         createTestSuites(irFile, annotationCollector)
         recordTestFunctions(annotationCollector)
-        if (xcTestRunner) generateEntryPoint()
+//        if (xcTestRunner) generateEntryPoint()
     }
 
 //    private object DECLARATION_ORIGIN_SUITE : IrDeclarationOriginImpl("CREATE_TEST_SUITE")

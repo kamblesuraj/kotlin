@@ -47,7 +47,6 @@ class TestCaseRunner(
                     associatedError = NSError.errorWithDomain("???", 10, null),
                     attachments = emptyList<XCTAttachment>()
             )
-//            _XCTSkipFailureException  ???
             testRun?.recordIssue(issue) ?: error("No TestRun for the test found")
         }
     }
