@@ -26,6 +26,12 @@ public class SerializationIrJsBoxTestGenerated extends AbstractSerializationIrJs
     }
 
     @Test
+    @TestMetadata("constValInSerialName.kt")
+    public void testConstValInSerialName() throws Exception {
+        runTest("plugins/kotlinx-serialization/testData/boxIr/constValInSerialName.kt");
+    }
+
+    @Test
     @TestMetadata("excludedFromExport.kt")
     public void testExcludedFromExport() throws Exception {
         runTest("plugins/kotlinx-serialization/testData/boxIr/excludedFromExport.kt");
