@@ -187,11 +187,12 @@ bitcode {
         module("xctest") {
             // Needs header XCTest.h from the framework
             compilerArgs.set(listOfNotNull(
-                    "-iframework",
-                    developerFrameworks[target]?.let { it() }
+                    "-iframework", developerFrameworks[target]?.let { it() }
             ))
             headersDirs.from(files("src/main/cpp"))
-
+            sourceSets {
+                main {}
+            }
             onlyIf { target.family.isAppleFamily }
         }
 
