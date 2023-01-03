@@ -6,10 +6,13 @@
 package org.jetbrains.kotlin.backend.konan.driver.phases
 
 import org.jetbrains.kotlin.backend.common.lower
+import org.jetbrains.kotlin.backend.konan.OutputFiles
 import org.jetbrains.kotlin.backend.konan.driver.PhaseContext
 import org.jetbrains.kotlin.backend.konan.driver.PhaseEngine
 import org.jetbrains.kotlin.backend.konan.lower.ExpectToActualDefaultValueCopier
 import org.jetbrains.kotlin.backend.konan.lower.SpecialBackendChecksTraversal
+import org.jetbrains.kotlin.backend.konan.objcexport.createObjCFramework
+import org.jetbrains.kotlin.backend.konan.objcexport.createTestBundle
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
 internal val SpecialBackendChecksPhase = createSimpleNamedCompilerPhase<PsiToIrContext, PsiToIrOutput>(
@@ -29,4 +32,13 @@ internal val CopyDefaultValuesToActualPhase = createSimpleNamedCompilerPhase<Pha
 
 internal fun <T : PsiToIrContext> PhaseEngine<T>.runSpecialBackendChecks(psiToIrOutput: PsiToIrOutput) {
     runPhase(SpecialBackendChecksPhase, psiToIrOutput)
+}
+
+internal val CreateTestBundlePhase = createSimpleNamedCompilerPhase<PhaseContext, FrontendPhaseOutput.Full>(
+        "CreateTestBundlePhase",
+        "Create XCTest bundle"
+) { context, input ->
+    val config = context.config
+    val output = OutputFiles(config.outputPath, config.target, config.produce).mainFile
+    createTestBundle(config, input.moduleDescriptor, output)
 }

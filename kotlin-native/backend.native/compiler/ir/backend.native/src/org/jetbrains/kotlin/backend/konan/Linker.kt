@@ -19,6 +19,7 @@ internal fun determineLinkerOutput(context: PhaseContext): LinkerOutputKind =
                 val staticFramework = context.config.produceStaticFramework
                 if (staticFramework) LinkerOutputKind.STATIC_LIBRARY else LinkerOutputKind.DYNAMIC_LIBRARY
             }
+            CompilerOutputKind.TEST_BUNDLE,
             CompilerOutputKind.DYNAMIC_CACHE,
             CompilerOutputKind.DYNAMIC -> LinkerOutputKind.DYNAMIC_LIBRARY
             CompilerOutputKind.STATIC_CACHE,
@@ -125,31 +126,44 @@ internal class Linker(val generationState: NativeGenerationState) {
         val additionalLinkerArgs: List<String>
         val executable: String
 
-        if (config.produce != CompilerOutputKind.FRAMEWORK) {
-            additionalLinkerArgs = if (target.family.isAppleFamily) {
-                when (config.produce) {
-                    CompilerOutputKind.DYNAMIC_CACHE ->
-                        listOf("-install_name", outputFiles.dynamicCacheInstallName)
-                    else -> listOf("-dead_strip")
+        when (config.produce) {
+            CompilerOutputKind.TEST_BUNDLE -> {
+                val bundle = File(generationState.outputFile)
+                val name = bundle.name.removeSuffix(config.produce.suffix())
+                require(target.family.isAppleFamily)
+                val bundleRelativePath = if (target.family == Family.OSX) "Contents/MacOS/$name" else name
+                additionalLinkerArgs = listOf("-bundle")
+                val bundlePath = bundle.child(bundleRelativePath).parentFile
+                bundlePath.mkdirs()
+                executable = bundlePath.absolutePath
+            }
+            CompilerOutputKind.FRAMEWORK -> {
+                val framework = File(generationState.outputFile)
+                val dylibName = framework.name.removeSuffix(".framework")
+                val dylibRelativePath = when (target.family) {
+                    Family.IOS,
+                    Family.TVOS,
+                    Family.WATCHOS -> dylibName
+                    Family.OSX -> "Versions/A/$dylibName"
+                    else -> error(target)
                 }
-            } else {
-                emptyList()
+                additionalLinkerArgs = listOf("-dead_strip", "-install_name", "@rpath/${framework.name}/$dylibRelativePath")
+                val dylibPath = framework.child(dylibRelativePath)
+                dylibPath.parentFile.mkdirs()
+                executable = dylibPath.absolutePath
             }
-            executable = outputFiles.nativeBinaryFile
-        } else {
-            val framework = File(generationState.outputFile)
-            val dylibName = framework.name.removeSuffix(".framework")
-            val dylibRelativePath = when (target.family) {
-                Family.IOS,
-                Family.TVOS,
-                Family.WATCHOS -> dylibName
-                Family.OSX -> "Versions/A/$dylibName"
-                else -> error(target)
+            else -> {
+                additionalLinkerArgs = if (target.family.isAppleFamily) {
+                    when (config.produce) {
+                        CompilerOutputKind.DYNAMIC_CACHE ->
+                            listOf("-install_name", outputFiles.dynamicCacheInstallName)
+                        else -> listOf("-dead_strip")
+                    }
+                } else {
+                    emptyList()
+                }
+                executable = outputFiles.nativeBinaryFile
             }
-            additionalLinkerArgs = listOf("-dead_strip", "-install_name", "@rpath/${framework.name}/$dylibRelativePath")
-            val dylibPath = framework.child(dylibRelativePath)
-            dylibPath.parentFile.mkdirs()
-            executable = dylibPath.absolutePath
         }
 
         val needsProfileLibrary = generationState.coverage.enabled

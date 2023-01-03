@@ -126,9 +126,11 @@ private fun collectLlvmModules(generationState: NativeGenerationState, generated
                 libraries.flatMap { it.bitcodePaths }.filter { it.isBitcode }
             }
 
-    val nativeLibraries = config.nativeLibraries + config.launcherNativeLibraries
-            .takeIf { config.produce == CompilerOutputKind.PROGRAM }.orEmpty() + config.xcTestLauncherLibraries
-                    .takeIf { config.produce == CompilerOutputKind.PROGRAM && config.xcTestRunner }.orEmpty()
+    val nativeLibraries = config.nativeLibraries +
+            config.launcherNativeLibraries
+                    .takeIf { config.produce == CompilerOutputKind.PROGRAM }.orEmpty() +
+            config.xcTestLauncherLibraries
+                    .takeIf { config.produce == CompilerOutputKind.TEST_BUNDLE && config.xcTestRunner }.orEmpty()
     val additionalBitcodeFilesToLink = generationState.llvm.additionalProducedBitcodeFiles
     val exceptionsSupportNativeLibrary = listOf(config.exceptionsSupportNativeLibrary)
             .takeIf { config.produce == CompilerOutputKind.DYNAMIC_CACHE }.orEmpty()

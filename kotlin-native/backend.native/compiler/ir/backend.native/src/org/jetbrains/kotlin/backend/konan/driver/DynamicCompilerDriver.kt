@@ -32,7 +32,7 @@ internal class DynamicCompilerDriver : CompilerDriver() {
                         CompilerOutputKind.DYNAMIC_CACHE -> produceBinary(engine, config, environment)
                         CompilerOutputKind.STATIC_CACHE -> produceBinary(engine, config, environment)
                         CompilerOutputKind.PRELIMINARY_CACHE -> TODO()
-                        CompilerOutputKind.TEST_BUNDLE -> TODO() // produceBinary()
+                        CompilerOutputKind.TEST_BUNDLE -> produceBundle(engine, config, environment)
                     }
                 }
             }
@@ -89,6 +89,22 @@ internal class DynamicCompilerDriver : CompilerDriver() {
      */
     private fun produceBinary(engine: PhaseEngine<PhaseContext>, config: KonanConfig, environment: KotlinCoreEnvironment) {
         val frontendOutput = engine.runFrontend(config, environment) ?: return
+        val psiToIrOutput = engine.runPsiToIr(frontendOutput, isProducingLibrary = false)
+        val backendContext = createBackendContext(config, frontendOutput, psiToIrOutput)
+        engine.runBackend(backendContext)
+    }
+
+    /**
+     * Produce a bundle that is a directory with code and resources.
+     * It consists of
+     * - Info.plist
+     * - Binary.
+     * See https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/AboutBundles/AboutBundles.html
+     * TODO: ObjC framework is also a bundle
+     */
+    private fun produceBundle(engine: PhaseEngine<PhaseContext>, config: KonanConfig, environment: KotlinCoreEnvironment) {
+        val frontendOutput = engine.runFrontend(config, environment) ?: return
+        engine.runPhase(CreateTestBundlePhase, frontendOutput)
         val psiToIrOutput = engine.runPsiToIr(frontendOutput, isProducingLibrary = false)
         val backendContext = createBackendContext(config, frontendOutput, psiToIrOutput)
         engine.runBackend(backendContext)
