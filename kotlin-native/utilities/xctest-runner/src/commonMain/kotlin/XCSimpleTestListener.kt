@@ -1,7 +1,7 @@
 import platform.Foundation.NSBundle
-import platform.XCTest.*
 import platform.darwin.NSObject
 import platform.darwin.NSUInteger
+import platform.XCTest.*
 
 class XCSimpleTestListener : NSObject(), XCTestObservationProtocol {
     override fun testBundleDidFinish(testBundle: NSBundle) {
@@ -41,10 +41,10 @@ class XCSimpleTestListener : NSObject(), XCTestObservationProtocol {
     }
 
     override fun testSuite(
-        testSuite: XCTestSuite,
-        didFailWithDescription: String,
-        inFile: String?,
-        atLine: NSUInteger
+            testSuite: XCTestSuite,
+            didFailWithDescription: String,
+            inFile: String?,
+            atLine: NSUInteger
     ) {
         println("testSuite: ${testSuite.name} $didFailWithDescription @ $inFile:$atLine")
     }

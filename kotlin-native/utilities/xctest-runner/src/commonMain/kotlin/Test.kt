@@ -50,17 +50,6 @@ class MyTest {
         fun afterClass() {
             println("After @AfterClass")
         }
-
-        @Test
-        fun companionTest() {
-            println("Companion test")
-        }
-
-        @Test
-        @Ignore
-        fun companionIgnoreTest() {
-            println("Companion ignored test")
-        }
     }
 
     @BeforeTest
