@@ -59,17 +59,6 @@ kotlin {
     val devFrameworks = developerFrameworks()
 
     nativeTargets.forEach {
-        it.compilations.all {
-//            cinterops {
-//                @Suppress("UNUSED_VARIABLE")
-//                val xctest by creating {
-//                    devFrameworks[konanTarget]?.let { path ->
-//                        compilerOpts("-iframework", path)
-//                    }
-//                    extraOpts = listOf("-Xshort-module-name", "XCTest")
-//                }
-//            }
-        }
         it.binaries {
             // TODO: XCTest.framework should be copied to @rpath/Frameworks instead of adding rpath
             val target = this.target.konanTarget
