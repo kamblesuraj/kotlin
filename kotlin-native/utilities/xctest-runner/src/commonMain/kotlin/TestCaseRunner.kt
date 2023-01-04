@@ -8,6 +8,7 @@ import platform.objc.*
 
 import kotlin.native.internal.test.GeneratedSuites
 import kotlin.native.internal.test.TestCase
+import kotlin.native.internal.ExportForCppRuntime
 
 @ExportObjCClass(name = "Kotlin/Native @Test")
 class TestCaseRunner(
@@ -167,7 +168,7 @@ class TestCaseRunner(
 
 internal typealias SEL = COpaquePointer?
 
-@Suppress("unused")
+@ExportForCppRuntime("Konan_create_testSuite")
 fun defaultTestSuiteRunner(): XCTestSuite {
     XCTestObservationCenter.sharedTestObservationCenter.addTestObserver(XCSimpleTestListener())
     val nativeTestSuite = XCTestSuite.testSuiteWithName("Kotlin/Native test suite")
