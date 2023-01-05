@@ -87,3 +87,39 @@ class MyTest {
         println("After @AfterTest")
     }
 }
+
+@Ignore
+class IgnoredSuite {
+    @BeforeTest
+    fun beforeTest() {
+        println("Setup @BeforeTest")
+    }
+
+    @Test
+    fun testTest() {
+        println("Test @Test Test")
+    }
+
+    @AfterTest
+    fun afterTest() {
+        println("After @AfterTest")
+    }
+}
+
+class SuiteWithIgnoredCases {
+    @BeforeTest
+    fun beforeTest() {
+        println("Setup @BeforeTest")
+    }
+
+    @Test
+    @Ignore
+    fun testIgnored() {
+        println("Ignored test")
+    }
+
+    @AfterTest
+    fun afterTest() {
+        println("After @AfterTest")
+    }
+}

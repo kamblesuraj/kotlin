@@ -6,9 +6,10 @@ import platform.Foundation.*
 import platform.XCTest.*
 import platform.objc.*
 
+import kotlin.native.internal.ExportForCppRuntime
 import kotlin.native.internal.test.GeneratedSuites
 import kotlin.native.internal.test.TestCase
-import kotlin.native.internal.ExportForCppRuntime
+import kotlin.native.internal.test.TestSuite
 
 @ExportObjCClass(name = "Kotlin/Native @Test")
 class TestCaseRunner(
@@ -16,17 +17,12 @@ class TestCaseRunner(
         private val testName: String,
         private val testCase: TestCase
 ) : XCTestCase(invocation) {
-    private val shouldSkip: Boolean
-        get() = testCase.ignored
-
-    /**
-     * Sets XCTest to continue running after failure
-     */
+    // Sets XCTest to continue running after failure to match Kotlin Test
     override fun continueAfterFailure(): Boolean = true
 
     @ObjCAction
     fun run() {
-        if (shouldSkip) {
+        if (testCase.ignored) {
             // TODO: XCTSkip() should be used instead, but https://youtrack.jetbrains.com/issue/KT-43719
             //  just skip it for now as no one catches the _XCTSkipFailureException
             //  023-01-02 20:06:56.016 xctest[76004:10364894] *** Terminating app due to uncaught exception '_XCTSkipFailureException', reason: 'Test skipped'
@@ -58,11 +54,11 @@ class TestCaseRunner(
 
     override fun setUp() {
         super.setUp()
-        if (!shouldSkip) testCase.doBefore()
+        if (!testCase.ignored) testCase.doBefore()
     }
 
     override fun tearDown() {
-        if (!shouldSkip) testCase.doAfter()
+        if (!testCase.ignored) testCase.doAfter()
         super.tearDown()
     }
 
@@ -74,23 +70,24 @@ class TestCaseRunner(
     override fun name() = testName
 
     companion object : XCTestCaseMeta(), XCTestSuiteExtensionsProtocolMeta {
-        override fun defaultTestSuite(): XCTestSuite? {
-            return defaultTestSuite
-        }
-
         //region: XCTestSuiteExtensionsProtocolMeta extensions
         /**
          * These are from the XCTestCase extension and are not available by default.
          * See `@interface XCTestCase (XCTestSuiteExtensions)` in `XCTestCase.h` header file.
          * Issue: https://youtrack.jetbrains.com/issue/KT-40426
          */
+
+        override fun defaultTestSuite(): XCTestSuite? = defaultTestSuite
+
         // TODO: setUp() and tearDown() methods are required for tests with @Before/AfterClass annotations
         //  testSuites should be generated one-to-one with each suite run by the own TestCaseRunner
         override fun setUp() {
-
+            println("setUp method from $this")
+            Throwable().printStackTrace()
         }
 
         override fun tearDown() {
+            println("tearDown after all")
             disposeRunMethods()
         }
         //endregion
@@ -168,6 +165,21 @@ class TestCaseRunner(
 
 internal typealias SEL = COpaquePointer?
 
+class TestSuiteRunner(private val testSuite: TestSuite) : XCTestSuite(testSuite.name) {
+    private val ignoredSuite: Boolean
+        get() = testSuite.ignored || testSuite.testCases.all { it.value.ignored }
+
+    override fun setUp() {
+        super.setUp()
+        if (!ignoredSuite) testSuite.doBeforeClass()
+    }
+
+    override fun tearDown() {
+        if (!ignoredSuite) testSuite.doAfterClass()
+        super.tearDown()
+    }
+}
+
 @ExportForCppRuntime("Konan_create_testSuite")
 fun defaultTestSuiteRunner(): XCTestSuite {
     XCTestObservationCenter.sharedTestObservationCenter.addTestObserver(XCSimpleTestListener())
@@ -181,12 +193,13 @@ fun defaultTestSuiteRunner(): XCTestSuite {
 
     println(":::: Create test suites ::::")
     createTestSuites().forEach {
-        println("[${it.name}] Tests: " + it.tests().joinToString(", ", "[", "]"))
+        println("* Suite '${it.name}' with tests: " + it.tests().joinToString(", ", "[", "]"))
         nativeTestSuite.addTest(it)
     }
+    println(":::: Tests created ::::")
     @Suppress("UNCHECKED_CAST")
     (nativeTestSuite.tests as List<XCTest>).forEach {
-        println("${it.name} with ${it.testCaseCount} tests")
+        println("* Suite '${it.name}' with ${it.testCaseCount} test cases")
     }
     return nativeTestSuite
 }
@@ -196,7 +209,7 @@ internal fun createTestSuites(): List<XCTestSuite> {
     val testInvocations = TestCaseRunner.testInvocations()
     return GeneratedSuites.suites
             .map {
-                val suite = XCTestSuite.testSuiteWithName(it.name)
+                val suite = TestSuiteRunner(it)
                 it.testCases.values.map { testCase ->
                     testInvocations
                             .filter { nsInvocation ->
