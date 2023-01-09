@@ -55,8 +55,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.1")
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
-    coreJsIrRuntimeForTests("org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.0-RC") { isTransitive = false }
-    jsonJsIrRuntimeForTests("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0-RC") { isTransitive = false }
+    coreJsIrRuntimeForTests("org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.1") { isTransitive = false }
+    jsonJsIrRuntimeForTests("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1") { isTransitive = false }
 
     testRuntimeOnly(intellijCore())
     testRuntimeOnly(commonDependency("org.jetbrains.kotlin:kotlin-reflect")) { isTransitive = false }
