@@ -1,8 +1,7 @@
-import kotlinx.cinterop.COpaquePointer
-import kotlinx.cinterop.ExportObjCClass
-import kotlinx.cinterop.ObjCAction
+import kotlinx.cinterop.*
 
 import platform.Foundation.*
+import platform.UniformTypeIdentifiers.UTTypeSourceCode
 import platform.XCTest.*
 import platform.objc.*
 
@@ -11,7 +10,7 @@ import kotlin.native.internal.test.GeneratedSuites
 import kotlin.native.internal.test.TestCase
 import kotlin.native.internal.test.TestSuite
 
-@ExportObjCClass(name = "Kotlin/Native @Test")
+@ExportObjCClass(name = "Kotlin/Native::Test")
 class TestCaseRunner(
         invocation: NSInvocation,
         private val testName: String,
@@ -20,9 +19,11 @@ class TestCaseRunner(
     // Sets XCTest to continue running after failure to match Kotlin Test
     override fun continueAfterFailure(): Boolean = true
 
+    private val ignored = testCase.ignored || testCase.suite.ignored
+
     @ObjCAction
     fun run() {
-        if (testCase.ignored) {
+        if (ignored) {
             // TODO: XCTSkip() should be used instead, but https://youtrack.jetbrains.com/issue/KT-43719
             //  just skip it for now as no one catches the _XCTSkipFailureException
             //  023-01-02 20:06:56.016 xctest[76004:10364894] *** Terminating app due to uncaught exception '_XCTSkipFailureException', reason: 'Test skipped'
@@ -36,33 +37,59 @@ class TestCaseRunner(
                 is AssertionError -> XCTIssueTypeAssertionFailure
                 else -> XCTIssueTypeUncaughtException
             }
+            val stackTrace = throwable.getStackTrace()
+            val failedStackLine = stackTrace.first {
+                // try to filter out kotlin.Exceptions and kotlin.test.Assertion inits
+                !it.contains("kfun:kotlin.")
+            }
+            // Find path and line number
+            val matchResult = Regex("^\\d+ +.* \\((.*):(\\d+):.*\\)$").find(failedStackLine)
+            val sourceLocation = if (matchResult != null) {
+                val (file, line) = matchResult.destructured
+                XCTSourceCodeLocation(file, line.toLong())
+            } else {
+                XCTSourceCodeLocation()
+            }
+
+            @Suppress("CAST_NEVER_SUCCEEDS")
+            val stackAsPayload = (stackTrace.joinToString("\n") as? NSString)
+                    ?.dataUsingEncoding(NSUTF8StringEncoding)
+            val stackTraceAttachment = XCTAttachment.attachmentWithUniformTypeIdentifier(
+                    identifier = UTTypeSourceCode.identifier,
+                    name = "Kotlin stacktrace (full)",
+                    payload = stackAsPayload,
+                    userInfo = null
+            )
 
             val issue = XCTIssue(
                     type = type,
-                    compactDescription = "${throwable.message} in $testName",
-                    detailedDescription = "Caught exception ${throwable.message} in $testName",
+                    compactDescription = "$throwable in $testName",
+                    detailedDescription = "Caught exception $throwable in $testName (caused by ${throwable.cause})",
                     sourceCodeContext = XCTSourceCodeContext(
                             callStackAddresses = throwable.getStackTraceAddresses(),
-                            location = XCTSourceCodeLocation() // TODO: provide with file path and line from stacktrace
+                            location = sourceLocation
                     ),
                     associatedError = null,
-                    attachments = emptyList<XCTAttachment>()
+                    attachments = listOf(stackTraceAttachment)
             )
-            testRun?.recordIssue(issue) ?: error("TestRun for the test not found")
+            testRun?.recordIssue(issue) ?: error("TestRun for the test $testName not found")
         }
     }
 
     override fun setUp() {
         super.setUp()
-        if (!testCase.ignored) testCase.doBefore()
+        if (!ignored) testCase.doBefore()
     }
 
     override fun tearDown() {
-        if (!testCase.ignored) testCase.doAfter()
+        if (!ignored) testCase.doAfter()
         super.tearDown()
     }
 
-    override fun description() = "@Test fun ${name()}()"
+    override fun description(): String = buildString {
+        append(testName)
+        if (ignored) append("(ignored)")
+    }
 
     // TODO: file an issue for null in this::class.simpleName
     //  "${this::class.simpleName}::$testName" leads to "null::$testName"
@@ -87,6 +114,8 @@ class TestCaseRunner(
         }
 
         override fun tearDown() {
+            // FIXME: it looks like it's never invoked and hence methods aren't disposed
+            //  do we need to dispose them at all or just check that we don't add them twice
             println("tearDown after all")
             disposeRunMethods()
         }
