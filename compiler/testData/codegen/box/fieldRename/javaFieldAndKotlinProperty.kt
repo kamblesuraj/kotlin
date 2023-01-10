@@ -11,7 +11,15 @@ public class BaseJava {
 
 // FILE: Derived.kt
 class Derived : BaseJava() {
-    val a = "OK"
+    var a = "OK"
 }
 
-fun box() = Derived().a
+fun box(): String {
+    val first = Derived().a
+    if (first != "OK") return first
+    val d = Derived()
+    if (d::a.get() != "OK") return d::a.get()
+    d.a = "12"
+    if (d.a != "12") return "Error writing: ${d.a}"
+    return "OK"
+}

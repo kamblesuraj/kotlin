@@ -17994,12 +17994,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         }
 
         @Test
-        @TestMetadata("javaFieldAndKotlinInvisiblePropertyWrite.kt")
-        public void testJavaFieldAndKotlinInvisiblePropertyWrite() throws Exception {
-            runTest("compiler/testData/codegen/box/fieldRename/javaFieldAndKotlinInvisiblePropertyWrite.kt");
-        }
-
-        @Test
         @TestMetadata("javaFieldAndKotlinLateinitProperty.kt")
         public void testJavaFieldAndKotlinLateinitProperty() throws Exception {
             runTest("compiler/testData/codegen/box/fieldRename/javaFieldAndKotlinLateinitProperty.kt");
