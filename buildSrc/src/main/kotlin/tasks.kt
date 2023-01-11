@@ -185,13 +185,15 @@ fun Project.projectTest(
             "-Djna.nosys=true"
         )
 
-        val junit5ParallelTestWorkers =
-            project.kotlinBuildProperties.junit5NumberOfThreadsForParallelExecution ?: Runtime.getRuntime().availableProcessors()
+        // leave 1 cpu free for OS, IO, etc.
+        val allowedProcessors = (cpu - 1).coerceAtLeast(1)
 
-        val memoryPerTestProcessMb = maxHeapSizeMb ?: if (jUnitMode == JUnitMode.JUnit5)
-            totalMaxMemoryForTestsMb.coerceIn(defaultMaxMemoryPerTestWorkerMb, defaultMaxMemoryPerTestWorkerMb * junit5ParallelTestWorkers)
-        else
+        val memoryPerTestProcessMb = maxHeapSizeMb ?: if (jUnitMode == JUnitMode.JUnit5) {
+            // JUnit5 uses threads instead of forks, for 16 threads xmx4g is measured to be enough
+            totalMaxMemoryForTestsMb.coerceIn(defaultMaxMemoryPerTestWorkerMb, 4 * 1024)
+        } else {
             defaultMaxMemoryPerTestWorkerMb
+        }
 
         maxHeapSize = "${memoryPerTestProcessMb}m"
 
@@ -249,24 +251,30 @@ fun Project.projectTest(
             val forks = (totalMaxMemoryForTestsMb / memoryPerTestProcessMb).coerceAtMost(16)
             maxParallelForks =
                 project.providers.gradleProperty("kotlin.test.maxParallelForks").forUseAtConfigurationTime().orNull?.toInt()
-                    ?: forks.coerceIn(1, Runtime.getRuntime().availableProcessors())
+                    ?: forks.coerceIn(1, allowedProcessors)
         }
 
         defineJDKEnvVariables.forEach { version ->
             val javaLauncher = project.getToolchainLauncherFor(version).orNull ?: error("Can't find toolchain for $version")
             environment(version.envName, javaLauncher.metadata.installationPath.asFile.absolutePath)
         }
+
+        logger.warn("Test ${project.name}:${taskName}")
+        logger.warn("cpu=${cpu} ramMb=${ramMb}")
+        logger.warn("mode=${jUnitMode} xmx=${maxHeapSize} forks=${maxParallelForks}")
     }.apply { configure(body) }
 }
 
-val defaultMaxMemoryPerTestWorkerMb = 1600
-val reservedMemoryMb = 9000 // system processes, gradle daemon, kotlin daemon, etc ...
+val defaultMaxMemoryPerTestWorkerMb = 1600 // TODO: really 1600 ?
+val reservedMemoryMb = 9 * 1024 // system processes, gradle daemon, kotlin daemon, etc ...
 
-val totalMaxMemoryForTestsMb: Int
-    get() {
-        val mxbean = ManagementFactory.getOperatingSystemMXBean() as OperatingSystemMXBean
-        return (mxbean.totalPhysicalMemorySize / 1048576 - reservedMemoryMb).toInt()
-    }
+val ramMb = ((ManagementFactory.getOperatingSystemMXBean() as OperatingSystemMXBean).totalPhysicalMemorySize / (1024*1024)).toInt()
+// val ramMb = 16000
+
+val cpu = Runtime.getRuntime().availableProcessors()
+// val cpu = 4
+
+val totalMaxMemoryForTestsMb = ramMb - reservedMemoryMb
 
 val Test.commandLineIncludePatterns: Set<String>
     get() = (filter as? DefaultTestFilter)?.commandLineIncludePatterns.orEmpty()

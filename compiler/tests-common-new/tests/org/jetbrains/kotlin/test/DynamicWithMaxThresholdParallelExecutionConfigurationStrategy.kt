@@ -21,7 +21,7 @@ class DynamicWithMaxThresholdParallelExecutionConfigurationStrategy : ParallelEx
 
     override fun createConfiguration(configurationParameters: ConfigurationParameters): ParallelExecutionConfiguration {
         val threshold = configurationParameters[FIXED_THRESHOLD].map { it.toIntOrNull() }.orElse(null) ?: DEFAULT_VALUE
-        val cpuCores = Runtime.getRuntime().availableProcessors()
+        val cpuCores = (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
         val parallelism = if (threshold > 0) minOf(cpuCores, threshold) else cpuCores
         return object : ParallelExecutionConfiguration {
             override fun getParallelism(): Int = parallelism

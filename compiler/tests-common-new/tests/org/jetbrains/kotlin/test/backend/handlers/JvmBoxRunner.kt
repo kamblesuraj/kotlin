@@ -233,6 +233,7 @@ open class JvmBoxRunner(testServices: TestServices) : JvmBinaryArtifactHandler(t
             javaExe.absolutePath,
             runIf(ATTACH_DEBUGGER in module.directives) { "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005" },
             "-ea",
+            "-Xmx1g",
             runIf(ENABLE_JVM_PREVIEW in module.directives) { "--enable-preview" },
             "-classpath",
             classPath.joinToString(File.pathSeparator, transform = { File(it.toURI()).absolutePath }),
