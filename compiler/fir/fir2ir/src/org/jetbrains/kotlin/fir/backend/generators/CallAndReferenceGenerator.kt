@@ -230,14 +230,12 @@ class CallAndReferenceGenerator(
     // Would be much better to use super qualifiers only in case when it's used explicitly.
     // However, FE 1.0 does it, and currently we have no better way to provide these receivers.
     // See KT-49507 and KT-48954 as good examples for cases we try to handle here
-    private fun FirExpression.superQualifierSymbolForField(fieldSymbol: IrFieldSymbol): IrClassSymbol? {
+    private fun superQualifierSymbolForField(dispatchReceiver: FirExpression, fieldSymbol: IrFieldSymbol): IrClassSymbol? {
         if (fieldSymbol.owner.correspondingPropertySymbol != null) return null
         val originalContainingClass = fieldSymbol.owner.parentClassOrNull ?: return null
-        val ownContainingClass = typeRef.toIrType().classifierOrNull?.owner as? IrClass ?: return null
-        // For static field, we shouldn't unwrap fake override in any case
-        if (fieldSymbol.owner.isStatic) return ownContainingClass.symbol
+        val dispatchReceiverRepresentativeClass = dispatchReceiver.typeRef.toIrType().classifierOrNull?.owner as? IrClass ?: return null
         // Find first Java super class to avoid possible visibility exposure & separate compilation problems
-        return getJavaFieldContainingClassSymbol(ownContainingClass, originalContainingClass)
+        return getJavaFieldContainingClassSymbol(dispatchReceiverRepresentativeClass, originalContainingClass)
     }
 
     // Note: ownContainingClass here is the use-site receiver class,
@@ -246,9 +244,13 @@ class CallAndReferenceGenerator(
     // This function returns a class symbol which:
     // - is the most derived Java class in hierarchy which has no Kotlin base classes (including transitive ones)
     // E.g. K2 <: J3 <: K1 <: J2 <: J1 ==> J2 is chosen
-    private fun getJavaFieldContainingClassSymbol(ownContainingClass: IrClass, originalContainingClass: IrClass): IrClassSymbol {
-        var superQualifierClass = ownContainingClass
-        var superQualifierClassFromJava: IrClass? = ownContainingClass.takeIf { it.isFromJava() }
+    // We shouldn't allow base Kotlin classes to avoid possible clashes with invisible properties inside
+    private fun getJavaFieldContainingClassSymbol(
+        dispatchReceiverRepresentativeClass: IrClass,
+        originalContainingClass: IrClass
+    ): IrClassSymbol {
+        var superQualifierClass = dispatchReceiverRepresentativeClass
+        var superQualifierClassFromJava: IrClass? = dispatchReceiverRepresentativeClass.takeIf { it.isFromJava() }
         while (superQualifierClass !== originalContainingClass) {
             superQualifierClass = superQualifierClass.superTypes.find {
                 val kind = it.getClass()?.kind
@@ -490,7 +492,7 @@ class CallAndReferenceGenerator(
                         IrGetFieldImpl(
                             startOffset, endOffset, symbol, type,
                             origin = IrStatementOrigin.GET_PROPERTY.takeIf { calleeReference !is FirDelegateFieldReference },
-                            superQualifierSymbol = dispatchReceiver.superQualifierSymbolForField(symbol)
+                            superQualifierSymbol = superQualifierSymbolForField(dispatchReceiver, symbol)
                         )
                     }
 
@@ -575,7 +577,7 @@ class CallAndReferenceGenerator(
                 when (symbol) {
                     is IrFieldSymbol -> IrSetFieldImpl(
                         startOffset, endOffset, symbol, type, origin,
-                        superQualifierSymbol = dispatchReceiver.superQualifierSymbolForField(symbol)
+                        superQualifierSymbol = superQualifierSymbolForField(dispatchReceiver, symbol)
                     ).apply {
                         value = assignedValue
                     }
@@ -1076,6 +1078,7 @@ class CallAndReferenceGenerator(
                                 this is IrPropertyReference && field?.isEligibleForDispatchReceiverCasting() == true -> {
                                     // Why should we do this type cast at all?
                                     //     to avoid accessing invisible backing field in bytecode
+                                    // TODO: consider reusing getJavaFieldContainingClassSymbol() here
                                     ownerDispatchReceiverParameter.type
                                 }
                                 else -> {
