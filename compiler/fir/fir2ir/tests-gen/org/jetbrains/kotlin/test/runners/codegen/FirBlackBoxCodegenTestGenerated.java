@@ -17988,6 +17988,12 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         }
 
         @Test
+        @TestMetadata("javaFieldAndKotlinInvisiblePropertyViaTypeParameter.kt")
+        public void testJavaFieldAndKotlinInvisiblePropertyViaTypeParameter() throws Exception {
+            runTest("compiler/testData/codegen/box/fieldRename/javaFieldAndKotlinInvisiblePropertyViaTypeParameter.kt");
+        }
+
+        @Test
         @TestMetadata("javaFieldAndKotlinInvisiblePropertyWithGetter.kt")
         public void testJavaFieldAndKotlinInvisiblePropertyWithGetter() throws Exception {
             runTest("compiler/testData/codegen/box/fieldRename/javaFieldAndKotlinInvisiblePropertyWithGetter.kt");

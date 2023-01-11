@@ -233,9 +233,10 @@ class CallAndReferenceGenerator(
     private fun superQualifierSymbolForField(dispatchReceiver: FirExpression, fieldSymbol: IrFieldSymbol): IrClassSymbol? {
         if (fieldSymbol.owner.correspondingPropertySymbol != null) return null
         val originalContainingClass = fieldSymbol.owner.parentClassOrNull ?: return null
-        val dispatchReceiverRepresentativeClass = dispatchReceiver.typeRef.toIrType().classifierOrNull?.owner as? IrClass ?: return null
+        val dispatchReceiverIrType = dispatchReceiver.typeRef.toIrType()
+        val dispatchReceiverRepresentativeClassifierSymbol = dispatchReceiverIrType.classifierOrNull ?: return null
         // Find first Java super class to avoid possible visibility exposure & separate compilation problems
-        return getJavaFieldContainingClassSymbol(dispatchReceiverRepresentativeClass, originalContainingClass)
+        return getJavaFieldContainingClassSymbol(dispatchReceiverRepresentativeClassifierSymbol, originalContainingClass.symbol)
     }
 
     // Note: ownContainingClass here is the use-site receiver class,
@@ -246,25 +247,31 @@ class CallAndReferenceGenerator(
     // E.g. K2 <: J3 <: K1 <: J2 <: J1 ==> J2 is chosen
     // We shouldn't allow base Kotlin classes to avoid possible clashes with invisible properties inside
     private fun getJavaFieldContainingClassSymbol(
-        dispatchReceiverRepresentativeClass: IrClass,
-        originalContainingClass: IrClass
+        dispatchReceiverRepresentativeClassifierSymbol: IrClassifierSymbol,
+        originalContainingClassSymbol: IrClassSymbol
     ): IrClassSymbol {
-        var superQualifierClass = dispatchReceiverRepresentativeClass
-        var superQualifierClassFromJava: IrClass? = dispatchReceiverRepresentativeClass.takeIf { it.isFromJava() }
-        while (superQualifierClass !== originalContainingClass) {
-            superQualifierClass = superQualifierClass.superTypes.find {
+        var superQualifierClassifierSymbol = dispatchReceiverRepresentativeClassifierSymbol
+        var superQualifierClassFromJava: IrClass? = dispatchReceiverRepresentativeClassifierSymbol.ownerClassIfFromJava()
+        while (superQualifierClassifierSymbol !== originalContainingClassSymbol) {
+            superQualifierClassifierSymbol = superQualifierClassifierSymbol.superTypes().find {
                 val kind = it.getClass()?.kind
-                kind == ClassKind.CLASS || kind == ClassKind.ENUM_CLASS
-            }?.getClass() ?: break
-            val isFromJava = superQualifierClass.isFromJava()
+                // Note: for class we will find class here,
+                // for type parameter either class or another type parameter (they cannot be in supertypes together)
+                kind == ClassKind.CLASS || kind == ClassKind.ENUM_CLASS || kind == null
+            }?.classifierOrNull ?: break
+            val isFromJava = superQualifierClassifierSymbol.isFromJava()
             if (superQualifierClassFromJava == null) {
-                superQualifierClassFromJava = superQualifierClass.takeIf { isFromJava }
+                superQualifierClassFromJava = superQualifierClassifierSymbol.ownerClassIfFromJava()
             } else if (!isFromJava) {
                 superQualifierClassFromJava = null
             }
         }
-        return superQualifierClassFromJava?.symbol ?: originalContainingClass.symbol
+        return superQualifierClassFromJava?.symbol ?: originalContainingClassSymbol
     }
+
+    private fun IrClassifierSymbol.isFromJava() = (owner as? IrDeclaration)?.isFromJava() == true
+
+    private fun IrClassifierSymbol.ownerClassIfFromJava(): IrClass? = (owner as? IrClass)?.takeIf { it.isFromJava() }
 
     private fun FirExpression.superQualifierSymbol(): IrClassSymbol? {
         if (this !is FirQualifiedAccess) {
