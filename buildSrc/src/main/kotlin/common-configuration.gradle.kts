@@ -195,6 +195,11 @@ fun Project.configureKotlinCompilationOptions() {
                     freeCompilerArgs += "-opt-in=org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction"
                 }
 
+                // :kotlin-native:Interop:Indexer relies on lambdas being generated in the old way, see `createStaticCFunction`.
+                if (project.path != ":kotlin-native:Interop:Indexer") {
+                    freeCompilerArgs += "-XXLanguage:+LightweightLambdas"
+                }
+
                 if (project.path == ":kotlin-util-klib") {
                     // This is a temporary workaround for a configuration problem in kotlin-native. Namely, module `:kotlin-native-shared`
                     // depends on kotlin-util-klib from bootstrap for some reason (see `kotlin-native/shared/build.gradle.kts`), but when
