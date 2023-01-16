@@ -202,9 +202,9 @@ class SerializationFirResolveExtension(session: FirSession) : FirDeclarationGene
                     }
                 )
             }
-
-            excludeFromJsExport()
         }
+
+        excludeFromJsExport()
 
         return function.symbol
     }
