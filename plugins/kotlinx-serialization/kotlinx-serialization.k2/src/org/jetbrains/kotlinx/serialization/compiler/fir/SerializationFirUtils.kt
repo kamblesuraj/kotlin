@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.serialization.compiler.fir
 
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.fir.FirAnnotationContainer
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.builder.FirAnnotationContainerBuilder
 import org.jetbrains.kotlin.fir.declarations.*
@@ -234,8 +235,8 @@ val ConeKotlinType.isGeneratedSerializableObject: Boolean
     get() = toRegularClassSymbol(this@FirSession)?.let { it.classKind.isObject && it.hasSerializableOrMetaAnnotationWithoutArgs } ?: false
 
 
-context(FirAnnotationContainerBuilder)
-fun FirExtension.excludeFromJsExport() {
+context(FirExtension)
+fun FirAnnotationContainer.excludeFromJsExport() {
     if (!session.moduleData.platform.isJs()) {
         return
     }
@@ -243,7 +244,7 @@ fun FirExtension.excludeFromJsExport() {
     val jsExportIgnoreAnnotation = jsExportIgnore as? FirRegularClassSymbol ?: return
     val jsExportIgnoreConstructor = jsExportIgnoreAnnotation.declarationSymbols.firstIsInstanceOrNull<FirConstructorSymbol>() ?: return
 
-    annotations.add(buildAnnotationCall {
+    val jsExportIgnoreAnnotationCall = buildAnnotationCall {
         argumentList = buildResolvedArgumentList(linkedMapOf())
         annotationTypeRef = buildResolvedTypeRef {
             type = jsExportIgnoreAnnotation.defaultType()
@@ -252,5 +253,7 @@ fun FirExtension.excludeFromJsExport() {
             name = jsExportIgnoreAnnotation.name
             resolvedSymbol = jsExportIgnoreConstructor
         }
-    })
+    }
+
+    replaceAnnotations(annotations + jsExportIgnoreAnnotationCall)
 }
