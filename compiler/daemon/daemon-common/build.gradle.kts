@@ -7,9 +7,6 @@ dependencies {
     api(project(":compiler:cli-common"))
     api(project(":kotlin-build-common"))
     api(kotlinStdlib())
-    compileOnly(project(":js:js.config"))
-    compileOnly(intellijCore())
-    api(commonDependency("org.jetbrains.kotlinx", "kotlinx-coroutines-core")) { isTransitive = false }
 }
 
 sourceSets {
