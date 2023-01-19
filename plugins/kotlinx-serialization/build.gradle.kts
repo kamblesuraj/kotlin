@@ -94,9 +94,11 @@ fun Test.setUpJsIrBoxTests() {
     dependsOn(":kotlin-stdlib-js-ir:compileKotlinJs")
     dependsOn(":kotlin-test:kotlin-test-js-ir:compileKotlinJs")
 
-    systemProperty("javascript.engine.path.V8", d8Plugin.requireConfigured().executablePath.absolutePath)
-    systemProperty("serialization.core.path", coreJsIrRuntimeForTests.asPath)
-    systemProperty("serialization.json.path", jsonJsIrRuntimeForTests.asPath)
+    doFirst {
+        systemProperty("javascript.engine.path.V8", d8Plugin.requireConfigured().executablePath.absolutePath)
+        systemProperty("serialization.core.path", coreJsIrRuntimeForTests.asPath)
+        systemProperty("serialization.json.path", jsonJsIrRuntimeForTests.asPath)
+    }
 
     systemProperty("kotlin.js.test.root.out.dir", "$buildDir/")
     systemProperty("kotlin.js.full.stdlib.path", "libraries/stdlib/js-ir/build/classes/kotlin/js/main")
