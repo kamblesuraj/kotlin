@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.fir.resolve.ScopeSession
 import org.jetbrains.kotlin.fir.resolve.createFunctionType
 import org.jetbrains.kotlin.fir.resolve.dfa.unwrapSmartcastExpression
 import org.jetbrains.kotlin.fir.resolve.fullyExpandedType
+import org.jetbrains.kotlin.fir.resolve.inference.LambdaWithTypeVariableAsExpectedTypeAtom
 import org.jetbrains.kotlin.fir.resolve.inference.model.ConeArgumentConstraintPosition
 import org.jetbrains.kotlin.fir.resolve.inference.model.ConeReceiverConstraintPosition
 import org.jetbrains.kotlin.fir.resolve.inference.preprocessCallableReference
@@ -525,6 +526,12 @@ fun FirExpression.isFunctional(
             if (classLikeExpectedFunctionType == null || coneType is ConeIntegerLiteralType) {
                 return false
             }
+            if (coneType is ConeTypeVariableType) {
+                val namedReferenceWithCandidate = namedReferenceWithCandidate() ?: return false
+                return namedReferenceWithCandidate.candidate.postponedAtoms.any {
+                    it is LambdaWithTypeVariableAsExpectedTypeAtom
+                }
+            }
             val invokeSymbol =
                 coneType.findContributedInvokeSymbol(
                     session, scopeSession, classLikeExpectedFunctionType, shouldCalculateReturnTypesOfFakeOverrides = false
@@ -566,6 +573,13 @@ fun FirExpression.isFunctional(
         }
     }
 }
+
+private fun FirExpression.namedReferenceWithCandidate(): FirNamedReferenceWithCandidate? =
+    when (this) {
+        is FirResolvable -> calleeReference as? FirNamedReferenceWithCandidate
+        is FirSafeCallExpression -> (selector as? FirExpression)?.namedReferenceWithCandidate()
+        else -> null
+    }
 
 fun FirExpression.getExpectedType(
     parameter: FirValueParameter/*, languageVersionSettings: LanguageVersionSettings*/
