@@ -358,6 +358,9 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments> @Inject constr
     @get:Internal
     internal abstract val preciseCompilationResultsBackup: Property<Boolean>
 
+    @get:Internal
+    internal abstract val keepIncrementalCompilationCachesInMemory: Property<Boolean>
+
     /** Task outputs that we don't want to include in [TaskOutputsBackup] (see [TaskOutputsBackup.outputsToRestore] for more info). */
     @get:Internal
     internal abstract val taskOutputsBackupExcludes: SetProperty<File>
@@ -725,6 +728,7 @@ abstract class KotlinCompile @Inject constructor(
                 multiModuleICSettings = multiModuleICSettings,
                 withAbiSnapshot = useKotlinAbiSnapshot.get(),
                 preciseCompilationResultsBackup = preciseCompilationResultsBackup.get(),
+                keepIncrementalCompilationCachesInMemory = keepIncrementalCompilationCachesInMemory.get(),
             )
         } else null
 
@@ -1138,6 +1142,7 @@ abstract class Kotlin2JsCompile @Inject constructor(
                 taskBuildCacheableOutputDirectory.get().asFile,
                 multiModuleICSettings = multiModuleICSettings,
                 preciseCompilationResultsBackup = preciseCompilationResultsBackup.get(),
+                keepIncrementalCompilationCachesInMemory = keepIncrementalCompilationCachesInMemory.get(),
             )
         } else null
 
