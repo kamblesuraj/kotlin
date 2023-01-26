@@ -594,11 +594,26 @@ class BodyGenerator(
             }
 
             wasmSymbols.unsafeGetScratchRawMemory -> {
-                
                 body.buildConstI32Symbol(context.scratchMemAddr, location)
             }
 
-            
+            wasmSymbols.returnArgumentIfItIsKotlinAny -> {
+                body.buildBlock("") { _ ->
+                    body.buildBlock("returnIfAny", WasmAnyRef) { innerLabel ->
+                        body.buildGetLocal(functionContext.referenceLocal(0), SourceLocation.NoLocation(""))
+                        body.buildInstr(WasmOp.EXTERN_INTERNALIZE, SourceLocation.NoLocation(""))
+                        body.buildBrInstr(WasmOp.BR_ON_NON_DATA_DEPRECATED, innerLabel, SourceLocation.NoLocation(""))
+                        body.buildBrInstr(
+                            WasmOp.BR_ON_CAST_FAIL_DEPRECATED,
+                            innerLabel,
+                            context.referenceGcType(backendContext.irBuiltIns.anyClass),
+                            SourceLocation.NoLocation("")
+                        )
+                        body.buildInstr(WasmOp.RETURN, SourceLocation.NoLocation(""))
+                    }
+                    body.buildDrop(SourceLocation.NoLocation(""))
+                }
+            }
 
             wasmSymbols.wasmArrayCopy -> {
                 val immediate = WasmImmediate.GcType(
