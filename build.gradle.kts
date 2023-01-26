@@ -502,6 +502,13 @@ allprojects {
             }
         }
 
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-ide-plugin-dependencies") {
+            content {
+                includeVersion("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", "1.5.10-release-949")
+                includeVersion("org.jetbrains.kotlin", "kotlin-stdlib-jdk7", "1.5.10-release-949")
+            }
+        }
+
         maven("https://download.jetbrains.com/teamcity-repository") {
             content {
                 includeModule("org.jetbrains.teamcity", "serviceMessages")
