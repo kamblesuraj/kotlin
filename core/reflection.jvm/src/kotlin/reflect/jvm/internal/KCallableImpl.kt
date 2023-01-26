@@ -8,6 +8,7 @@ package kotlin.reflect.jvm.internal
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.load.java.descriptors.JavaCallableMemberDescriptor
+import org.jetbrains.kotlin.types.asSimpleType
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.lang.reflect.WildcardType
@@ -15,6 +16,7 @@ import java.util.*
 import kotlin.coroutines.Continuation
 import kotlin.reflect.*
 import kotlin.reflect.jvm.internal.calls.Caller
+import kotlin.reflect.jvm.internal.calls.getMfvcUnboxMethods
 import kotlin.reflect.jvm.javaType
 import kotlin.reflect.jvm.jvmErasure
 import java.lang.reflect.Array as ReflectArray
@@ -113,7 +115,7 @@ internal abstract class KCallableImpl<out R> : KCallable<R>, KTypeParameterOwner
 
     private val _absentArguments = ReflectProperties.lazySoft {
         val parameterSize = parameters.size + (if (isSuspend) 1 else 0)
-        val maskSize = (parameters.size + Integer.SIZE - 1) / Integer.SIZE
+        val maskSize = (parameters.sumOf { getParameterTypeSize(it) } + Integer.SIZE - 1) / Integer.SIZE
 
         // Array containing the actual function arguments, masks, and +1 for DefaultConstructorMarker or MethodHandle.
         val arguments = arrayOfNulls<Any?>(parameterSize + maskSize + 1)
@@ -162,13 +164,16 @@ internal abstract class KCallableImpl<out R> : KCallable<R>, KTypeParameterOwner
         var anyOptional = false
 
         for (parameter in parameters) {
+            val parameterTypeSize = getParameterTypeSize(parameter)
             when {
                 args.containsKey(parameter) -> {
                     arguments[parameter.index] = args[parameter]
                 }
                 parameter.isOptional -> {
-                    val maskIndex = parameterSize + (valueParameterIndex / Integer.SIZE)
-                    arguments[maskIndex] = (arguments[maskIndex] as Int) or (1 shl (valueParameterIndex % Integer.SIZE))
+                    for (valueSubParameterIndex in valueParameterIndex until (valueParameterIndex + parameterTypeSize)) {
+                        val maskIndex = parameterSize + (valueSubParameterIndex / Integer.SIZE)
+                        arguments[maskIndex] = (arguments[maskIndex] as Int) or (1 shl (valueSubParameterIndex % Integer.SIZE))
+                    }
                     anyOptional = true
                 }
                 parameter.isVararg -> {}
@@ -178,7 +183,7 @@ internal abstract class KCallableImpl<out R> : KCallable<R>, KTypeParameterOwner
             }
 
             if (parameter.kind == KParameter.Kind.VALUE) {
-                valueParameterIndex++
+                valueParameterIndex += parameterTypeSize
             }
         }
 
@@ -195,6 +200,13 @@ internal abstract class KCallableImpl<out R> : KCallable<R>, KTypeParameterOwner
         return reflectionCall {
             caller.call(arguments) as R
         }
+    }
+
+    private fun getParameterTypeSize(parameter: KParameter) = if (parameter.type.needsMultiFieldValueClassFlattening) {
+        val type = (parameter.type as KTypeImpl).type.asSimpleType()
+        getMfvcUnboxMethods(type)!!.size
+    } else {
+        1
     }
 
     private fun callAnnotationConstructor(args: Map<KParameter, Any?>): R {

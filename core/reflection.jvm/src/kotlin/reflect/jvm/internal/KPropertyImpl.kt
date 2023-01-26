@@ -270,7 +270,7 @@ private fun KPropertyImpl.Accessor<*, *>.computeCallerForAccessor(isGetter: Bool
                     if (property.descriptor.isUnderlyingPropertyOfInlineClass() &&
                         property.descriptor.visibility == DescriptorVisibilities.INTERNAL
                     ) {
-                        val unboxMethod = property.descriptor.containingDeclaration.toInlineClass()?.getUnboxMethod(property.descriptor)
+                        val unboxMethod = property.descriptor.containingDeclaration.toInlineClass()?.getInlineCLassUnboxMethod(property.descriptor)
                             ?: throw KotlinReflectionInternalError("Underlying property of inline class $property should have a field")
                         if (isBound) InternalUnderlyingValOfInlineClass.Bound(unboxMethod, boundReceiver)
                         else InternalUnderlyingValOfInlineClass.Unbound(unboxMethod)
@@ -315,7 +315,7 @@ private fun KPropertyImpl.Accessor<*, *>.computeCallerForAccessor(isGetter: Bool
             return if (isBound) CallerImpl.Method.BoundInstance(accessor, boundReceiver)
             else CallerImpl.Method.Instance(accessor)
         }
-    }.createInlineClassAwareCallerIfNeeded(descriptor)
+    }.createValueClassAwareCallerIfNeeded(descriptor)
 }
 
 private fun PropertyDescriptor.isJvmFieldPropertyInCompanionObject(): Boolean {

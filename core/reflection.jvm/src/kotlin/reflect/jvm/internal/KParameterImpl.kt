@@ -20,6 +20,8 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.resolve.descriptorUtil.declaresOrInheritsDefaultValue
 import kotlin.reflect.KParameter
 import kotlin.reflect.KType
+import kotlin.reflect.compoundType
+import kotlin.reflect.jvm.internal.calls.ValueClassAwareCaller
 
 internal class KParameterImpl(
     val callable: KCallableImpl<*>,
@@ -39,6 +41,7 @@ internal class KParameterImpl(
             return if (name.isSpecial) null else name.asString()
         }
 
+    @OptIn(ExperimentalStdlibApi::class)
     override val type: KType
         get() = KTypeImpl(descriptor.type) {
             val descriptor = descriptor
@@ -53,7 +56,17 @@ internal class KParameterImpl(
                 (callable.descriptor.containingDeclaration as ClassDescriptor).toJavaClass()
                     ?: throw KotlinReflectionInternalError("Cannot determine receiver Java type of inherited declaration: $descriptor")
             } else {
-                callable.caller.parameterTypes[index]
+                when (val caller = callable.caller) {
+                    is ValueClassAwareCaller -> {
+                        val slice = caller.getRealSlicesOfParameters(index)
+                        val parameterTypes = caller.parameterTypes.slice(slice)
+                        compoundType(*parameterTypes.toTypedArray())
+                    }
+                    is ValueClassAwareCaller.MultiFieldValueClassPrimaryConstructorCaller -> {
+                        compoundType(*caller.originalParametersGroups[index].toTypedArray())
+                    }
+                    else -> caller.parameterTypes[index]
+                }
             }
         }
 

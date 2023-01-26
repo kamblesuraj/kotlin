@@ -122,13 +122,24 @@ internal sealed class CallerImpl<out M : Member>(
             }
         }
 
-        class BoundStatic(method: ReflectMethod, private val boundReceiver: Any?) : BoundCaller, Method(
+        class BoundStatic(method: ReflectMethod, internal val boundReceiver: Any?) : BoundCaller, Method(
             method, requiresInstance = false, parameterTypes = method.genericParameterTypes.dropFirst()
         ) {
             override fun call(args: Array<*>): Any? {
                 checkArguments(args)
                 return callMethod(null, arrayOf(boundReceiver, *args))
             }
+        }
+
+        class BoundStaticMultiFieldValueClass(method: ReflectMethod, internal val boundReceivers: Array<Any?>) : BoundCaller, Method(
+            method, requiresInstance = false, parameterTypes = method.genericParameterTypes.drop(boundReceivers.size).toTypedArray()
+        ) {
+            override fun call(args: Array<*>): Any? {
+                checkArguments(args)
+                return callMethod(null, arrayOf(*boundReceivers, *args))
+            }
+
+            val receiversCount: Int get() = boundReceivers.size
         }
 
         class BoundInstance(method: ReflectMethod, private val boundReceiver: Any?) : BoundCaller,

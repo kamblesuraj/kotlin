@@ -35252,6 +35252,19 @@ public class K2NativeCodegenBoxTestGenerated extends AbstractNativeCodegenBoxTes
                         }
                     }
                 }
+
+                @Nested
+                @TestMetadata("compiler/testData/codegen/box/reflection/call/valueClasses")
+                @TestDataPath("$PROJECT_ROOT")
+                @Tag("codegenK2")
+                @UseExtTestCaseGroupProvider()
+                @K2Pipeline()
+                public class ValueClasses {
+                    @Test
+                    public void testAllFilesPresentInValueClasses() throws Exception {
+                        KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/call/valueClasses"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.NATIVE, true);
+                    }
+                }
             }
 
             @Nested
@@ -35770,6 +35783,19 @@ public class K2NativeCodegenBoxTestGenerated extends AbstractNativeCodegenBoxTes
                     @Test
                     public void testAllFilesPresentInTypes() throws Exception {
                         KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/mapping/types"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.NATIVE, true);
+                    }
+                }
+
+                @Nested
+                @TestMetadata("compiler/testData/codegen/box/reflection/mapping/valueClasses")
+                @TestDataPath("$PROJECT_ROOT")
+                @Tag("codegenK2")
+                @UseExtTestCaseGroupProvider()
+                @K2Pipeline()
+                public class ValueClasses {
+                    @Test
+                    public void testAllFilesPresentInValueClasses() throws Exception {
+                        KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/mapping/valueClasses"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.NATIVE, true);
                     }
                 }
             }

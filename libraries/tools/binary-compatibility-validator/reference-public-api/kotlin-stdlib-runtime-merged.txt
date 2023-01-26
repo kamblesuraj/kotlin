@@ -5105,6 +5105,7 @@ public final class kotlin/reflect/KVisibility : java/lang/Enum {
 }
 
 public final class kotlin/reflect/TypesJVMKt {
+	public static final fun compoundType ([Ljava/lang/reflect/Type;)Ljava/lang/reflect/Type;
 	public static final fun getJavaType (Lkotlin/reflect/KType;)Ljava/lang/reflect/Type;
 }
 

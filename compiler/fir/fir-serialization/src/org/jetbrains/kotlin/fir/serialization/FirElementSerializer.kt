@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.fir.serialization
 
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.config.LanguageFeature
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
@@ -187,21 +188,32 @@ class FirElementSerializer private constructor(
             builder.companionObjectName = getSimpleNameIndex(companionObject.name)
         }
 
-        val representation = (klass as? FirRegularClass)?.inlineClassRepresentation
-        if (representation != null) {
-            builder.inlineClassUnderlyingPropertyName = getSimpleNameIndex(representation.underlyingPropertyName)
+        when (val representation = (klass as? FirRegularClass)?.valueClassRepresentation) {
+            is InlineClassRepresentation -> {
+                builder.inlineClassUnderlyingPropertyName = getSimpleNameIndex(representation.underlyingPropertyName)
 
-            val property = callableMembers.single {
-                it is FirProperty && it.receiverParameter == null && it.name == representation.underlyingPropertyName
-            }
+                val property = callableMembers.single {
+                    it is FirProperty && it.receiverParameter == null && it.name == representation.underlyingPropertyName
+                }
 
-            if (!property.visibility.isPublicAPI) {
-                if (useTypeTable()) {
-                    builder.inlineClassUnderlyingTypeId = typeId(representation.underlyingType)
-                } else {
-                    builder.setInlineClassUnderlyingType(typeProto(representation.underlyingType))
+                if (!property.visibility.isPublicAPI) {
+                    if (useTypeTable()) {
+                        builder.inlineClassUnderlyingTypeId = typeId(representation.underlyingType)
+                    } else {
+                        builder.setInlineClassUnderlyingType(typeProto(representation.underlyingType))
+                    }
                 }
             }
+            is MultiFieldValueClassRepresentation -> {
+                val namesToTypes = representation.underlyingPropertyNamesToTypes
+                builder.addAllMultiFieldValueClassUnderlyingName(namesToTypes.map { (name, _) -> getSimpleNameIndex(name) })
+                if (useTypeTable()) {
+                    builder.addAllMultiFieldValueClassUnderlyingTypeId(namesToTypes.map { (_, kotlinType) -> typeId(kotlinType) })
+                } else {
+                    builder.addAllMultiFieldValueClassUnderlyingType(namesToTypes.map { (_, kotlinType) -> typeProto(kotlinType).build() })
+                }
+            }
+            null -> Unit
         }
 
         if (klass is FirRegularClass) {

@@ -227,3 +227,25 @@ private fun typeToString(type: Type): String =
             unwrap.last().name + "[]".repeat(unwrap.count())
         } else type.name
     } else type.toString()
+
+@ExperimentalStdlibApi
+fun compoundType(vararg types: Type): Type = when (types.size) {
+    0 -> throw KotlinReflectionNotSupportedError("Expected at least 2 types for compound type")
+    1 -> types.single()
+    else -> CompoundTypeImpl(types)
+}
+
+@ExperimentalStdlibApi
+private class CompoundTypeImpl(val types: Array<out Type>) : TypeImpl {
+    private val hashCode = types.contentHashCode()
+    override fun getTypeName(): String {
+        return types.joinToString(", ", "[", "]")
+    }
+
+    override fun equals(other: Any?): Boolean =
+        other is CompoundTypeImpl && this.types contentEquals other.types
+
+    override fun hashCode(): Int = hashCode
+
+    override fun toString(): String = getTypeName()
+}
