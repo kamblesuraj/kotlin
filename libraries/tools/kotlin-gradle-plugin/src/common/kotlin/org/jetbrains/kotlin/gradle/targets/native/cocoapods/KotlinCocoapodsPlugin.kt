@@ -326,11 +326,22 @@ open class KotlinCocoapodsPlugin : Plugin<Project> {
             }
 
             kotlinExtension.supportedTargets().all { target ->
-                target.compilations.getByName(KotlinCompilation.MAIN_COMPILATION_NAME).cinterops.create(pod.moduleName) { interop ->
+                val cinterops = target.compilations.getByName(KotlinCompilation.MAIN_COMPILATION_NAME).cinterops
+                cinterops.create(pod.moduleName) { interop ->
 
-                    val interopTask = project.tasks.getByPath(interop.interopProcessingTaskName)
+                    val interopTask = project.tasks.named<CInteropProcess>(interop.interopProcessingTaskName).get()
 
                     interopTask.dependsOn(defTask)
+
+                    pod.dependencies.forEach { dependencyName ->
+                        val dependencyPod = cocoapodsExtension.pods.findByName(dependencyName)
+                            ?: error("Pod '$pod' has dependency on pod '$target'" )
+
+                        val dependencyTaskName = cinterops.getByName(dependencyPod.moduleName).interopProcessingTaskName
+                        val dependencyTask = project.tasks.named<CInteropProcess>(dependencyTaskName).get()
+
+                        interop.dependencyFiles += project.files(dependencyTask.outputFile).builtBy(dependencyTask)
+                    }
 
                     with(interop) {
                         defFileProperty.set(defTask.map { it.outputFile })

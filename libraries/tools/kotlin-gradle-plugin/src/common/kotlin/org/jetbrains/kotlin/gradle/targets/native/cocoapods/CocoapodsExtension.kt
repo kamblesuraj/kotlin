@@ -10,6 +10,7 @@ import org.gradle.api.Action
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectSet
 import org.gradle.api.Project
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.*
 import org.jetbrains.kotlin.gradle.dsl.multiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.cocoapods.CocoapodsExtension.CocoapodsDependency.PodLocation.*
@@ -291,6 +292,13 @@ abstract class CocoapodsExtension @Inject constructor(private val project: Proje
          */
         @get:Input
         var linkOnly: Boolean = false
+
+        @get:Input
+        val dependencies: MutableList<String> = mutableListOf()
+
+        fun dependsOn(dependency: String) {
+            dependencies.add(dependency)
+        }
 
         @Input
         override fun getName(): String = name
