@@ -1,6 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.DontIncludeResourceTransformer
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.pill.PillExtension
 
 plugins {
@@ -62,6 +61,7 @@ dependencies {
         exclude(group = "*")
     }
     commonCompileOnly(project(":kotlin-tooling-metadata"))
+    commonCompileOnly("org.yaml:snakeyaml:1.32")
 
     commonImplementation(project(":kotlin-gradle-plugin-idea"))
     commonImplementation(project(":kotlin-gradle-plugin-idea-proto"))
@@ -87,10 +87,12 @@ dependencies {
     embedded("com.github.gundy:semver4j:0.16.4:nodeps") {
         exclude(group = "*")
     }
+    embedded("org.yaml:snakeyaml:1.32")
 
     testCompileOnly(project(":compiler"))
     testCompileOnly(project(":kotlin-annotation-processing"))
     testCompileOnly(project(":kotlin-annotation-processing-gradle"))
+    testImplementation("org.yaml:snakeyaml:1.32")
 
     testImplementation(commonDependency("org.jetbrains.teamcity:serviceMessages"))
     testImplementation(projectTests(":kotlin-build-common"))

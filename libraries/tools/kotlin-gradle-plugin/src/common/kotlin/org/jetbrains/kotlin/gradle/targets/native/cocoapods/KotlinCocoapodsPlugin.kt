@@ -41,6 +41,7 @@ import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.konan.target.KonanTarget.*
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.capitalizeAsciiOnly
 import org.jetbrains.kotlin.utils.addToStdlib.cast
+import org.yaml.snakeyaml.Yaml
 import java.io.File
 
 internal val Project.cocoapodsBuildDirs: CocoapodsBuildDirs
@@ -324,6 +325,13 @@ open class KotlinCocoapodsPlugin : Plugin<Project> {
                 // This task is an implementation detail so we don't add it in any group
                 // to avoid showing it in the `tasks` output.
             }
+
+            val lock = Yaml().load<Map<String, Any>>(project.file(cocoapodsExtension.podfile!!.path + ".lock").inputStream())
+            val lockPods = lock["PODS"] as List<Any?>
+
+            "asas"
+
+
 
             kotlinExtension.supportedTargets().all { target ->
                 val cinterops = target.compilations.getByName(KotlinCompilation.MAIN_COMPILATION_NAME).cinterops
