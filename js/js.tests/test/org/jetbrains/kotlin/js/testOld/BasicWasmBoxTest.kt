@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
 import org.jetbrains.kotlin.js.config.JsConfig
 import org.jetbrains.kotlin.js.facade.TranslationUnit
-import org.jetbrains.kotlin.js.testOld.engines.ExternalTool
+import org.jetbrains.kotlin.js.testOld.engines.WasmVM
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNamedFunction
@@ -249,19 +249,45 @@ abstract class BasicWasmBoxTest(
                     File(dir, mjsFile.name).writeText(mjsFile.readText())
                 }
 
-                ExternalTool(System.getProperty("javascript.engine.path.V8"))
-                    .run(
-                        "--experimental-wasm-gc",
-                        *jsFilesBefore.map { File(it).absolutePath }.toTypedArray(),
-                        "--module",
-                        "./${entryMjs}",
-                        *jsFilesAfter.map { File(it).absolutePath }.toTypedArray(),
-                        workingDirectory = dir
-                    )
+                val failsIn = InTextDirectivesUtils.findListWithPrefixes(file.readText(), "// WASM_FAILS_IN: ")
+
+                val exceptions = listOf(WasmVM.V8, WasmVM.SpiderMonkey).mapNotNull map@{ vm ->
+                    try {
+                        if (debugMode >= DebugMode.DEBUG) {
+                            println(" ------ Run in ${vm.name}" + if (vm.shortName in failsIn) " (expected to fail)" else "")
+                        }
+                        vm.run(
+                            "./${entryMjs}",
+                            jsFilesBefore.map { File(it).absolutePath },
+                            jsFilesAfter.map { File(it).absolutePath },
+                            workingDirectory = dir
+                        )
+                        if (vm.shortName in failsIn) {
+                            return@map AssertionError("The test expected to fail in ${vm.name}. Please update the testdata.")
+                        }
+                    } catch (e: Throwable) {
+                        if (vm.shortName !in failsIn) {
+                            return@map e
+                        }
+                    }
+                    null
+                }
+
+                when (exceptions.size) {
+                    0 -> {} // Everything OK
+                    1 -> {
+                        throw exceptions.single()
+                    }
+                    else -> {
+                        throw AssertionError("Failed with several exceptions. Look at suppressed exceptions below.").apply {
+                            exceptions.forEach { addSuppressed(it) }
+                        }
+                    }
+                }
             }
 
-            writeToFilesAndRunD8Test("d8", compilerResult)
-            writeToFilesAndRunD8Test("d8-dce", compilerResultWithDCE)
+            writeToFilesAndRunD8Test("dev", compilerResult)
+            writeToFilesAndRunD8Test("dce", compilerResultWithDCE)
         }
     }
 
