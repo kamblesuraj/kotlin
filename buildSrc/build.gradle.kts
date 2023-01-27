@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 buildscript {
     // workaround for KGP build metrics reports: https://github.com/gradle/gradle/issues/20001
     project.extensions.extraProperties["kotlin.build.report.output"] = null
+    // FIXME: This is to workaround issue with missing runtime KGP dependency
+    project.extensions.extraProperties["_kgp_internal_kotlin_compile_transforms_registered"] = true
 
     val versionPropertiesFile = project.rootProject.projectDir.parentFile.resolve("gradle/versions.properties")
     val versionProperties = java.util.Properties()
@@ -30,7 +32,6 @@ apply {
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
-    `groovy`
     id("org.jetbrains.kotlin.jvm")
     id("org.jetbrains.kotlin.plugin.sam.with.receiver")
 }
@@ -84,18 +85,6 @@ java {
     }
 }
 
-sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
-    kotlin.srcDir("src/main/kotlin")
-    if (!kotlinBuildProperties.isInJpsBuildIdeaSync) {
-        kotlin.srcDir("../kotlin-native/shared/src/library/kotlin")
-        kotlin.srcDir("../kotlin-native/shared/src/main/kotlin")
-        kotlin.srcDir("../kotlin-native/build-tools/src/main/kotlin")
-        kotlin.srcDir("../kotlin-native/tools/kotlin-native-gradle-plugin/src/main/kotlin")
-        kotlin.srcDir("../compiler/util-klib/src")
-        kotlin.srcDir("../native/utils/src")
-    }
-}
-
 tasks.validatePlugins.configure {
     enabled = false
 }
@@ -124,23 +113,13 @@ dependencies {
 
     compileOnly(gradleApi())
 
-    val kotlinVersion = project.bootstrapKotlinVersion
-    val metadataVersion = "0.0.1-dev-10"
-    val coroutinesVersion = "1.5.0"
-
     // See https://github.com/gradle/gradle/issues/22510
     implementation("org.gradle.kotlin:gradle-kotlin-dsl-plugins:2.4.1")
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:${project.bootstrapKotlinVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:${project.bootstrapKotlinVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:${project.bootstrapKotlinVersion}")
     implementation("com.google.code.gson:gson:2.8.9") // Workaround for Gradle dependency resolution error
-
     implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.5.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-metadata-klib:$metadataVersion")
-    if (kotlinBuildProperties.isInJpsBuildIdeaSync) {
-        implementation("org.jetbrains.kotlin:kotlin-native-utils:${project.bootstrapKotlinVersion}")
-    }
 }
 
 samWithReceiver {
@@ -162,58 +141,15 @@ compileKotlin.apply {
     }
 }
 
-if (!kotlinBuildProperties.isInJpsBuildIdeaSync) {
-    sourceSets["main"].extensions
-        .getByType(GroovySourceDirectorySet::class.java)
-        .srcDir("../kotlin-native/build-tools/src/main/groovy")
-}
-
-tasks.withType<GroovyCompile>().configureEach {
-    classpath += project.files(compileKotlin.outputs)
-    dependsOn(compileKotlin)
-}
-
 allprojects {
     tasks.register("checkBuild")
 }
 
 gradlePlugin {
     plugins {
-        create("compileToBitcode") {
-            id = "compile-to-bitcode"
-            implementationClass = "org.jetbrains.kotlin.bitcode.CompileToBitcodePlugin"
-        }
-        create("runtimeTesting") {
-            id = "runtime-testing"
-            implementationClass = "org.jetbrains.kotlin.testing.native.RuntimeTestingPlugin"
-        }
-        create("compilationDatabase") {
-            id = "compilation-database"
-            implementationClass = "org.jetbrains.kotlin.cpp.CompilationDatabasePlugin"
-        }
-        create("konan") {
-            id = "konan"
-            implementationClass = "org.jetbrains.kotlin.gradle.plugin.konan.KonanPlugin"
-        }
-        // We bundle a shaded version of kotlinx-serialization plugin
-        create("kotlinx-serialization-native") {
-            id = "kotlinx-serialization-native"
-            implementationClass = "shadow.org.jetbrains.kotlinx.serialization.gradle.SerializationGradleSubplugin"
-        }
-
-        create("org.jetbrains.kotlin.konan") {
-            id = "org.jetbrains.kotlin.konan"
-            implementationClass = "org.jetbrains.kotlin.gradle.plugin.konan.KonanPlugin"
-        }
-
         create("native") {
             id = "native"
             implementationClass = "org.jetbrains.gradle.plugins.tools.NativePlugin"
-        }
-
-        create("native-interop-plugin") {
-            id = "native-interop-plugin"
-            implementationClass = "org.jetbrains.kotlin.NativeInteropPlugin"
         }
     }
 }
