@@ -9,9 +9,11 @@ import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.utils.isLocal
 import org.jetbrains.kotlin.fir.symbols.ConeClassLikeLookupTag
 import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
 import org.jetbrains.kotlin.fir.types.ConeClassLikeType
 import org.jetbrains.kotlin.fir.types.ConeIntersectionType
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.fir.types.toLookupTag
 
 fun FirCallableSymbol<*>.dispatchReceiverClassTypeOrNull(): ConeClassLikeType? =
     fir.dispatchReceiverClassTypeOrNull()
@@ -39,6 +41,15 @@ fun FirRegularClass.containingClassForLocal(): ConeClassLikeLookupTag? =
 
 fun FirDanglingModifierList.containingClass(): ConeClassLikeLookupTag? =
     containingClassAttr
+
+fun FirClassLikeSymbol<*>.getContainingClassLookupTag(): ConeClassLikeLookupTag? {
+    return if (classId.isLocal) {
+        (fir as? FirRegularClass)?.containingClassForLocal()
+    } else {
+        val ownerId = classId.outerClassId
+        ownerId?.toLookupTag()
+    }
+}
 
 private object ContainingClassKey : FirDeclarationDataKey()
 var FirCallableDeclaration.containingClassForStaticMemberAttr: ConeClassLikeLookupTag? by FirDeclarationDataRegistry.data(ContainingClassKey)
@@ -158,4 +169,3 @@ var FirFunction.isJavaRecordComponent: Boolean? by FirDeclarationDataRegistry.da
 private object IsCatchParameterProperty : FirDeclarationDataKey()
 
 var FirProperty.isCatchParameter: Boolean? by FirDeclarationDataRegistry.data(IsCatchParameterProperty)
-
