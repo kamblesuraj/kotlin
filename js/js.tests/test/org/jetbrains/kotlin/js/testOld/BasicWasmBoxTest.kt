@@ -200,7 +200,7 @@ abstract class BasicWasmBoxTest(
 
             val testJs = if (debugMode >= DebugMode.DEBUG) testJsVerbose else testJsQuiet
 
-            fun writeToFilesAndRunD8Test(name: String, res: WasmCompilerResult) {
+            fun writeToFilesAndRunTest(name: String, res: WasmCompilerResult) {
                 val dir = File(outputDirBase, name)
                 dir.mkdirs()
 
@@ -286,8 +286,8 @@ abstract class BasicWasmBoxTest(
                 }
             }
 
-            writeToFilesAndRunD8Test("dev", compilerResult)
-            writeToFilesAndRunD8Test("dce", compilerResultWithDCE)
+            writeToFilesAndRunTest("dev", compilerResult)
+            writeToFilesAndRunTest("dce", compilerResultWithDCE)
         }
     }
 
