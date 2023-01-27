@@ -144,15 +144,12 @@ internal external fun isNullish(ref: ExternalInterfaceType?): Boolean
 /*
 * Compiler generates inplace next code:
 * ```
-* block {
-*     block (result anyref) {
-*         local.get 0
-*         extern.internalize
-*         br_on_non_data_fail 0
-*         br_on_cast_fail 0 (type $kotlin.Any)
-*         return
-*     }
-*     drop
+* block (result anyref) {
+*     local.get 0
+*     extern.internalize
+*     br_on_non_data_fail 0
+*     br_on_cast_fail 0 (type $kotlin.Any)
+*     return
 * }
 * ```
 */
