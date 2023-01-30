@@ -41,6 +41,7 @@ data class BuildOptions(
     val freeArgs: List<String> = emptyList(),
     val statisticsForceValidation: Boolean = true,
     val usePreciseOutputsBackup: Boolean? = null,
+    val keepIncrementalCompilationCachesInMemory: Boolean? = null,
 ) {
     val safeAndroidVersion: String
         get() = androidVersion ?: error("AGP version is expected to be set")
@@ -154,6 +155,10 @@ data class BuildOptions(
 
         if (usePreciseOutputsBackup != null) {
             arguments.add("-Pkotlin.compiler.preciseCompilationResultsBackup=$usePreciseOutputsBackup")
+        }
+
+        if (keepIncrementalCompilationCachesInMemory != null) {
+            arguments.add("-Pkotlin.compiler.keepIncrementalCompilationCachesInMemory=$keepIncrementalCompilationCachesInMemory")
         }
 
         arguments.addAll(freeArgs)
