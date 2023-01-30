@@ -92,7 +92,6 @@ class PackageJson(
         val gson = GsonBuilder()
             .setPrettyPrinting()
             .disableHtmlEscaping()
-            .serializeNulls()
             .addSerializationExclusionStrategy(
                 object : ExclusionStrategy {
                     override fun shouldSkipField(f: FieldAttributes?): Boolean =
@@ -112,9 +111,16 @@ class PackageJson(
             }
         } else null
 
+        val gsonForCustomFields = GsonBuilder()
+            .disableHtmlEscaping()
+            .serializeNulls()
+            .create()
+
         customFields
             .forEach { (key, value) ->
-                val valueElement = gson.toJsonTree(value)
+                val valueElement = gsonForCustomFields
+                    .toJsonTree(value)
+
                 jsonTree.asJsonObject.add(key, valueElement)
             }
         if (jsonTree != previous) {
