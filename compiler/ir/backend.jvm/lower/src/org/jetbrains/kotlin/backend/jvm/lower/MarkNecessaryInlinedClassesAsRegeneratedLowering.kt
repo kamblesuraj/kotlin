@@ -43,8 +43,7 @@ class MarkNecessaryInlinedClassesAsRegeneratedLowering(val context: JvmBackendCo
     override fun visitBlock(expression: IrBlock): IrExpression {
         if (expression is IrInlinedFunctionBlock && expression.isFunctionInlining()) {
             val element = expression.inlineDeclaration
-            if (!visited.contains(element)) {
-                visited += element
+            if (visited.add(element)) {
                 // TODO that if callee is located in other module? can we lower it from file lowering?
                 element.transform(this, null)
             }
