@@ -171,15 +171,16 @@ object IrTree : AbstractTreeBuilder() {
         +listField("sealedSubclasses", classSymbolType, mutability = Var)
     }
     val attributeContainer: ElementConfig by element(Declaration) {
-        kDoc = buildString {
-            append("Represent IR element that can be copied, but must remember its original class. ")
-            appendLine("It is useful, for example, to keep track of generated names for anonymous declarations.")
-            append("@property attributeOwnerId original element before copying. ")
-            appendLine("Always satisfy following invariant `this.attributeOwnerId == this.attributeOwnerId.attributeOwnerId`")
-            append("@property attributeOwnerIdBeforeInline original element before inlining. ")
-            append("Has sense only with IR inliner. If element wasn't inlined contains `null`. ")
-            append("Unlike, previous property doesn't have special invariant and can contain a chain of declarations.")
-        }
+        kDoc = """
+            Represents an IR element that can be copied, but must remember its original element. It is
+            useful, for example, to keep track of generated names for anonymous declarations.
+            @property attributeOwnerId original element before copying. Always satisfies the following
+              invariant: `this.attributeOwnerId == this.attributeOwnerId.attributeOwnerId`.
+            @property attributeOwnerIdBeforeInline original element before inlining. Useful only with IR
+              inliner. `null` if the element wasn't inlined. Unlike [attributeOwnerId], doesn't have the
+              idempotence invariant and can contain a chain of declarations.
+        """.trimIndent()
+
         +field("attributeOwnerId", attributeContainer, mutable = true)
         +field("attributeOwnerIdBeforeInline", attributeContainer, mutable = true, nullable = true) // null <=> this element wasn't inlined
     }
