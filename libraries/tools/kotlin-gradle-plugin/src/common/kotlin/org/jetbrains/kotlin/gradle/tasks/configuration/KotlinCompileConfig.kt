@@ -101,8 +101,8 @@ internal open class BaseKotlinCompileConfig<TASK : KotlinCompile> : AbstractKotl
         private const val TRANSFORMS_REGISTERED = "_kgp_internal_kotlin_compile_transforms_registered"
 
         val ARTIFACT_TYPE_ATTRIBUTE: Attribute<String> = Attribute.of("artifactType", String::class.java)
-        private const val DIRECTORY_ARTIFACT_TYPE = "directory"
-        private const val JAR_ARTIFACT_TYPE = "jar"
+        const val DIRECTORY_ARTIFACT_TYPE = "directory"
+        const val JAR_ARTIFACT_TYPE = "jar"
         const val CLASSPATH_ENTRY_SNAPSHOT_ARTIFACT_TYPE = "classpath-entry-snapshot"
 
         private fun getDefaultLangSetting(project: Project, ext: KotlinTopLevelExtension): Provider<LanguageSettings> {

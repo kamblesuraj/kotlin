@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.copyAttributes
 import org.jetbrains.kotlin.gradle.plugin.sources.METADATA_CONFIGURATION_NAME_SUFFIX
 import org.jetbrains.kotlin.gradle.targets.js.KotlinJsTarget
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+import org.jetbrains.kotlin.gradle.tasks.configuration.BaseKotlinCompileConfig
 import org.jetbrains.kotlin.gradle.utils.*
 
 internal sealed class DefaultKotlinCompilationDependencyConfigurationsFactory :
@@ -197,6 +198,10 @@ private fun KotlinCompilationDependencyConfigurationsContainer(
         isVisible = false
         isCanBeConsumed = false
         attributes.attribute(Usage.USAGE_ATTRIBUTE, KotlinUsages.consumerApiUsage(target))
+        attributes.attribute(
+            BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE,
+            BaseKotlinCompileConfig.DIRECTORY_ARTIFACT_TYPE
+        )
         if (target.platformType != KotlinPlatformType.androidJvm) {
             attributes.attribute(Category.CATEGORY_ATTRIBUTE, target.project.categoryByName(Category.LIBRARY))
         }
@@ -211,6 +216,10 @@ private fun KotlinCompilationDependencyConfigurationsContainer(
             isVisible = false
             isCanBeConsumed = false
             isCanBeResolved = true
+            attributes.attribute(
+                BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE,
+                BaseKotlinCompileConfig.DIRECTORY_ARTIFACT_TYPE
+            )
             attributes.attribute(Usage.USAGE_ATTRIBUTE, KotlinUsages.consumerRuntimeUsage(target))
             if (target.platformType != KotlinPlatformType.androidJvm) {
                 attributes.attribute(Category.CATEGORY_ATTRIBUTE, target.project.categoryByName(Category.LIBRARY))
