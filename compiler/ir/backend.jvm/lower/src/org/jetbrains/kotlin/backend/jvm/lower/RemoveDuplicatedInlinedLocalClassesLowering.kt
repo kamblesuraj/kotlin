@@ -157,8 +157,7 @@ class RemoveDuplicatedInlinedLocalClassesLowering(val context: JvmBackendContext
     }
 
     override fun visitFunctionReference(expression: IrFunctionReference, data: Boolean): IrElement {
-        if (expression.symbol.owner in visited) return expression
-        visited += expression.symbol.owner
+        if (!visited.add(expression.symbol.owner)) return expression
         expression.symbol.owner.accept(this, data)
         return super.visitFunctionReference(expression, data)
     }
