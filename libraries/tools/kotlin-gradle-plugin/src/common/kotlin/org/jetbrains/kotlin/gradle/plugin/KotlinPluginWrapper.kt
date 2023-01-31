@@ -49,6 +49,8 @@ import org.jetbrains.kotlin.gradle.targets.js.npm.addNpmDependencyExtension
 import org.jetbrains.kotlin.gradle.targets.metadata.isKotlinGranularMetadataEnabled
 import org.jetbrains.kotlin.gradle.targets.native.internal.CInteropKlibLibraryElements
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
+import org.jetbrains.kotlin.gradle.tasks.configuration.ArtifactTypeCompatibilityRule
+import org.jetbrains.kotlin.gradle.tasks.configuration.BaseKotlinCompileConfig
 import org.jetbrains.kotlin.gradle.testing.internal.KotlinTestsRegistry
 import org.jetbrains.kotlin.gradle.tooling.registerBuildKotlinToolingMetadataTask
 import org.jetbrains.kotlin.gradle.utils.*
@@ -172,6 +174,9 @@ abstract class DefaultKotlinBasePlugin : KotlinBasePlugin {
         KotlinPlatformType.setupAttributesMatchingStrategy(this)
         KotlinUsages.setupAttributesMatchingStrategy(this, isKotlinGranularMetadata)
         KotlinJsCompilerAttribute.setupAttributesMatchingStrategy(project.dependencies.attributesSchema)
+        this.attribute(BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE) { strategy ->
+            strategy.compatibilityRules.add(ArtifactTypeCompatibilityRule::class.java)
+        }
         ProjectLocalConfigurations.setupAttributesMatchingStrategy(this)
         CInteropKlibLibraryElements.setupAttributesMatchingStrategy(this)
     }

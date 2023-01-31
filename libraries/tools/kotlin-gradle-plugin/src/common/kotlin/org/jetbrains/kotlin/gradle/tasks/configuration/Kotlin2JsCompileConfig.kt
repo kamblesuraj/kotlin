@@ -10,6 +10,8 @@ import org.gradle.api.artifacts.transform.InputArtifact
 import org.gradle.api.artifacts.transform.TransformAction
 import org.gradle.api.artifacts.transform.TransformOutputs
 import org.gradle.api.artifacts.transform.TransformParameters
+import org.gradle.api.attributes.AttributeCompatibilityRule
+import org.gradle.api.attributes.CompatibilityCheckDetails
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.file.FileSystemOperations
@@ -143,6 +145,19 @@ internal open class BaseKotlin2JsCompileConfig<TASK : Kotlin2JsCompile>(
                 )
             }
         }
+    }
+}
+
+class ArtifactTypeCompatibilityRule : AttributeCompatibilityRule<String> {
+    override fun execute(details: CompatibilityCheckDetails<String>) {
+        if (details.consumerValue != BaseKotlinCompileConfig.DIRECTORY_ARTIFACT_TYPE) return details.compatible()
+        val producerValue: String = details.producerValue ?: return details.compatible()
+
+        if (producerValue != "jar" && producerValue != "klib") {
+            return details.compatible()
+        }
+
+        details.incompatible()
     }
 }
 
