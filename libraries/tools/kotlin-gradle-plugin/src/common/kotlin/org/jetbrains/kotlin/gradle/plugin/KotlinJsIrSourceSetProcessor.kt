@@ -42,17 +42,7 @@ internal class KotlinJsIrSourceSetProcessor(
         val compilation = compilationInfo.tcsOrNull?.compilation as KotlinJsIrCompilation
 
         kotlinTask.configure {
-            val compileDirectoryFiles = compilation.configurations
-                .runtimeDependencyConfiguration!!
-                .incoming
-                .artifactView { artifactView ->
-                    artifactView.attributes.attribute(
-                        BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE,
-                        BaseKotlinCompileConfig.DIRECTORY_ARTIFACT_TYPE
-                    )
-                }
-                .files
-            it.libraries.from(compileDirectoryFiles)
+            it.libraries.from(compilation.compileDirectoryFiles)
         }
 
         compilation.binaries
@@ -61,17 +51,7 @@ internal class KotlinJsIrSourceSetProcessor(
                 val configAction = KotlinJsIrLinkConfig(binary)
                 configAction.configureTask {
                     it.description = taskDescription
-                    val runtimeDirectoryFiles = compilation.configurations
-                        .runtimeDependencyConfiguration!!
-                        .incoming
-                        .artifactView { artifactView ->
-                            artifactView.attributes.attribute(
-                                BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE,
-                                BaseKotlinCompileConfig.DIRECTORY_ARTIFACT_TYPE
-                            )
-                        }
-                        .files
-                    it.libraries.from(runtimeDirectoryFiles)
+                    it.libraries.from(compilation.runtimeDirectoryFiles)
                 }
                 configAction.configureTask { task ->
                     task.modeProperty.set(binary.mode)
