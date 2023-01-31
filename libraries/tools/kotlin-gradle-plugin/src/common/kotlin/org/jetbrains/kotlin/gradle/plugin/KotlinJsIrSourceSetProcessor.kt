@@ -12,9 +12,9 @@ import org.jetbrains.kotlin.gradle.targets.js.ir.JsIrBinary
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrCompilation
 import org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinTasksProvider
+import org.jetbrains.kotlin.gradle.tasks.configuration.BaseKotlinCompileConfig
 import org.jetbrains.kotlin.gradle.tasks.configuration.Kotlin2JsCompileConfig
 import org.jetbrains.kotlin.gradle.tasks.configuration.KotlinJsIrLinkConfig
-import org.jetbrains.kotlin.gradle.utils.filesProvider
 
 internal class KotlinJsIrSourceSetProcessor(
     tasksProvider: KotlinTasksProvider,
@@ -41,13 +41,37 @@ internal class KotlinJsIrSourceSetProcessor(
 
         val compilation = compilationInfo.tcsOrNull?.compilation as KotlinJsIrCompilation
 
+        kotlinTask.configure {
+            val compileDirectoryFiles = compilation.configurations
+                .runtimeDependencyConfiguration!!
+                .incoming
+                .artifactView { artifactView ->
+                    artifactView.attributes.attribute(
+                        BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE,
+                        BaseKotlinCompileConfig.DIRECTORY_ARTIFACT_TYPE
+                    )
+                }
+                .files
+            it.libraries.from(compileDirectoryFiles)
+        }
+
         compilation.binaries
             .withType(JsIrBinary::class.java)
             .all { binary ->
                 val configAction = KotlinJsIrLinkConfig(binary)
                 configAction.configureTask {
                     it.description = taskDescription
-                    it.libraries.from(compilation.runtimeDependencyFiles)
+                    val runtimeDirectoryFiles = compilation.configurations
+                        .runtimeDependencyConfiguration!!
+                        .incoming
+                        .artifactView { artifactView ->
+                            artifactView.attributes.attribute(
+                                BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE,
+                                BaseKotlinCompileConfig.DIRECTORY_ARTIFACT_TYPE
+                            )
+                        }
+                        .files
+                    it.libraries.from(runtimeDirectoryFiles)
                 }
                 configAction.configureTask { task ->
                     task.modeProperty.set(binary.mode)
