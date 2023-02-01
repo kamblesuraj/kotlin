@@ -178,7 +178,7 @@ class FirNativeKLibSerializerExtension(
             proto.addExtension(KlibMetadataProtoBuf.propertySetterAnnotation, annotationSerializer.serializeAnnotation(it))
         }
         property.initializer?.let {
-            if (it is FirConstExpression<*> && it.value != null && it.value !is NullValue)
+            if (it is FirConstExpression<*> && it.value != null)
                 annotationSerializer.valueProto(it)?.let { builder ->
                     proto.setExtension(KlibMetadataProtoBuf.compileTimeValue, builder.build())
                 }
