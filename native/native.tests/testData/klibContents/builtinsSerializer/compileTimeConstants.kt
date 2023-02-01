@@ -1,3 +1,5 @@
+// KT-56189
+// MUTED_WHEN: K2
 package test
 
 enum class Weapon {

@@ -28,9 +28,9 @@ import org.jetbrains.kotlin.library.metadata.resolver.TopologicalLibraryOrder
 import org.jetbrains.kotlin.metadata.ProtoBuf
 import org.jetbrains.kotlin.utils.toMetadataVersion
 import org.jetbrains.kotlin.metadata.deserialization.BinaryVersion
+import org.jetbrains.kotlin.metadata.deserialization.Flags
 import org.jetbrains.kotlin.metadata.serialization.MutableVersionRequirementTable
 import org.jetbrains.kotlin.psi
-import org.jetbrains.kotlin.resolve.constants.NullValue
 
 internal fun PhaseContext.firSerializer(
         input: Fir2IrOutput
@@ -177,12 +177,10 @@ class FirNativeKLibSerializerExtension(
         property.setter?.nonSourceAnnotations(session)?.forEach {
             proto.addExtension(KlibMetadataProtoBuf.propertySetterAnnotation, annotationSerializer.serializeAnnotation(it))
         }
-        property.initializer?.let {
-            if (it is FirConstExpression<*> && it.value != null)
-                annotationSerializer.valueProto(it)?.let { builder ->
-                    proto.setExtension(KlibMetadataProtoBuf.compileTimeValue, builder.build())
-                }
-        }
+        if (Flags.HAS_CONSTANT.get(proto.flags))
+            annotationSerializer.valueProto(property.initializer as FirConstExpression<*>)?.let { constBuilder ->
+                proto.setExtension(KlibMetadataProtoBuf.compileTimeValue, constBuilder.build())
+            }
         // TODO KT-56090 Serialize KDocString
         super.serializeProperty(property, proto, versionRequirementTable, childSerializer)
     }
