@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilationToRunnableFiles
 import org.jetbrains.kotlin.gradle.plugin.KotlinTargetComponent
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsageContext.MavenScope
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.utils.getValue
 
 internal data class ModuleCoordinates(
@@ -217,6 +218,8 @@ private fun KotlinTargetComponent.findUsageContext(configurationName: String): U
         configurationName in compilation.relatedConfigurationNames ||
                 configurationName == compilation.target.apiElementsConfigurationName ||
                 configurationName == compilation.target.runtimeElementsConfigurationName ||
-                configurationName == compilation.target.defaultConfigurationName
+                configurationName == compilation.target.defaultConfigurationName ||
+                configurationName == (compilation.target as? KotlinJsIrTarget)?.unpackedApiConfigurationName ||
+                configurationName == (compilation.target as? KotlinJsIrTarget)?.unpackedRuntimeConfigurationName
     }
 }

@@ -55,25 +55,21 @@ import org.jetbrains.kotlin.gradle.plugin.statistics.KotlinBuildStatsService
 import org.jetbrains.kotlin.gradle.report.*
 import org.jetbrains.kotlin.gradle.targets.js.internal.LibraryFilterCachingService
 import org.jetbrains.kotlin.gradle.targets.js.internal.UsesLibraryFilterCachingService
-import org.jetbrains.kotlin.gradle.tasks.internal.KotlinJvmOptionsCompat
 import org.jetbrains.kotlin.gradle.targets.js.ir.*
-import org.jetbrains.kotlin.gradle.targets.js.ir.DISABLE_PRE_IR
-import org.jetbrains.kotlin.gradle.targets.js.ir.PRODUCE_JS
-import org.jetbrains.kotlin.gradle.targets.js.ir.PRODUCE_UNZIPPED_KLIB
-import org.jetbrains.kotlin.gradle.targets.js.ir.PRODUCE_ZIPPED_KLIB
 import org.jetbrains.kotlin.gradle.tasks.internal.KotlinJsOptionsCompat
+import org.jetbrains.kotlin.gradle.tasks.internal.KotlinJvmOptionsCompat
 import org.jetbrains.kotlin.gradle.utils.*
 import org.jetbrains.kotlin.incremental.*
 import org.jetbrains.kotlin.incremental.ClasspathChanges.ClasspathSnapshotDisabled
 import org.jetbrains.kotlin.incremental.ClasspathChanges.ClasspathSnapshotEnabled.*
 import org.jetbrains.kotlin.incremental.ClasspathChanges.ClasspathSnapshotEnabled.IncrementalRun.*
+import org.jetbrains.kotlin.library.KLIB_MANIFEST_FILE_NAME
 import org.jetbrains.kotlin.library.impl.isKotlinLibrary
 import org.jetbrains.kotlin.statistics.metrics.BooleanMetrics
 import org.jetbrains.kotlin.utils.JsLibraryUtils
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 import java.io.File
 import java.nio.file.Files.*
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 const val KOTLIN_BUILD_DIR_NAME = "kotlin"
@@ -1137,8 +1133,24 @@ abstract class Kotlin2JsCompile @Inject constructor(
 
         val icEnv = if (isIncrementalCompilationEnabled()) {
             logger.info(USING_JS_INCREMENTAL_COMPILATION_MESSAGE)
+            val changedFiles = getChangedFiles(inputChanges, incrementalProps)
+                .let {
+                    when (it) {
+                        is ChangedFiles.Unknown -> it
+                        is ChangedFiles.Known -> {
+                            val predicate: (File) -> Boolean = { if (it.extension == "kt") true else it.name == KLIB_MANIFEST_FILE_NAME }
+                            ChangedFiles.Known(
+                                it.modified
+                                    .filter(predicate),
+                                it.removed
+                                    .filter(predicate),
+                                it.forDependencies
+                            )
+                        }
+                    }
+                }
             IncrementalCompilationEnvironment(
-                getChangedFiles(inputChanges, incrementalProps),
+                changedFiles,
                 ClasspathChanges.NotAvailableForJSCompiler,
                 taskBuildCacheableOutputDirectory.get().asFile,
                 multiModuleICSettings = multiModuleICSettings,
