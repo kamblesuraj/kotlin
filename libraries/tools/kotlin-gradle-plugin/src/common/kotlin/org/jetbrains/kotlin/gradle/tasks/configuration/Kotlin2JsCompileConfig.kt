@@ -123,17 +123,20 @@ internal open class BaseKotlin2JsCompileConfig<TASK : Kotlin2JsCompile>(
     }
 
     companion object {
+        private const val TRANSFORMS_REGISTERED = "_kgp_internal_kotlin_js_compile_transforms_registered"
+        const val UNPACKED_KLIB_ARTIFACT_TYPE = "unpacked-klib-js"
+
         fun registerTransformsOnce(project: Project) {
-            if (project.extensions.extraProperties.has("hello")) {
+            if (project.extensions.extraProperties.has(TRANSFORMS_REGISTERED)) {
                 return
             }
-            project.extensions.extraProperties["hello"] = true
+            project.extensions.extraProperties[TRANSFORMS_REGISTERED] = true
 
             project.dependencies.registerTransform(Unzip::class.java) {
                 it.from.attribute(BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE, BaseKotlinCompileConfig.JAR_ARTIFACT_TYPE)
                 it.to.attribute(
                     BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE,
-                    BaseKotlinCompileConfig.DIRECTORY_ARTIFACT_TYPE
+                    Kotlin2JsCompileConfig.UNPACKED_KLIB_ARTIFACT_TYPE
                 )
             }
 
@@ -141,7 +144,7 @@ internal open class BaseKotlin2JsCompileConfig<TASK : Kotlin2JsCompile>(
                 it.from.attribute(BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE, "klib")
                 it.to.attribute(
                     BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE,
-                    BaseKotlinCompileConfig.DIRECTORY_ARTIFACT_TYPE
+                    Kotlin2JsCompileConfig.UNPACKED_KLIB_ARTIFACT_TYPE
                 )
             }
         }
@@ -150,7 +153,7 @@ internal open class BaseKotlin2JsCompileConfig<TASK : Kotlin2JsCompile>(
 
 class ArtifactTypeCompatibilityRule : AttributeCompatibilityRule<String> {
     override fun execute(details: CompatibilityCheckDetails<String>) {
-        if (details.consumerValue != BaseKotlinCompileConfig.DIRECTORY_ARTIFACT_TYPE) return details.compatible()
+        if (details.consumerValue != Kotlin2JsCompileConfig.UNPACKED_KLIB_ARTIFACT_TYPE) return
         val producerValue: String = details.producerValue ?: return details.compatible()
 
         if (producerValue != "jar" && producerValue != "klib") {

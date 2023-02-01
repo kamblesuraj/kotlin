@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.gradle.plugin.sources.METADATA_CONFIGURATION_NAME_SU
 import org.jetbrains.kotlin.gradle.targets.js.KotlinJsTarget
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.tasks.configuration.BaseKotlinCompileConfig
+import org.jetbrains.kotlin.gradle.tasks.configuration.Kotlin2JsCompileConfig
 import org.jetbrains.kotlin.gradle.utils.*
 
 internal sealed class DefaultKotlinCompilationDependencyConfigurationsFactory :
@@ -201,7 +202,7 @@ private fun KotlinCompilationDependencyConfigurationsContainer(
         if (target.platformType == KotlinPlatformType.js) {
             attributes.attribute(
                 BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE,
-                BaseKotlinCompileConfig.DIRECTORY_ARTIFACT_TYPE
+                Kotlin2JsCompileConfig.UNPACKED_KLIB_ARTIFACT_TYPE
             )
         }
         if (target.platformType != KotlinPlatformType.androidJvm) {
@@ -221,7 +222,7 @@ private fun KotlinCompilationDependencyConfigurationsContainer(
             if (target.platformType == KotlinPlatformType.js) {
                 attributes.attribute(
                     BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE,
-                    BaseKotlinCompileConfig.DIRECTORY_ARTIFACT_TYPE
+                    Kotlin2JsCompileConfig.UNPACKED_KLIB_ARTIFACT_TYPE
                 )
             }
             attributes.attribute(Usage.USAGE_ATTRIBUTE, KotlinUsages.consumerRuntimeUsage(target))

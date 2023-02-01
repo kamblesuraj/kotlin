@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.gradle.targets.js.ir
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.compilationImpl.KotlinCompilationImpl
 import org.jetbrains.kotlin.gradle.tasks.configuration.BaseKotlinCompileConfig
+import org.jetbrains.kotlin.gradle.tasks.configuration.Kotlin2JsCompileConfig
 import javax.inject.Inject
 
 open class KotlinJsIrCompilation @Inject internal constructor(compilation: KotlinCompilationImpl) : KotlinJsCompilation(compilation) {
@@ -17,7 +18,7 @@ open class KotlinJsIrCompilation @Inject internal constructor(compilation: Kotli
         .artifactView { artifactView ->
             artifactView.attributes.attribute(
                 BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE,
-                BaseKotlinCompileConfig.DIRECTORY_ARTIFACT_TYPE
+                Kotlin2JsCompileConfig.UNPACKED_KLIB_ARTIFACT_TYPE
             )
         }
 
@@ -30,7 +31,7 @@ open class KotlinJsIrCompilation @Inject internal constructor(compilation: Kotli
         .artifactView { artifactView ->
             artifactView.attributes.attribute(
                 BaseKotlinCompileConfig.ARTIFACT_TYPE_ATTRIBUTE,
-                BaseKotlinCompileConfig.DIRECTORY_ARTIFACT_TYPE
+                Kotlin2JsCompileConfig.UNPACKED_KLIB_ARTIFACT_TYPE
             )
         }
 
