@@ -144,12 +144,3 @@ compileKotlin.apply {
 allprojects {
     tasks.register("checkBuild")
 }
-
-gradlePlugin {
-    plugins {
-        create("native") {
-            id = "native"
-            implementationClass = "org.jetbrains.gradle.plugins.tools.NativePlugin"
-        }
-    }
-}
