@@ -304,6 +304,7 @@ class FirElementSerializer private constructor(
                 }
             }
         }
+
         val hasConstant = !property.isVar && property.initializer?.let {
             it is FirConstExpression<*> && it.value != null
         } ?: false
