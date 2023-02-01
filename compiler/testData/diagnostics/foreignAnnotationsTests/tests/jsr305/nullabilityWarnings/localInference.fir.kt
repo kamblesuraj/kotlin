@@ -87,7 +87,7 @@ fun ifChecksAndSmartCasts() {
     val r2 = if (b == null) 42 else b.length
 
     // JB
-    val r3 = if (<!SENSELESS_COMPARISON!>c == null<!>) 42 else c.length
+    val r3 = if (c == null) 42 else c.length
     val r4 = if (d == null) 42 else d.length
 
     // Platform

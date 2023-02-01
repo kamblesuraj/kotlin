@@ -18,8 +18,8 @@ fun f(): Unit {
     x === "1"
     x !== "1"
 
-    x === 1
-    x !== 1
+    <!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x === 1<!>
+    <!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x !== 1<!>
 
     x..2
     x in 1..2

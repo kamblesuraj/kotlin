@@ -3419,8 +3419,22 @@ internal val KT_DIAGNOSTIC_CONVERTER = KtDiagnosticConverterBuilder.buildConvert
             token,
         )
     }
+    add(FirErrors.SENSELESS_COMPARISON_ERROR) { firDiagnostic ->
+        SenselessComparisonErrorImpl(
+            firDiagnostic.a.source!!.psi as KtExpression,
+            firDiagnostic.b,
+            firDiagnostic as KtPsiDiagnostic,
+            token,
+        )
+    }
     add(FirErrors.SENSELESS_NULL_IN_WHEN) { firDiagnostic ->
         SenselessNullInWhenImpl(
+            firDiagnostic as KtPsiDiagnostic,
+            token,
+        )
+    }
+    add(FirErrors.SENSELESS_NULL_IN_WHEN_ERROR) { firDiagnostic ->
+        SenselessNullInWhenErrorImpl(
             firDiagnostic as KtPsiDiagnostic,
             token,
         )
@@ -3807,6 +3821,30 @@ internal val KT_DIAGNOSTIC_CONVERTER = KtDiagnosticConverterBuilder.buildConvert
     }
     add(FirErrors.INCOMPATIBLE_ENUM_COMPARISON_ERROR) { firDiagnostic ->
         IncompatibleEnumComparisonErrorImpl(
+            firSymbolBuilder.typeBuilder.buildKtType(firDiagnostic.a),
+            firSymbolBuilder.typeBuilder.buildKtType(firDiagnostic.b),
+            firDiagnostic as KtPsiDiagnostic,
+            token,
+        )
+    }
+    add(FirErrors.INCOMPATIBLE_ENUM_COMPARISON) { firDiagnostic ->
+        IncompatibleEnumComparisonImpl(
+            firSymbolBuilder.typeBuilder.buildKtType(firDiagnostic.a),
+            firSymbolBuilder.typeBuilder.buildKtType(firDiagnostic.b),
+            firDiagnostic as KtPsiDiagnostic,
+            token,
+        )
+    }
+    add(FirErrors.FORBIDDEN_IDENTITY_EQUALS) { firDiagnostic ->
+        ForbiddenIdentityEqualsImpl(
+            firSymbolBuilder.typeBuilder.buildKtType(firDiagnostic.a),
+            firSymbolBuilder.typeBuilder.buildKtType(firDiagnostic.b),
+            firDiagnostic as KtPsiDiagnostic,
+            token,
+        )
+    }
+    add(FirErrors.FORBIDDEN_IDENTITY_EQUALS_WARNING) { firDiagnostic ->
+        ForbiddenIdentityEqualsWarningImpl(
             firSymbolBuilder.typeBuilder.buildKtType(firDiagnostic.a),
             firSymbolBuilder.typeBuilder.buildKtType(firDiagnostic.b),
             firDiagnostic as KtPsiDiagnostic,

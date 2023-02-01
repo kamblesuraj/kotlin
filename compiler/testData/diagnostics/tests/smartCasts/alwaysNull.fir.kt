@@ -3,7 +3,7 @@ fun foo(): String {
     s = null
     s?.length
     s<!UNSAFE_CALL!>.<!>length
-    if (<!SENSELESS_COMPARISON!>s == null<!>) return s!!
+    if (s == null) return s!!
     var t: String? = "y"
     if (t == null) t = "x"
     var x: Int? = null

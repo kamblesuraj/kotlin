@@ -8,9 +8,9 @@ fun <T, INDIRECT: T> nullableUpperBound(t: T, ind: INDIRECT) {
 }
 
 fun <T: Any, INDIRECT: T> notNullUpperBound(t: T, ind: INDIRECT) {
-    if (<!SENSELESS_COMPARISON!>t == null<!>) {} // still a warning
-    if (<!SENSELESS_COMPARISON!>t != null<!>) {} // still a warning
-    if (<!SENSELESS_COMPARISON!>ind == null<!>) {} // still a warning
-    if (<!SENSELESS_COMPARISON!>ind != null<!>) {} // still a warning
+    if (t == null) {} // still a warning
+    if (t != null) {} // still a warning
+    if (ind == null) {} // still a warning
+    if (ind != null) {} // still a warning
 }
 

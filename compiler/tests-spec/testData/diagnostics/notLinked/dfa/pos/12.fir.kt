@@ -86,7 +86,7 @@ fun <T> T?.case_4() {
 // TESTCASE NUMBER: 5
 fun <T> T?.case_5() {
     if (this is Interface1) {
-        if (<!SENSELESS_COMPARISON!>this != null<!>) {
+        if (this != null) {
             <!DEBUG_INFO_EXPRESSION_TYPE("T? & Interface1 & T?!!")!>this<!>
             <!DEBUG_INFO_EXPRESSION_TYPE("T? & Interface1 & T?!!")!>this<!>.equals(null)
             this.propT
@@ -318,7 +318,7 @@ fun <T> T.case_8() {
 
 // TESTCASE NUMBER: 9
 fun <T : Number> T.case_9() {
-    if (<!SENSELESS_COMPARISON!>this != null<!>) {
+    if (this != null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("T")!>this<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("T")!>this<!>.equals(null)
         <!DEBUG_INFO_EXPRESSION_TYPE("T")!>this<!>.propT
@@ -565,7 +565,7 @@ fun <T> T.case_12() where T : Number?, T: Interface1? {
  * ISSUES: KT-28785
  */
 fun <T> T.case_13() where T : Out<*>?, T: Comparable<T?> {
-    if (<!SENSELESS_COMPARISON!>this != null<!>) {
+    if (this != null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("T")!>this<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("T")!>this<!>.equals(null)
         <!DEBUG_INFO_EXPRESSION_TYPE("T")!>this<!>.propT
@@ -3492,7 +3492,7 @@ fun <T> T.case_56() where T : Number?, T: Interface1? {
  * ISSUES: KT-28785
  */
 fun <T> T.case_57() where T : Out<*>?, T: Comparable<T?> {
-    if (<!SENSELESS_COMPARISON!>this != null<!>) {
+    if (this != null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("T")!>this<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("T")!>this<!>.equals(null)
         <!DEBUG_INFO_EXPRESSION_TYPE("T")!>this<!>.propT
@@ -3797,7 +3797,7 @@ fun <T> T.case_61() where T : InterfaceWithTypeParameter1<T>?, T: Case61_3<T>?, 
 
 // TESTCASE NUMBER: 62
 fun Nothing?.case_62() {
-    if (<!SENSELESS_COMPARISON!>this != null<!>) {
+    if (this != null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Nothing? & kotlin.Nothing")!>this<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Nothing? & kotlin.Nothing")!>this<!>.hashCode()
 
@@ -3816,7 +3816,7 @@ fun Nothing?.case_62() {
 
 // TESTCASE NUMBER: 63
 fun Nothing.case_63() {
-    if (<!SENSELESS_COMPARISON!>this != null<!>) {
+    if (this != null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Nothing")!>this<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Nothing")!>this<!>.hashCode()
 

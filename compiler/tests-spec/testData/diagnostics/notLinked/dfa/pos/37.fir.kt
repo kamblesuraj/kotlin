@@ -77,7 +77,7 @@ fun case_6(x: Boolean?) {
 // TESTCASE NUMBER: 7
 fun case_7(x: Boolean?) {
     while (true) {
-        if (!(x === false)) return
+        if (!(<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x === false<!>)) return
     }
 
     <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Boolean?")!>x<!>
@@ -199,7 +199,7 @@ fun case_17(x: Boolean?, y: Boolean?) {
                     else -> if (true) if (true) if (true) if (true) if (true) x!! else x!! else x!! else x!! else x!! else x!!
                 }
                 <!SENSELESS_COMPARISON!>false<!> -> x!!
-                <!SENSELESS_COMPARISON!>null<!> -> if (true) if (true) if (true) if (true) if (true) x!! else x!! else x!! else x!! else x!! else x!!
+                null -> if (true) if (true) if (true) if (true) if (true) x!! else x!! else x!! else x!! else x!! else x!!
             } else x!! else x!! else x!! else x!! else x!!
         }
         break@loop

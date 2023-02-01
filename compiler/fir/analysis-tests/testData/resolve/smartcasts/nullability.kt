@@ -100,7 +100,7 @@ fun test_9(a: Int, b: Int?) {
     }
     b<!UNSAFE_CALL!>.<!>inc()
 
-    if (a === b) {
+    if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>a === b<!>) {
         b.inc()
     }
     b<!UNSAFE_CALL!>.<!>inc()
@@ -110,7 +110,7 @@ fun test_9(a: Int, b: Int?) {
     }
     b<!UNSAFE_CALL!>.<!>inc()
 
-    if (b === a) {
+    if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>b === a<!>) {
         b.inc()
     }
     b<!UNSAFE_CALL!>.<!>inc()

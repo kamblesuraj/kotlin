@@ -24,7 +24,7 @@ fun g(a: SomeClass?) {
     }
     var c = a as? SomeSubClass
     c = Impl
-    if (<!SENSELESS_COMPARISON!>c != null<!>) {
+    if (c != null) {
         // 'a' cannot be cast to SomeSubClass
         a<!UNSAFE_CALL!>.<!>hashCode()
         a.<!UNRESOLVED_REFERENCE!>foo<!>

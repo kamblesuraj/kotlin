@@ -1176,7 +1176,12 @@ object DIAGNOSTICS_LIST : DiagnosticList("FirErrors") {
             parameter<FirExpression>("expression")
             parameter<Boolean>("compareResult")
         }
+        val SENSELESS_COMPARISON_ERROR by error<KtExpression> {
+            parameter<FirExpression>("expression")
+            parameter<Boolean>("compareResult")
+        }
         val SENSELESS_NULL_IN_WHEN by warning<KtElement>()
+        val SENSELESS_NULL_IN_WHEN_ERROR by error<KtElement>()
         val TYPECHECKER_HAS_RUN_INTO_RECURSIVE_PROBLEM by error<KtExpression>()
     }
 
@@ -1322,6 +1327,18 @@ object DIAGNOSTICS_LIST : DiagnosticList("FirErrors") {
             parameter<ConeKotlinType>("rightType")
         }
         val INCOMPATIBLE_ENUM_COMPARISON_ERROR by error<KtElement> {
+            parameter<ConeKotlinType>("leftType")
+            parameter<ConeKotlinType>("rightType")
+        }
+        val INCOMPATIBLE_ENUM_COMPARISON by warning<KtElement> {
+            parameter<ConeKotlinType>("leftType")
+            parameter<ConeKotlinType>("rightType")
+        }
+        val FORBIDDEN_IDENTITY_EQUALS by error<KtElement> {
+            parameter<ConeKotlinType>("leftType")
+            parameter<ConeKotlinType>("rightType")
+        }
+        val FORBIDDEN_IDENTITY_EQUALS_WARNING by warning<KtElement> {
             parameter<ConeKotlinType>("leftType")
             parameter<ConeKotlinType>("rightType")
         }

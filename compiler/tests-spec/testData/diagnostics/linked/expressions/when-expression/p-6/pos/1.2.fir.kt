@@ -15,7 +15,7 @@ fun case_1(value_1: SealedClass) = when (value_1) {
 fun case_2(value_1: SealedClass?): String = when (value_1) {
     !is SealedChild2 -> "" // including null
     <!USELESS_IS_CHECK!>is SealedChild2<!> -> ""
-    <!SENSELESS_NULL_IN_WHEN!>null<!> -> "" // redundant
+    null -> "" // redundant
 }
 
 // TESTCASE NUMBER: 3

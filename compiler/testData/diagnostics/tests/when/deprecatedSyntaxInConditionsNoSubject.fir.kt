@@ -47,8 +47,8 @@ fun testWithSubject_ok(x: Boolean, y: Boolean?, any: Any, z: Boolean) {
         x <!OVERLOAD_RESOLUTION_AMBIGUITY!>>=<!> x -> {}
         x == x -> {}
         x != x -> {}
-        x === x -> {}
-        x !== x -> {}
+        <!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x === x<!> -> {}
+        <!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x !== x<!> -> {}
         x && x -> {}
         x || x -> {}
     }

@@ -3,7 +3,7 @@
 
 // TESTCASE NUMBER: 1
 fun case_1(vararg x: Int?) {
-    if (<!SENSELESS_COMPARISON!>x != null<!>) {
+    if (x != null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Array<out kotlin.Int?>")!>x<!>
         x[0]
     }
@@ -28,7 +28,7 @@ fun case_2(vararg x: Int?) {
 
 // TESTCASE NUMBER: 3
 fun <T> case_3(vararg x: T?) {
-    if (<!SENSELESS_COMPARISON!>x != null<!>) {
+    if (x != null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Array<out T?>")!>x<!>
         x[0]
     }

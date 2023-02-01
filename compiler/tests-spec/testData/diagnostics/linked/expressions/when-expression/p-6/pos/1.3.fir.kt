@@ -46,7 +46,7 @@ fun case_5(value_1: Any?): String {
     when (value_1) {
         is Float, is Char?, is Int -> return ""
         is Double, is EmptyObject, is String -> return ""
-        <!SENSELESS_NULL_IN_WHEN!>null<!> -> return "" // null-check redundant
+        null -> return "" // null-check redundant
         else -> return ""
     }
 }
@@ -58,7 +58,7 @@ fun case_5(value_1: Any?): String {
  */
 fun case_6(value_1: Any?): String {
     when (value_1) {
-        is Float, is Char?, <!SENSELESS_NULL_IN_WHEN!>null<!>, is Int -> return "" // double nullable type check in the one branch
+        is Float, is Char?, null, is Int -> return "" // double nullable type check in the one branch
         is Double, is EmptyObject, is String -> return ""
         else -> return ""
     }

@@ -13,7 +13,7 @@ open class Foo(val prop: Int) {
 }
 
 fun box(): String? {
-    if (<!SENSELESS_COMPARISON!>Foo(42) == null<!>) return null
+    if (Foo(42) == null) return null
 
     return "OK"
 }

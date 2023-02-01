@@ -55,7 +55,7 @@ fun case_2(a: Inv<Inv<Inv<Inv<Inv<Inv<Int?>?>?>?>?>?>?) {
 fun case_3(a: Inv<Int>?) {
     if (a != null) {
         val b = a
-        if (<!SENSELESS_COMPARISON!>a == null<!>) {
+        if (a == null) {
             <!DEBUG_INFO_EXPRESSION_TYPE("Inv<kotlin.Int>? & kotlin.Nothing")!>b<!>
             <!DEBUG_INFO_EXPRESSION_TYPE("Inv<kotlin.Int>? & kotlin.Nothing")!>b<!>.equals(null)
             <!DEBUG_INFO_EXPRESSION_TYPE("Inv<kotlin.Int>? & kotlin.Nothing")!>b<!>.propT

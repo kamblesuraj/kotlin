@@ -22,7 +22,7 @@ fun case_1(x: Any?) {
 
 // TESTCASE NUMBER: 2
 fun case_2(x: Nothing?) {
-    if (<!SENSELESS_COMPARISON!>x == null<!>) {
+    if (x == null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Nothing?")!>x<!>
     }
 }
@@ -67,7 +67,7 @@ fun case_7() {
 
 // TESTCASE NUMBER: 8
 fun case_8(x: TypealiasNullableString) {
-    if (x == null && <!SENSELESS_COMPARISON!><!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString & kotlin.Nothing?")!>x<!> == null<!>)
+    if (x == null && <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString & kotlin.Nothing?")!>x<!> == null)
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString & kotlin.Nothing?")!>x<!>
 }
 
@@ -135,21 +135,21 @@ fun case_14() {
     val a = Case14()
 
     if (a.x == null) {
-        if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
-            if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
-                if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
-                    if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
-                        if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
-                            if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
-                                if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
-                                    if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
-                                        if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
-                                            if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
-                                                if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
-                                                    if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
-                                                        if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
-                                                            if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
-                                                                if (<!SENSELESS_COMPARISON!>a.x == null<!>) {
+        if (a.x == null) {
+            if (a.x == null) {
+                if (a.x == null) {
+                    if (a.x == null) {
+                        if (a.x == null) {
+                            if (a.x == null) {
+                                if (a.x == null) {
+                                    if (a.x == null) {
+                                        if (a.x == null) {
+                                            if (a.x == null) {
+                                                if (a.x == null) {
+                                                    if (a.x == null) {
+                                                        if (a.x == null) {
+                                                            if (a.x == null) {
+                                                                if (a.x == null) {
                                                                     a.x
                                                                 }
                                                             }
@@ -258,7 +258,7 @@ fun case_23(a: ((Float) -> Int?)?, b: Float?) {
     if (a == null && b == null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Function1<kotlin.Float, kotlin.Int?>? & kotlin.Nothing?")!>a<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Float? & kotlin.Nothing?")!>b<!>
-        if (<!SENSELESS_COMPARISON!>a != null<!>) {
+        if (a != null) {
             <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Function1<kotlin.Float, kotlin.Int?>? & kotlin.Nothing")!>a<!>
         }
     }

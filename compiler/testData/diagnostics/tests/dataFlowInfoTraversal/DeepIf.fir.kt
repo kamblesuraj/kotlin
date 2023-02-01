@@ -16,14 +16,14 @@ fun foo() {
         }
         if (<!SENSELESS_COMPARISON!>x == null<!>) bar(x) else bar(x)
         bar(bar(x))
-    } else if (<!SENSELESS_COMPARISON!>x == null<!>) {
+    } else if (x == null) {
         bar(<!ARGUMENT_TYPE_MISMATCH!>x<!>)
-        if (<!SENSELESS_COMPARISON!>x != null<!>) {
+        if (x != null) {
             bar(x)
-            if (<!SENSELESS_COMPARISON!>x == null<!>) bar(x)
-            if (<!SENSELESS_COMPARISON!>x == null<!>) bar(x) else bar(x)
+            if (x == null) bar(x)
+            if (x == null) bar(x) else bar(x)
             bar(bar(x) + bar(x))
-        } else if (<!SENSELESS_COMPARISON!>x == null<!>) {
+        } else if (x == null) {
             bar(<!ARGUMENT_TYPE_MISMATCH!>x<!>)
         }
     }

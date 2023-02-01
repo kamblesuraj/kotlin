@@ -182,7 +182,7 @@ fun case_6(a: Interface1?, b: Interface2, d: Boolean) {
     x.apply {
         this as Interface3
         <!DEBUG_INFO_EXPRESSION_TYPE("Interface2? & Interface1? & Interface3 & Interface2 & Interface1")!>this<!>
-        if (<!SENSELESS_COMPARISON!>this != null<!>) {
+        if (this != null) {
             <!DEBUG_INFO_EXPRESSION_TYPE("Interface2? & Interface1? & Interface3 & Interface2 & Interface1")!>this<!>
             <!DEBUG_INFO_EXPRESSION_TYPE("Interface2? & Interface1? & Interface3 & Interface2 & Interface1")!>this<!>.equals(null)
             <!DEBUG_INFO_EXPRESSION_TYPE("Interface2? & Interface1? & Interface3 & Interface2 & Interface1")!>this<!>.propT
@@ -200,7 +200,7 @@ fun case_6(a: Interface1?, b: Interface2, d: Boolean) {
     x.let {
         it as Interface3
         <!DEBUG_INFO_EXPRESSION_TYPE("Interface2? & Interface1? & Interface3 & Interface2 & Interface1")!>it<!>
-        if (<!SENSELESS_COMPARISON!>it != null<!>) {
+        if (it != null) {
             <!DEBUG_INFO_EXPRESSION_TYPE("Interface2? & Interface1? & Interface3 & Interface2 & Interface1")!>it<!>
             <!DEBUG_INFO_EXPRESSION_TYPE("Interface2? & Interface1? & Interface3 & Interface2 & Interface1")!>it<!>.equals(null)
             <!DEBUG_INFO_EXPRESSION_TYPE("Interface2? & Interface1? & Interface3 & Interface2 & Interface1")!>it<!>.propT

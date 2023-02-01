@@ -154,7 +154,7 @@ fun case_10(x: Any): String {
 fun case_11(x: Any?): String? {
     if (x is Nothing?) {
         return when(x) {
-            <!SENSELESS_COMPARISON!>null<!> -> null
+            null -> null
         }
     }
     return ""
@@ -168,7 +168,7 @@ fun case_11(x: Any?): String? {
 fun case_12(x: Any?): String? {
     if (x == null) {
         return when(x) {
-            <!SENSELESS_COMPARISON!>null<!> -> null
+            null -> null
         }
     }
     return ""
@@ -182,7 +182,7 @@ fun case_12(x: Any?): String? {
 fun case_13(x: Any?): String? {
     if (x === null) {
         return when(x) {
-            <!SENSELESS_COMPARISON!>null<!> -> null
+            null -> null
         }
     }
     return ""
@@ -196,7 +196,7 @@ fun case_13(x: Any?): String? {
 fun case_14(x: Any?): String? {
     x as Nothing?
     return when(x) {
-        <!SENSELESS_COMPARISON!>null<!> -> null
+        null -> null
     }
 }
 
@@ -322,7 +322,7 @@ fun case_25(x: Any) {
             is SealedChild1 -> 1
             is SealedChild2 -> 2
             is SealedChild3 -> 3
-            <!SENSELESS_NULL_IN_WHEN!>null<!> -> 5
+            null -> 5
         }
     }
 }
@@ -355,7 +355,7 @@ fun case_28(x: Any): Int {
             is SealedChild1 -> 1
             is SealedChild2 -> 2
             is SealedChild3 -> 3
-            <!SENSELESS_NULL_IN_WHEN!>null<!> -> 5
+            null -> 5
         }
     }
     return 0
@@ -400,7 +400,7 @@ fun case_32(x: Any) {
             SealedWithObjectsChild1 -> 1
             SealedWithObjectsChild2 -> 2
             SealedWithObjectsChild3 -> 3
-            <!SENSELESS_NULL_IN_WHEN!>null<!> -> 5
+            null -> 5
         }
     }
 }
@@ -433,7 +433,7 @@ fun case_35(x: Any): Int {
             SealedWithObjectsChild1 -> 1
             SealedWithObjectsChild2 -> 2
             SealedWithObjectsChild3 -> 3
-            <!SENSELESS_NULL_IN_WHEN!>null<!> -> 5
+            null -> 5
         }
     }
     return 0

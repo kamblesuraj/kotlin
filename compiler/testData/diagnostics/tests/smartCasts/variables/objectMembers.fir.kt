@@ -16,7 +16,7 @@ fun objectInit() {
     }
     y = null
     x<!UNSAFE_CALL!>.<!>length // bad
-    if (<!SENSELESS_COMPARISON!>x != null<!>) x.length // ok
+    if (x != null) x.length // ok
 }
 
 fun objectMethod() {

@@ -21,7 +21,7 @@ fun case_1(x: Any?, y: Any?) {
  * ISSUES: KT-30317
  */
 fun case_2(x: Any?, y: Any?) {
-    if (x as Int === y) {
+    if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x as Int === y<!>) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any? & kotlin.Int")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any? & kotlin.Int")!>x<!>.inv(<!TOO_MANY_ARGUMENTS!>10<!>)
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any? & kotlin.Int")!>y<!>
@@ -49,7 +49,7 @@ fun case_3(x: Any?, y: Any?) {
  * ISSUES: KT-30317
  */
 fun case_4(x: Any?, y: Any?) {
-    if (y === x as Int) {
+    if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>y === x as Int<!>) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any? & kotlin.Int")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any? & kotlin.Int")!>x<!>.inv(<!TOO_MANY_ARGUMENTS!>10<!>)
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any? & kotlin.Int")!>y<!>
