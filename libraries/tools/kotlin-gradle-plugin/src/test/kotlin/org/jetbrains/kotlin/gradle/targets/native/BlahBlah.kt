@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.gradle.targets.native
 
 import org.gradle.api.logging.Logger
 import org.jetbrains.kotlin.gradle.targets.native.PodfileLockParser.LockedPod
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.junit.Test
 import org.yaml.snakeyaml.Yaml
 import java.io.File
@@ -27,7 +28,7 @@ class PodfileLockParser(private val logger: Logger?) {
             .mapNotNull { it.toPod() }
             .also {
                 if (shouldWarn) {
-                    logger?.warn("w: Unexpected Podfile.lock format")
+                    logger?.warn("Unexpected Podfile.lock format")
                 }
             }
     }
@@ -37,9 +38,9 @@ class PodfileLockParser(private val logger: Logger?) {
         return null
     }
 
-    private fun Any?.asList(): List<*> = (this as? List<*>) ?: reportUnexpectedFormat() ?: emptyList<Nothing>()
+    private fun Any?.asList(): List<*> = safeAs<List<*>>() ?: reportUnexpectedFormat() ?: emptyList<Nothing>()
 
-    private fun Any?.asMap(): Map<*, *> = (this as? Map<*, *>) ?: reportUnexpectedFormat() ?: emptyMap<Nothing, Nothing>()
+    private fun Any?.asMap(): Map<*, *> = safeAs<Map<*, *>>() ?: reportUnexpectedFormat() ?: emptyMap<Nothing, Nothing>()
 
     private fun Any?.toPod(): LockedPod? {
         return when (this) {
