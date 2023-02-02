@@ -6073,6 +6073,14 @@ if (isAppleTarget(project)) {
             }
         }
     }
+
+    frameworkTest("testKt56233Framework") {
+        enabled = isExperimentalMM // Fails with legacy MM. It's deprecated, so won't fix.
+        framework("Kt56233") {
+            sources = ['framework/kt56233']
+        }
+        swiftSources = ['framework/kt56233']
+    }
 }
 
 /**
