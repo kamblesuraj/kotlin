@@ -31,7 +31,7 @@ function box() {
 
     const { Basic, WithCompanion } = pkg;
 
-    if (Basic.Companion !== undefined) return "fail: Basic should not export synthetic companion";
+    if (Basic.Companion === undefined) return "fail: Unfortunatly we can't exclude the companion from export because it would break logic of other plugins";
 
     const basic = new Basic("Test", 44);
 

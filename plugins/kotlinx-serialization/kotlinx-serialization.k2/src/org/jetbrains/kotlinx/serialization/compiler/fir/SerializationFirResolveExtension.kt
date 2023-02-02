@@ -284,8 +284,6 @@ class SerializationFirResolveExtension(session: FirSession) : FirDeclarationGene
             }
         }
 
-        companion.excludeFromJsExport()
-
         return companion.symbol
     }
 

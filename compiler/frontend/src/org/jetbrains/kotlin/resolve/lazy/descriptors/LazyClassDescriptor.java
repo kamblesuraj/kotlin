@@ -549,15 +549,14 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
     }
 
     private ClassDescriptorWithResolutionScopes createSyntheticCompanionObjectDescriptor() {
-        SyntheticResolveExtension extension = c.getSyntheticResolveExtension();
-        Name syntheticCompanionName = extension.getSyntheticCompanionObjectNameIfNeeded(this);
+        Name syntheticCompanionName = c.getSyntheticResolveExtension().getSyntheticCompanionObjectNameIfNeeded(this);
         if (syntheticCompanionName == null)
             return null;
         SyntheticClassOrObjectDescriptor companionDescriptor = new SyntheticClassOrObjectDescriptor(c,
                 /* parentClassOrObject= */ classOrObject,
                 this, syntheticCompanionName, getSource(),
                 /* outerScope= */ getOuterScope(),
-                Modality.FINAL, PUBLIC, extension.getSyntheticCompanionAnnotations(this), PRIVATE, ClassKind.OBJECT, true);
+                Modality.FINAL, PUBLIC, Annotations.Companion.getEMPTY(), PRIVATE, ClassKind.OBJECT, true);
         companionDescriptor.initialize();
         return companionDescriptor;
     }

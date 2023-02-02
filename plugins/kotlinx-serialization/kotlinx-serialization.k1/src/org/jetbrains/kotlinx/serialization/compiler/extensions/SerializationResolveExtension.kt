@@ -85,10 +85,6 @@ open class SerializationResolveExtension @JvmOverloads constructor(val metadataP
             SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT
         else null
 
-    override fun getSyntheticCompanionAnnotations(thisDescriptor: ClassDescriptor): Annotations {
-        return Annotations.create(listOfNotNull(thisDescriptor.jsExportIgnore()))
-    }
-
     override fun addSyntheticSupertypes(thisDescriptor: ClassDescriptor, supertypes: MutableList<KotlinType>) {
         KSerializerDescriptorResolver.addSerializerSupertypes(thisDescriptor, supertypes)
         KSerializerDescriptorResolver.addSerializerFactorySuperType(thisDescriptor, supertypes)
