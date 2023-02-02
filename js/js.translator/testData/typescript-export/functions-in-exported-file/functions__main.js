@@ -25,6 +25,7 @@ var genericWithConstraint = JS_TESTS.foo.genericWithConstraint;
 var genericWithMultipleConstraints = JS_TESTS.foo.genericWithMultipleConstraints;
 var formatList = JS_TESTS.foo.formatList;
 var createList = JS_TESTS.foo.createList;
+var defaultParametersAtTheBegining = JS_TESTS.foo.defaultParametersAtTheBegining;
 function assert(condition) {
     if (!condition) {
         throw "Assertion failed";
@@ -58,5 +59,7 @@ function box() {
     inlineFun(10, function (x) { result = x; });
     assert(result === 10);
     assert(formatList(createList()) === "1, 2, 3");
+    assert(defaultParametersAtTheBegining("A", "B") == "A and B");
+    assert(defaultParametersAtTheBegining(undefined, "B") == "Default Value and B");
     return "OK";
 }

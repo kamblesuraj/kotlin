@@ -68,3 +68,7 @@ fun formatList(value: List<*>): String = value.joinToString(", ") { it.toString(
 
 @JsExport
 fun createList(): List<*> = listOf(1, 2, 3)
+
+// KT-53180
+@JsExport
+fun defaultParametersAtTheBegining(a: String = "Default Value", b: String) = "$a and $b"
