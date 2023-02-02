@@ -95,6 +95,20 @@ ALWAYS_INLINE inline T atomicGetRelaxed(volatile const T* where) {
     return atomicGet<__ATOMIC_RELAXED>(where);
 }
 
+template <typename T>
+ALWAYS_INLINE inline T atomicExchangeRelaxed(volatile T* where, T newValue) {
+#ifndef KONAN_NO_THREADS
+#ifdef KONAN_NO_64BIT_ATOMIC
+    static_assert(sizeof(T) <= 4);
+#endif
+    return __atomic_exchange_n(where, newValue, __ATOMIC_RELAXED);
+#else
+    T oldValue = *where;
+    *where = newValue;
+    return oldValue;
+#endif
+}
+
 #pragma clang diagnostic pop
 
 static ALWAYS_INLINE inline void synchronize() {

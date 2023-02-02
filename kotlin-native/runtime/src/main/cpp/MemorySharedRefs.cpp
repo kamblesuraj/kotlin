@@ -69,6 +69,15 @@ bool ensureRefAccessible<ErrorPolicy::kIgnore>(ObjHeader* object, ForeignRefCont
   return true;
 }
 
+void disposeForeignRef(ObjHeader* object, ForeignRefContext context) noexcept {
+  if (context == nullptr) {
+    return;
+  }
+
+  kotlin::CalledFromNativeGuard guard(/* reentrant = */ true);
+  DeinitForeignRef(object, context);
+}
+
 }  // namespace
 
 void KRefSharedHolder::initLocal(ObjHeader* obj) {
@@ -139,7 +148,9 @@ void BackRefFromAssociatedObject::addRef() {
 
     // Foreign reference has already been deinitialized (see [releaseRef]).
     // Create a new one:
-    context_ = InitForeignRef(obj_);
+    auto* ctx = InitForeignRef(obj_);
+    auto* oldCtx = atomicExchangeRelaxed(&context_, ctx);
+    disposeForeignRef(obj_, oldCtx);
   }
 }
 
@@ -183,18 +194,10 @@ template bool BackRefFromAssociatedObject::tryAddRef<ErrorPolicy::kThrow>();
 template bool BackRefFromAssociatedObject::tryAddRef<ErrorPolicy::kTerminate>();
 
 void BackRefFromAssociatedObject::releaseRef() {
-  ForeignRefContext context = context_;
   if (atomicAdd(&refCount, -1) == 0) {
     if (obj_ == nullptr) return; // E.g. after [detach].
-
-    kotlin::CalledFromNativeGuard guard;
-
-    // Note: by this moment "subsequent" addRef may have already happened and patched context_.
-    // So use the value loaded before refCount update:
-    DeinitForeignRef(obj_, context);
-    // From this moment [context] is generally a dangling pointer.
-    // This is handled in [IsForeignRefAccessible] and [addRef].
-    // TODO: This probably isn't fine in new MM. Make sure it works.
+    ForeignRefContext context = atomicExchangeRelaxed<ForeignRefContext>(&context_, nullptr);
+    disposeForeignRef(obj_, context);
   }
 }
 
