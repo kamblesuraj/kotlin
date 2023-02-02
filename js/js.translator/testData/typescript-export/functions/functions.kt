@@ -72,3 +72,6 @@ fun createList(): List<*> = listOf(1, 2, 3)
 // KT-53180
 @JsExport
 fun defaultParametersAtTheBegining(a: String = "Default Value", b: String) = "$a and $b"
+
+@JsExport
+fun nonDefaultParameterInBetween(a: String = "Default A", b: String, c: String = "Default C") = "$a and $b and $c"
