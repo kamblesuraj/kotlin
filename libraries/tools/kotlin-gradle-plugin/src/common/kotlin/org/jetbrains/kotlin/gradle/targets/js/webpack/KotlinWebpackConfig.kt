@@ -107,7 +107,6 @@ data class KotlinWebpackConfig(
                     versions.webpackCli3
                 )
             )
-            it.add(versions.formatUtil)
 
             if (sourceMaps) {
                 it.add(
