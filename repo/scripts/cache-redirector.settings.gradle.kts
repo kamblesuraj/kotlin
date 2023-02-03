@@ -116,7 +116,7 @@ val aliases = mapOf(
     "https://repo.maven.apache.org/maven2" to "https://repo1.maven.org/maven2" // Maven Central
 )
 
-fun URI.maybeRedirect(): URI {
+fun URI.maybeRedirect(logger: String): URI {
     val url = toString().trimEnd('/')
     val deAliasedUrl = aliases.getOrDefault(url, url)
 
@@ -124,17 +124,22 @@ fun URI.maybeRedirect(): URI {
     return if (cacheUrlEntry != null) {
         val cacheUrl = cacheUrlEntry.value
         val originRestPath = deAliasedUrl.substringAfter(cacheUrlEntry.key, "")
+
+        if (url.contains("kotlin-dependencies") || url.contains("bootstrap")) {
+            println("$logger: $url -> $cacheUrl$originRestPath")
+        }
+
         URI("$cacheUrl$originRestPath")
     } else {
         this
     }
 }
 
-fun RepositoryHandler.redirect() = configureEach {
+fun RepositoryHandler.redirect(logger: String) = configureEach {
     when (this) {
-        is MavenArtifactRepository -> url = url.maybeRedirect()
+        is MavenArtifactRepository -> url = url.maybeRedirect(logger)
         is IvyArtifactRepository -> @Suppress("SENSELESS_COMPARISON") if (url != null) {
-            url = url.maybeRedirect()
+            url = url.maybeRedirect(logger)
         }
     }
 }
@@ -255,14 +260,15 @@ fun Task.logInvalidIvyRepo(
 // Main configuration
 
 if (cacheRedirectorEnabled.get()) {
-    logger.info("Redirecting repositories for settings in ${settingsDir.absolutePath}")
+    println("Redirecting repositories for settings in ${settingsDir.absolutePath} " + java.lang.Thread.currentThread().getName())
 
-    pluginManagement.repositories.redirect()
-    buildscript.repositories.redirect()
+    pluginManagement.repositories.redirect("pluginManagement.repositories")
+    buildscript.repositories.redirect("buildscript.repositories")
 
     gradle.beforeProject {
-        buildscript.repositories.redirect()
-        repositories.redirect()
+        println("Redirecting repositories in $this " + java.lang.Thread.currentThread().getName())
+        buildscript.repositories.redirect("beforeProject.buildscript.repositories")
+        repositories.redirect("beforeProject.repositories")
         overrideNativeCompilerDownloadUrl()
         addCheckRepositoriesTask()
     }

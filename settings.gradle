@@ -1,7 +1,9 @@
 pluginManagement {
+    println("settings.gradle apply")
     apply from: 'repo/scripts/cache-redirector.settings.gradle.kts'
     apply from: 'repo/scripts/kotlin-bootstrap.settings.gradle.kts'
 
+    println("settings.gradle repositories")
     repositories {
         maven { url "https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-dependencies" }
         mavenCentral()
@@ -15,6 +17,7 @@ pluginManagement {
 
 buildscript {
     def buildGradlePluginVersion = ext["kotlin.build.gradlePlugin.version"]
+    println("DEPENDENCIES")
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-build-gradle-plugin:${buildGradlePluginVersion}")
     }
