@@ -457,7 +457,7 @@ class KotlinConstraintSystemCompleter(
     ) {
         val areAllConstraintFromDeclaredUpperBounds = variableWithConstraints.constraints.all {
             val position = it.position.from
-            position is BuilderInferenceSubstitutionConstraintPosition<*, *> && position.isFromNotSubstitutedDeclaredUpperBound
+            position is BuilderInferenceSubstitutionConstraintPosition<*> && position.isFromNotSubstitutedDeclaredUpperBound
         }
 
         if (areAllConstraintFromDeclaredUpperBounds) {
