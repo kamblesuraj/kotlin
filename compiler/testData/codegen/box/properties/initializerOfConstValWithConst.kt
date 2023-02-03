@@ -3,7 +3,7 @@
 // NATIVE: in mode -Pkotlin.internal.native.test.mode=TWO_STAGE_MULTI_MODULE (default test mode), test fails as below
 //   InterpreterError: Unsupported number of arguments for invocation as builtin function: four
 //         in mode -Pkotlin.internal.native.test.mode=ONE_STAGE_MULTI_MODULE, test passes
-// IGNORE_BACKEND_K2: NATIVE, JS_IR
+// IGNORE_BACKEND_K2: JS_IR
 
 // MODULE: lib
 // FILE: lib.kt
