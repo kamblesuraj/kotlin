@@ -35,8 +35,6 @@ where advanced options include:
   -Xenhance-type-parameter-types-to-def-not-null
                              Enhance not null annotated type parameter's types to definitely not null types (@NotNull T => T & Any)
   -Xfriend-paths=<path>      Paths to output directories for friend modules (whose internals should be visible)
-  -Xignore-const-optimization-errors
-                             Ignore all compilation exceptions while optimizing some constant expressions.
   -Xmultifile-parts-inherit  Compile multifile classes as a hierarchy of parts and facade
   -Xmodule-path=<path>       Paths where to find Java 9+ modules
   -Xjava-package-prefix      Package prefix for Java files
@@ -189,6 +187,8 @@ where advanced options include:
                              Use 'warning' level to issue warnings instead of errors.
   -Xextended-compiler-checks Enable additional compiler checks that might provide verbose diagnostic information for certain errors.
                              Warning: this mode is not backward-compatible and might cause compilation errors in previously compiled code.
+  -Xignore-const-optimization-errors
+                             Ignore all compilation exceptions while optimizing some constant expressions.
   -Xenable-incremental-compilation
                              Enable incremental compilation
   -Xinference-compatibility  Enable compatibility changes for generic type inference algorithm

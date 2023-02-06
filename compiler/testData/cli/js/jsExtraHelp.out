@@ -83,6 +83,8 @@ where advanced options include:
                              Use 'warning' level to issue warnings instead of errors.
   -Xextended-compiler-checks Enable additional compiler checks that might provide verbose diagnostic information for certain errors.
                              Warning: this mode is not backward-compatible and might cause compilation errors in previously compiled code.
+  -Xignore-const-optimization-errors
+                             Ignore all compilation exceptions while optimizing some constant expressions.
   -Xenable-incremental-compilation
                              Enable incremental compilation
   -Xinference-compatibility  Enable compatibility changes for generic type inference algorithm
