@@ -39,6 +39,7 @@ import org.jetbrains.kotlin.resolve.calls.inference.model.SimpleConstraintSystem
 import org.jetbrains.kotlin.types.AbstractTypeChecker
 import org.jetbrains.kotlin.types.model.CaptureStatus
 import org.jetbrains.kotlin.types.model.TypeSystemCommonSuperTypesContext
+import org.jetbrains.kotlin.types.model.typeConstructor
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
 
 val SAM_LOOKUP_NAME = Name.special("<SAM-CONSTRUCTOR>")
@@ -526,12 +527,16 @@ fun FirExpression.isFunctional(
             if (classLikeExpectedFunctionType == null || coneType is ConeIntegerLiteralType) {
                 return false
             }
-            if (coneType is ConeTypeVariableType) {
-                val namedReferenceWithCandidate = namedReferenceWithCandidate() ?: return false
-                return namedReferenceWithCandidate.candidate.postponedAtoms.any {
-                    it is LambdaWithTypeVariableAsExpectedTypeAtom
-                }
+
+            val namedReferenceWithCandidate = namedReferenceWithCandidate()
+            if (namedReferenceWithCandidate?.candidate?.postponedAtoms?.any {
+                    it is LambdaWithTypeVariableAsExpectedTypeAtom &&
+                            it.expectedType.typeConstructor(session.typeContext) == coneType.typeConstructor(session.typeContext)
+                } == true
+            ) {
+                return true
             }
+
             val invokeSymbol =
                 coneType.findContributedInvokeSymbol(
                     session, scopeSession, classLikeExpectedFunctionType, shouldCalculateReturnTypesOfFakeOverrides = false
