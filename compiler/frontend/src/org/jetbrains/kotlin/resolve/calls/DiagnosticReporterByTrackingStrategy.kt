@@ -529,7 +529,19 @@ class DiagnosticReporterByTrackingStrategy(
                 // some error reported later?
             }
             is CallableReferenceConstraintPosition<*> -> TODO()
-            is DeclaredUpperBoundConstraintPosition<*> -> TODO()
+            is DeclaredUpperBoundConstraintPosition<*> -> {
+                val typeParameterDescriptor = position.typeParameter as TypeParameterDescriptor
+                val ownerDescriptor = typeParameterDescriptor.containingDeclaration
+                report(
+                    UPPER_BOUND_VIOLATION_IN_CONSTRAINT.on(
+                        psiKotlinCall.psiCall.callElement,
+                        typeParameterDescriptor.name,
+                        ownerDescriptor.name,
+                        error.upperKotlinType,
+                        error.lowerKotlinType
+                    )
+                )
+            }
             is DelegatedPropertyConstraintPosition<*> -> {
                 // DELEGATE_SPECIAL_FUNCTION_NONE_APPLICABLE, reported later
             }
