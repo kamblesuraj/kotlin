@@ -10766,12 +10766,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         }
 
         @Test
-        @TestMetadata("suspendImplTypeParameters.kt")
-        public void testSuspendImplTypeParameters() throws Exception {
-            runTest("compiler/testData/codegen/box/coroutines/suspendImplTypeParameters.kt");
-        }
-
-        @Test
         @TestMetadata("suspendInCycle.kt")
         public void testSuspendInCycle() throws Exception {
             runTest("compiler/testData/codegen/box/coroutines/suspendInCycle.kt");
