@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 open class KotlinJsIrCompilation @Inject internal constructor(compilation: KotlinCompilationImpl) : KotlinJsCompilation(compilation) {
     val compileDirectoryArtifactView = compilation.configurations
-        .runtimeDependencyConfiguration!!
+        .compileDependencyConfiguration
         .incoming
         .artifactView { artifactView ->
             artifactView.attributes.attribute(
