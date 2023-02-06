@@ -191,9 +191,9 @@ fun case_11(x: TypealiasNullableString<!REDUNDANT_NULLABLE!>?<!>, y: TypealiasNu
     if (x == null) {
 
     } else {
-        if (<!SENSELESS_COMPARISON!>x != null<!>) {
+        if (x != null) {
             if (y != null || y != null) {
-                if (<!SENSELESS_COMPARISON!>stringProperty == null<!> && nullableNothingProperty == null) {
+                if (stringProperty == null && nullableNothingProperty == null) {
                     if (t != null || t != null) {
                         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString? & kotlin.String")!>x<!>
                         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString? & kotlin.String")!>x<!>.equals(null)
@@ -247,7 +247,7 @@ fun case_13(x: orherpackage.EmptyClass13?, y: Nothing?) =
 // TESTCASE NUMBER: 14
 fun case_14() {
     val a = Class()
-    if (<!SENSELESS_COMPARISON!>a.prop_6 != a.prop_7<!>) {
+    if (a.prop_6 != a.prop_7) {
         a.prop_6
         a.prop_6.equals(null)
         a.prop_6.propT
@@ -264,7 +264,7 @@ fun case_14() {
 // TESTCASE NUMBER: 15
 fun case_15(x: TypealiasString?) {
     var y = null
-    val t = <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.String")!>if (x === null || <!SENSELESS_COMPARISON!>x == y<!> && x === y) "" else {
+    val t = <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.String")!>if (x === null || x == y && x === y) "" else {
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasString? & kotlin.String")!>x<!>.equals(null)
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasString? & kotlin.String")!>x<!>.propT
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasString? & kotlin.String")!>x<!>.propAny
@@ -388,7 +388,7 @@ fun case_20(b: Boolean) {
 // TESTCASE NUMBER: 21
 fun case_21() {
     val y = null
-    if (EnumClassWithNullableProperty.A.prop_1 !== null && <!SENSELESS_COMPARISON!>y != EnumClassWithNullableProperty.A.prop_1<!>) {
+    if (EnumClassWithNullableProperty.A.prop_1 !== null && y != EnumClassWithNullableProperty.A.prop_1) {
         EnumClassWithNullableProperty.A.prop_1
         EnumClassWithNullableProperty.A.prop_1.equals(null)
         EnumClassWithNullableProperty.A.prop_1.propT
@@ -553,7 +553,7 @@ fun case_29(a: Int?, b: Nothing?, c: Int = if (a === b) 0 else a) {
 }
 
 // TESTCASE NUMBER: 30
-fun case_30(a: Int?, b: Nothing?, c: Int = if (a === b || <!SENSELESS_COMPARISON!>a == null<!>) 0 else a) {
+fun case_30(a: Int?, b: Nothing?, c: Int = if (a === b || a == null) 0 else a) {
     <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int?")!>a<!>
     <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Nothing?")!>b<!>
 }

@@ -137,7 +137,7 @@ fun case_7(x: EmptyObject?) {
 fun case_8(x: TypealiasNullableString) {
     val y = null
 
-    if (x !== y && <!SENSELESS_COMPARISON!><!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString & kotlin.String")!>x<!> != y<!>) {
+    if (x !== y && <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString & kotlin.String")!>x<!> != y) {
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString & kotlin.String")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString & kotlin.String")!>x<!>.equals(null)
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString & kotlin.String")!>x<!>.propT
@@ -219,7 +219,7 @@ fun case_11(x: TypealiasNullableString<!REDUNDANT_NULLABLE!>?<!>, y: TypealiasNu
 }
 
 // TESTCASE NUMBER: 12
-fun case_12(x: TypealiasNullableString, y: TypealiasNullableString, z1: Nothing?, z2: Nothing?) = if (x == z1 || <!SENSELESS_COMPARISON!>x == z2<!>) "1"
+fun case_12(x: TypealiasNullableString, y: TypealiasNullableString, z1: Nothing?, z2: Nothing?) = if (x == z1 || x == z2) "1"
     else if (y === z1 && y == z2) {
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString & kotlin.String")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString & kotlin.String")!>x<!>.equals(null)
@@ -263,7 +263,7 @@ fun case_14() {
     val x = null
     val y = implicitNullableNothingProperty
 
-    if (a.x != x && <!SENSELESS_COMPARISON!>a.x != y<!> || a.x != y && a.x !== null) {
+    if (a.x != x && a.x != y || a.x != y && a.x !== null) {
         a.x
         a.x.equals(null)
         a.x.propT
@@ -280,7 +280,7 @@ fun case_14() {
 // TESTCASE NUMBER: 15
 fun case_15(x: TypealiasNullableString) {
     val y = null
-    val z = if (x === null || <!SENSELESS_COMPARISON!>y == x<!> && x === y || null === x) "" else {
+    val z = if (x === null || y == x && x === y || null === x) "" else {
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString & kotlin.String")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString & kotlin.String")!>x<!>.equals(null)
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString & kotlin.String")!>x<!>.propT
@@ -839,7 +839,7 @@ fun case_46(x: TypealiasNullableString<!REDUNDANT_NULLABLE!>?<!>, y: TypealiasNu
     } else {
         if (y === nullableNothingProperty) {
             if (z != nullableStringProperty) {
-                if (z === t || <!SENSELESS_COMPARISON!>t == nullableNothingProperty<!>) {
+                if (z === t || t == nullableNothingProperty) {
                     <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString? & kotlin.Nothing?")!>x<!>
                     <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString? & kotlin.Nothing?")!>x<!>.hashCode()
                 }
@@ -916,7 +916,7 @@ fun case_51() {
 }
 
 // TESTCASE NUMBER: 52
-val case_52 = if (nullableIntProperty !== nullableNothingProperty && <!SENSELESS_COMPARISON!>nullableNothingProperty != nullableIntProperty<!>) 0 else {
+val case_52 = if (nullableIntProperty !== nullableNothingProperty && nullableNothingProperty != nullableIntProperty) 0 else {
     <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int?")!>nullableIntProperty<!>
     <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int?")!>nullableIntProperty<!>.hashCode()
 }

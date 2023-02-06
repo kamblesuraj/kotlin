@@ -5,6 +5,6 @@ package kt2457
 fun foo(i: Int) : Int =
     when (i) {
         1 -> 1
-        <!SENSELESS_NULL_IN_WHEN!>null<!> -> 1
+        null -> 1
         else -> 1
     }

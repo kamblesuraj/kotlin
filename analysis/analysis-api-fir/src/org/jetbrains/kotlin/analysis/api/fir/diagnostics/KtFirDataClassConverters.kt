@@ -3411,34 +3411,6 @@ internal val KT_DIAGNOSTIC_CONVERTER = KtDiagnosticConverterBuilder.buildConvert
             token,
         )
     }
-    add(FirErrors.SENSELESS_COMPARISON) { firDiagnostic ->
-        SenselessComparisonImpl(
-            firDiagnostic.a.source!!.psi as KtExpression,
-            firDiagnostic.b,
-            firDiagnostic as KtPsiDiagnostic,
-            token,
-        )
-    }
-    add(FirErrors.SENSELESS_COMPARISON_ERROR) { firDiagnostic ->
-        SenselessComparisonErrorImpl(
-            firDiagnostic.a.source!!.psi as KtExpression,
-            firDiagnostic.b,
-            firDiagnostic as KtPsiDiagnostic,
-            token,
-        )
-    }
-    add(FirErrors.SENSELESS_NULL_IN_WHEN) { firDiagnostic ->
-        SenselessNullInWhenImpl(
-            firDiagnostic as KtPsiDiagnostic,
-            token,
-        )
-    }
-    add(FirErrors.SENSELESS_NULL_IN_WHEN_ERROR) { firDiagnostic ->
-        SenselessNullInWhenErrorImpl(
-            firDiagnostic as KtPsiDiagnostic,
-            token,
-        )
-    }
     add(FirErrors.TYPECHECKER_HAS_RUN_INTO_RECURSIVE_PROBLEM) { firDiagnostic ->
         TypecheckerHasRunIntoRecursiveProblemImpl(
             firDiagnostic as KtPsiDiagnostic,

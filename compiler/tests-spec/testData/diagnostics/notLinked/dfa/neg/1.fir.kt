@@ -56,15 +56,15 @@ fun case_5() {
     val x: Unit? = null
 
     if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x !== <!USELESS_IS_CHECK!>null is Boolean?<!><!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>
-    if (<!SENSELESS_COMPARISON!>x !== null == null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!><!UNSAFE_CALL!>.<!>equals(null)
-    if (<!SENSELESS_COMPARISON!>x !== null == null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>.propT
-    if (<!SENSELESS_COMPARISON!>x !== null == null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!><!UNSAFE_CALL!>.<!>propAny
-    if (<!SENSELESS_COMPARISON!>x !== null == null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>.propNullableT
-    if (<!SENSELESS_COMPARISON!>x !== null == null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>.propNullableAny
-    if (<!SENSELESS_COMPARISON!>x !== null == null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>.funT()
-    if (<!SENSELESS_COMPARISON!>x !== null == null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!><!UNSAFE_CALL!>.<!>funAny()
-    if (<!SENSELESS_COMPARISON!>x !== null == null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>.funNullableT()
-    if (<!SENSELESS_COMPARISON!>x !== null == null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>.funNullableAny()
+    if (x !== null == null) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!><!UNSAFE_CALL!>.<!>equals(null)
+    if (x !== null == null) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>.propT
+    if (x !== null == null) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!><!UNSAFE_CALL!>.<!>propAny
+    if (x !== null == null) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>.propNullableT
+    if (x !== null == null) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>.propNullableAny
+    if (x !== null == null) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>.funT()
+    if (x !== null == null) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!><!UNSAFE_CALL!>.<!>funAny()
+    if (x !== null == null) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>.funNullableT()
+    if (x !== null == null) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>.funNullableAny()
 }
 
 // TESTCASE NUMBER: 6
@@ -103,8 +103,8 @@ fun case_7() {
 
 // TESTCASE NUMBER: 8
 fun case_8(x: TypealiasNullableString) {
-    if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x !== null === null<!> && <!SENSELESS_COMPARISON!><!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString")!>x<!> != null != null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString")!>x<!><!UNSAFE_CALL!>.<!>get(0)
-    if (<!SENSELESS_COMPARISON!>x !== null != null<!> && <!FORBIDDEN_IDENTITY_EQUALS_WARNING!><!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString")!>x<!> != null === null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString")!>x<!><!UNSAFE_CALL!>.<!>get(0)
+    if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x !== null === null<!> && <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString")!>x<!> != null != null) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString")!>x<!><!UNSAFE_CALL!>.<!>get(0)
+    if (x !== null != null && <!FORBIDDEN_IDENTITY_EQUALS_WARNING!><!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString")!>x<!> != null === null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableString")!>x<!><!UNSAFE_CALL!>.<!>get(0)
 }
 
 // TESTCASE NUMBER: 9
@@ -167,15 +167,15 @@ fun case_11(x: TypealiasNullableStringIndirect<!REDUNDANT_NULLABLE!>?<!>, y: Typ
 fun case_12(x: TypealiasNullableStringIndirect, y: TypealiasNullableStringIndirect) =
     if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!><!USELESS_IS_CHECK!>(x == null) !is Boolean<!> === false<!>) "1"
     else if (<!USELESS_IS_CHECK!>(<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>y === null !== null<!>) is Boolean<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>
-    else if (<!SENSELESS_COMPARISON!>y === null != null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.equals(null)
-    else if (<!SENSELESS_COMPARISON!>y === null != null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.propT
-    else if (<!SENSELESS_COMPARISON!>y === null != null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!><!UNSAFE_CALL!>.<!>propAny
-    else if (<!SENSELESS_COMPARISON!>y === null != null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.propNullableT
-    else if (<!SENSELESS_COMPARISON!>y === null != null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.propNullableAny
-    else if (<!SENSELESS_COMPARISON!>y === null != null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.funT()
-    else if (<!SENSELESS_COMPARISON!>y === null != null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!><!UNSAFE_CALL!>.<!>funAny()
-    else if (<!SENSELESS_COMPARISON!>y === null != null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.funNullableT()
-    else if (<!SENSELESS_COMPARISON!>y === null != null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.funNullableAny()
+    else if (y === null != null) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.equals(null)
+    else if (y === null != null) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.propT
+    else if (y === null != null) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!><!UNSAFE_CALL!>.<!>propAny
+    else if (y === null != null) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.propNullableT
+    else if (y === null != null) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.propNullableAny
+    else if (y === null != null) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.funT()
+    else if (y === null != null) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!><!UNSAFE_CALL!>.<!>funAny()
+    else if (y === null != null) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.funNullableT()
+    else if (y === null != null) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.funNullableAny()
     else "-1"
 
 // TESTCASE NUMBER: 13
@@ -202,7 +202,7 @@ fun case_14() {
     if (a.x != <!USELESS_IS_CHECK!>null !is Boolean !is Boolean<!>) {
         if (a.x != null == true) {
             if (a.x !== null == false) {
-                if (<!SENSELESS_COMPARISON!>a.x != null == null<!>) {
+                if (a.x != null == null) {
                     if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>a.x != null !== null<!>) {
                         if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>a.x != null === true<!>) {
                             if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>a.x !== null === <!USELESS_IS_CHECK!>true !is Boolean<!><!> == true) {
@@ -303,7 +303,7 @@ fun case_19(b: Boolean) {
         }
     } else null
 
-    if (a != null !is Boolean && a<!UNSAFE_CALL!>.<!>B19 != null is Boolean && a<!UNSAFE_CALL!>.<!>B19<!UNSAFE_CALL!>.<!>C19 != null is Boolean && <!SENSELESS_COMPARISON!>a<!UNSAFE_CALL!>.<!>B19<!UNSAFE_CALL!>.<!>C19<!UNSAFE_CALL!>.<!>D19 != null == null<!> && <!FORBIDDEN_IDENTITY_EQUALS_WARNING!>a<!UNSAFE_CALL!>.<!>B19<!UNSAFE_CALL!>.<!>C19<!UNSAFE_CALL!>.<!>D19<!UNSAFE_CALL!>.<!>x != null !== null<!>) {
+    if (a != null !is Boolean && a<!UNSAFE_CALL!>.<!>B19 != null is Boolean && a<!UNSAFE_CALL!>.<!>B19<!UNSAFE_CALL!>.<!>C19 != null is Boolean && a<!UNSAFE_CALL!>.<!>B19<!UNSAFE_CALL!>.<!>C19<!UNSAFE_CALL!>.<!>D19 != null == null && <!FORBIDDEN_IDENTITY_EQUALS_WARNING!>a<!UNSAFE_CALL!>.<!>B19<!UNSAFE_CALL!>.<!>C19<!UNSAFE_CALL!>.<!>D19<!UNSAFE_CALL!>.<!>x != null !== null<!>) {
         a<!UNSAFE_CALL!>.<!>B19<!UNSAFE_CALL!>.<!>C19<!UNSAFE_CALL!>.<!>D19<!UNSAFE_CALL!>.<!>x
         a<!UNSAFE_CALL!>.<!>B19<!UNSAFE_CALL!>.<!>C19<!UNSAFE_CALL!>.<!>D19<!UNSAFE_CALL!>.<!>x<!UNSAFE_CALL!>.<!>equals(null)
         a<!UNSAFE_CALL!>.<!>B19<!UNSAFE_CALL!>.<!>C19<!UNSAFE_CALL!>.<!>D19<!UNSAFE_CALL!>.<!>x.propT

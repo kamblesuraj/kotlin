@@ -137,7 +137,7 @@ fun main(args: Array<String?>) {
         <!ASSIGNED_VALUE_IS_NEVER_READ!>a<!> = args[0]
     } else {
         a  = args.toString()
-        if (<!SENSELESS_COMPARISON!>a != null<!> && a.equals("cde")) return
+        if (a != null && a.equals("cde")) return
     }
 }
 

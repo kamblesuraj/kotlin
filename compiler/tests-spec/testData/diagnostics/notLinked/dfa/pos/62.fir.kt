@@ -33,7 +33,7 @@ fun case_2(x: Any) {
     val y = when(x) {
         true -> "true"
         false -> "false"
-        <!SENSELESS_NULL_IN_WHEN!>null<!> -> "false"
+        null -> "false"
     }
 }
 
@@ -97,7 +97,7 @@ fun case_7(x: Any) {
         val y = when(x) {
             true -> "true"
             false -> "false"
-            <!SENSELESS_NULL_IN_WHEN!>null<!> -> "false"
+            null -> "false"
         }
     }
 }
@@ -219,7 +219,7 @@ fun case_16(x: Any) {
             EnumClass.SOUTH -> 2
             EnumClass.WEST -> 3
             EnumClass.EAST -> 4
-            <!SENSELESS_NULL_IN_WHEN!>null<!> -> 5
+            null -> 5
         }
     }
 }
@@ -255,7 +255,7 @@ fun case_19(x: Any): Int {
             EnumClass.SOUTH -> 2
             EnumClass.WEST -> 3
             EnumClass.EAST -> 4
-            <!SENSELESS_NULL_IN_WHEN!>null<!> -> 5
+            null -> 5
         }
     }
     return 0

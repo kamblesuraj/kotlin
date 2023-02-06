@@ -35,7 +35,7 @@ inline fun <reified T>case_3(x: Any?) {
 
 // TESTCASE NUMBER: 4
 inline fun <reified T : <!FINAL_UPPER_BOUND!>Boolean<!>>case_4(x: Any?) {
-    if (<!SENSELESS_COMPARISON!>x is Int is T == null<!>) {
+    if (x is Int is T == null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!>.<!UNRESOLVED_REFERENCE!>inv<!>()
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!><!UNSAFE_CALL!>.<!>propAny
@@ -45,7 +45,7 @@ inline fun <reified T : <!FINAL_UPPER_BOUND!>Boolean<!>>case_4(x: Any?) {
 
 // TESTCASE NUMBER: 5
 fun case_5(x: Any?) {
-    if (<!SENSELESS_COMPARISON!>x is Int != null<!>) {
+    if (x is Int != null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!>.<!UNRESOLVED_REFERENCE!>inv<!>()
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!><!UNSAFE_CALL!>.<!>propAny
@@ -55,7 +55,7 @@ fun case_5(x: Any?) {
 
 // TESTCASE NUMBER: 6
 fun case_6(x: Any?) {
-    if (<!SENSELESS_COMPARISON!>x is Int == null<!>) {
+    if (x is Int == null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!>.<!UNRESOLVED_REFERENCE!>inv<!>()
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!><!UNSAFE_CALL!>.<!>propAny

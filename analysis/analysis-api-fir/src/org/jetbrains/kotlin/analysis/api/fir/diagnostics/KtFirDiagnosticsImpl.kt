@@ -2874,30 +2874,6 @@ internal class UnreachableCodeImpl(
     override val token: KtLifetimeToken,
 ) : KtFirDiagnostic.UnreachableCode(), KtAbstractFirDiagnostic<KtElement>
 
-internal class SenselessComparisonImpl(
-    override val expression: KtExpression,
-    override val compareResult: Boolean,
-    override val firDiagnostic: KtPsiDiagnostic,
-    override val token: KtLifetimeToken,
-) : KtFirDiagnostic.SenselessComparison(), KtAbstractFirDiagnostic<KtExpression>
-
-internal class SenselessComparisonErrorImpl(
-    override val expression: KtExpression,
-    override val compareResult: Boolean,
-    override val firDiagnostic: KtPsiDiagnostic,
-    override val token: KtLifetimeToken,
-) : KtFirDiagnostic.SenselessComparisonError(), KtAbstractFirDiagnostic<KtExpression>
-
-internal class SenselessNullInWhenImpl(
-    override val firDiagnostic: KtPsiDiagnostic,
-    override val token: KtLifetimeToken,
-) : KtFirDiagnostic.SenselessNullInWhen(), KtAbstractFirDiagnostic<KtElement>
-
-internal class SenselessNullInWhenErrorImpl(
-    override val firDiagnostic: KtPsiDiagnostic,
-    override val token: KtLifetimeToken,
-) : KtFirDiagnostic.SenselessNullInWhenError(), KtAbstractFirDiagnostic<KtElement>
-
 internal class TypecheckerHasRunIntoRecursiveProblemImpl(
     override val firDiagnostic: KtPsiDiagnostic,
     override val token: KtLifetimeToken,

@@ -3,10 +3,10 @@ fun readLine() = "x"
 fun foo() {
     var line = ""
 
-    while (<!SENSELESS_COMPARISON!>line != null<!>) {
+    while (line != null) {
         line = readLine()
 
-        if (<!SENSELESS_COMPARISON!>line != null<!>) {
+        if (line != null) {
             bar()
         }
     }

@@ -60,7 +60,7 @@ fun case_6(x: EmptyClass?) {
 
 // TESTCASE NUMBER: 7
 fun case_7() {
-    if (nullableStringProperty == null || <!SENSELESS_COMPARISON!><!DEBUG_INFO_EXPRESSION_TYPE("kotlin.String? & kotlin.String")!>nullableStringProperty<!> == null<!>) {
+    if (nullableStringProperty == null || <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.String? & kotlin.String")!>nullableStringProperty<!> == null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.String?")!>nullableStringProperty<!>
     }
 }

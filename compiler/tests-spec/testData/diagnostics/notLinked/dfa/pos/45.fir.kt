@@ -64,7 +64,7 @@ fun case_5() {
     val x: Int?
     val y: Int?
     x = 10;y = x
-    if (<!SENSELESS_COMPARISON!>y != null<!>) {
+    if (y != null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int? & kotlin.Int")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int? & kotlin.Int")!>x<!>.inv()
     }
@@ -75,7 +75,7 @@ fun case_6() {
     var x: Int?
     val y: Int?
     x = 10;y = x
-    if (<!SENSELESS_COMPARISON!>y != null<!>) {
+    if (y != null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int? & kotlin.Int")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int? & kotlin.Int")!>x<!>.inv()
     }
@@ -86,7 +86,7 @@ fun case_7() {
     val x: Int?
     var y: Int?
     x = 10;y = x
-    if (<!SENSELESS_COMPARISON!>y != null<!>) {
+    if (y != null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int? & kotlin.Int")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int? & kotlin.Int")!>x<!>.inv()
     }
@@ -97,7 +97,7 @@ fun case_8() {
     var x: Int?
     var y: Int?
     x = 10;y = x
-    if (<!SENSELESS_COMPARISON!>y != null<!>) {
+    if (y != null) {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int? & kotlin.Int")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int? & kotlin.Int")!>x<!>.inv()
     }

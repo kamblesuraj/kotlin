@@ -31,7 +31,7 @@ class Case2 {
     val x: Int
     init {
         val y = this
-        if (<!SENSELESS_COMPARISON!>y.x == null<!>) {
+        if (y.x == null) {
             x = 11
             <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>x<!>
             this.x

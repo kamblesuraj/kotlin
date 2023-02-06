@@ -1,12 +1,12 @@
 // FILE: KotlinFile.kt
-abstract class KotlinClass : JavaInterface1, JavaInterface2 {
+abstract class KotlinClass : JavaInterface3 {
     override fun getSomething(): String = ""
 }
 
 fun foo(k: KotlinClass) {
     useString(k.getSomething())
     useString(k.something)
-    if (<!SENSELESS_COMPARISON!>k.something == null<!>) return
+    if (k.something == null) return
 
     k.setSomething("")
     k.something = ""
@@ -23,3 +23,6 @@ public interface JavaInterface1 {
 public interface JavaInterface2 {
     void setSomething(String value);
 }
+
+// FILE: JavaInterface3.java
+public interface JavaInterface3 extends JavaInterface1, JavaInterface2 {}

@@ -9,7 +9,7 @@ fun foo() {
         2<!OVERLOAD_RESOLUTION_AMBIGUITY!>+<!><!SYNTAX!><!>
     }
     else {
-        if (<!SENSELESS_COMPARISON!>x == null<!>) return
+        if (x == null) return
         2<!OVERLOAD_RESOLUTION_AMBIGUITY!>+<!><!SYNTAX!><!>
     }
     bar(x)

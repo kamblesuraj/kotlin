@@ -5,13 +5,10 @@
 
 package org.jetbrains.kotlin.fir.analysis.checkers.expression
 
-import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.KtRealSourceElementKind
-import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
-import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactory0
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactory2
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors
 import org.jetbrains.kotlin.diagnostics.reportOn
@@ -91,7 +88,6 @@ object FirEqualityCompatibilityChecker : FirEqualityOperatorCallChecker() {
 
         return when {
             !oneIsBuiltin || !oneIsNotNull -> Applicability.APPLICABLE
-            lType.isNullableNothing || rType.isNullableNothing -> Applicability.INAPPLICABLE_AS_SENSELESS
             !shouldReportAsPerRules1(lType, rType, context) -> Applicability.APPLICABLE
             // Note: FE1.0 reports INCOMPATIBLE_ENUM_COMPARISON_ERROR only when TypeIntersector.isIntersectionEmpty() thinks the
             // given types are compatible. Exactly mimicking the behavior of FE1.0 is difficult and does not seem to provide any
@@ -201,7 +197,6 @@ object FirEqualityCompatibilityChecker : FirEqualityOperatorCallChecker() {
     private enum class Applicability {
         APPLICABLE,
         GENERALLY_INAPPLICABLE,
-        INAPPLICABLE_AS_SENSELESS,
         INAPPLICABLE_AS_ENUMS,
         INAPPLICABLE_AS_IDENTITY_LESS,
     }
@@ -256,30 +251,6 @@ object FirEqualityCompatibilityChecker : FirEqualityOperatorCallChecker() {
         }
     }
 
-    private fun getSenselessWhenBranchInapplicabilityDiagnostic(isWarning: Boolean, context: CheckerContext): KtDiagnosticFactory0 {
-        val shouldProperlyReportError = context.languageVersionSettings.supportsFeature(LanguageFeature.ReportErrorsForComparisonOperators)
-
-        return when {
-            isWarning || !shouldProperlyReportError -> FirErrors.SENSELESS_NULL_IN_WHEN
-            else -> FirErrors.SENSELESS_NULL_IN_WHEN_ERROR
-        }
-    }
-
-    private fun getSenselessComparisonInapplicabilityDiagnostic(
-        isWarning: Boolean,
-        context: CheckerContext,
-    ): KtDiagnosticFactory2<FirExpression, Boolean> {
-        val shouldProperlyReportError = context.languageVersionSettings.supportsFeature(LanguageFeature.ReportErrorsForComparisonOperators)
-
-        return when {
-            isWarning || !shouldProperlyReportError -> FirErrors.SENSELESS_COMPARISON
-            else -> FirErrors.SENSELESS_COMPARISON_ERROR
-        }
-    }
-
-    private fun isWhenBranch(source: KtSourceElement?, rType: ConeKotlinType): Boolean =
-        source?.elementType != KtNodeTypes.BINARY_EXPRESSION && rType.isNullableNothing
-
     private fun DiagnosticReporter.reportOn(
         expression: FirEqualityOperatorCall,
         applicability: Applicability,
@@ -289,15 +260,6 @@ object FirEqualityCompatibilityChecker : FirEqualityOperatorCallChecker() {
         rType: ConeKotlinType,
         context: CheckerContext,
     ): Unit = when {
-        applicability == Applicability.INAPPLICABLE_AS_SENSELESS -> when {
-            isWhenBranch(expression.source, rType) -> reportOn(
-                expression.source, getSenselessWhenBranchInapplicabilityDiagnostic(isWarning, context), context,
-            )
-            else -> reportOn(
-                expression.source, getSenselessComparisonInapplicabilityDiagnostic(isWarning, context),
-                expression, false, context,
-            )
-        }
         applicability == Applicability.INAPPLICABLE_AS_IDENTITY_LESS -> reportOn(
             expression.source, getIdentityLessInapplicabilityDiagnostic(lType, rType, isWarning, context),
             lType, rType, context,

@@ -15,6 +15,6 @@ fun foo(e: E, something: Any?): Int {
     return when (e) {
         E.A -> 1
         E.B -> 2
-        <!SENSELESS_NULL_IN_WHEN!>something<!> -> 3
+        something -> 3
     }
 }

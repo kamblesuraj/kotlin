@@ -489,10 +489,6 @@ import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.SEALED_INHERITOR_
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.SEALED_SUPERTYPE
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.SEALED_SUPERTYPE_IN_LOCAL_CLASS
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.SECONDARY_CONSTRUCTOR_WITH_BODY_INSIDE_VALUE_CLASS
-import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.SENSELESS_COMPARISON
-import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.SENSELESS_COMPARISON_ERROR
-import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.SENSELESS_NULL_IN_WHEN
-import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.SENSELESS_NULL_IN_WHEN_ERROR
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.SETTER_PROJECTED_OUT
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.SETTER_VISIBILITY_INCONSISTENT_WITH_PROPERTY_VISIBILITY
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.SINGLETON_IN_SUPERTYPE
@@ -1811,10 +1807,6 @@ object FirErrorsDefaultMessages : BaseDiagnosticRendererFactory() {
         map.put(LEAKED_IN_PLACE_LAMBDA, "Leaked in-place lambda: {0}", SYMBOL)
         map.put(FirErrors.WRONG_IMPLIES_CONDITION, "Wrong implies condition")
         map.put(UNREACHABLE_CODE, "Unreachable code", NOT_RENDERED, NOT_RENDERED)
-        map.put(SENSELESS_COMPARISON, "Condition ''{0}'' is always ''{1}''", FIR, TO_STRING)
-        map.put(SENSELESS_COMPARISON_ERROR, "Condition ''{0}'' is always ''{1}''", FIR, TO_STRING)
-        map.put(SENSELESS_NULL_IN_WHEN, "Expression under 'when' is never equal to null")
-        map.put(SENSELESS_NULL_IN_WHEN_ERROR, "Expression under 'when' is never equal to null")
 
         // Nullability
         map.put(USELESS_CALL_ON_NOT_NULL, "Unsafe call on not null")

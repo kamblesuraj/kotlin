@@ -620,10 +620,6 @@ object FirErrors {
     val VARIABLE_WITH_NO_TYPE_NO_INITIALIZER by error0<KtVariableDeclaration>(SourceElementPositioningStrategies.DECLARATION_NAME)
     val INITIALIZATION_BEFORE_DECLARATION by error1<KtExpression, FirBasedSymbol<*>>()
     val UNREACHABLE_CODE by warning2<KtElement, Set<KtSourceElement>, Set<KtSourceElement>>(SourceElementPositioningStrategies.UNREACHABLE_CODE)
-    val SENSELESS_COMPARISON by warning2<KtExpression, FirExpression, Boolean>()
-    val SENSELESS_COMPARISON_ERROR by error2<KtExpression, FirExpression, Boolean>()
-    val SENSELESS_NULL_IN_WHEN by warning0<KtElement>()
-    val SENSELESS_NULL_IN_WHEN_ERROR by error0<KtElement>()
     val TYPECHECKER_HAS_RUN_INTO_RECURSIVE_PROBLEM by error0<KtExpression>()
 
     // Nullability

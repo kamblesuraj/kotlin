@@ -12,7 +12,7 @@ fun case_1() {
     do {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!>
         x = x<!UNSAFE_CALL!>.<!>equals(10)
-    } while (<!SENSELESS_COMPARISON!>x != null<!>)
+    } while (x != null)
 }
 
 /*
@@ -72,7 +72,7 @@ fun case_6() {
     do {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!>
         x = x<!UNSAFE_CALL!>.<!>equals(10)
-    } while (<!SENSELESS_COMPARISON!>x != null<!>)
+    } while (x != null)
 }
 
 /*
@@ -100,7 +100,7 @@ fun case_8() {
     do {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!>
         x = x<!UNSAFE_CALL!>.<!>equals(10)
-    } while (<!SENSELESS_COMPARISON!>x != null<!>)
+    } while (x != null)
 }
 
 /*
@@ -128,7 +128,7 @@ fun case_10() {
     do {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!>
         x = x<!UNSAFE_CALL!>.<!>equals(10)
-    } while (<!SENSELESS_COMPARISON!>x != null<!>)
+    } while (x != null)
 }
 
 /*
@@ -142,7 +142,7 @@ fun case_11() {
     do {
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!>
         x = x<!UNSAFE_CALL!>.<!>equals(10)
-    } while (<!SENSELESS_COMPARISON!>x != null<!>)
+    } while (x != null)
 }
 
 /*
@@ -156,7 +156,7 @@ fun case_12() {
         do {
             <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!>
             x = x <!UNSAFE_CALL!>.<!>equals(10)
-        } while (<!SENSELESS_COMPARISON!>x != null<!>)
+        } while (x != null)
     }
 }
 
@@ -171,7 +171,7 @@ fun case_13() {
         do {
             <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Any?")!>x<!>
             x = x <!UNSAFE_CALL!>.<!>equals(10)
-        } while (<!SENSELESS_COMPARISON!>x != null<!>)
+        } while (x != null)
     }
 }
 
