@@ -1,0 +1,102 @@
+element: e
+implicit receivers:
+  type: A
+  owner symbol: KtFirAnonymousFunctionSymbol
+
+  type: B
+  owner symbol: KtFirAnonymousFunctionSymbol
+
+  type: C
+  owner symbol: KtFirNamedClassOrObjectSymbol
+
+scopes:
+  LocalScope, index = 0
+    classifiers: 0
+    callables: 0
+
+  LocalScope, index = 1
+    classifiers: 0
+    callables: 0
+
+  LocalScope, index = 2
+    classifiers: 0
+    callables: 0
+
+  LocalScope, index = 3
+    classifiers: 0
+    callables: 1
+      val localVarA: kotlin.Int
+
+  LocalScope, index = 4
+    classifiers: 0
+    callables: 1
+      lambdaArg: kotlin.String
+
+  LocalScope, index = 5
+    classifiers: 0
+    callables: 2
+      val localVarB: kotlin.Int
+      fun localFunB()
+
+  LocalScope, index = 6
+    classifiers: 0
+    callables: 1
+      param: kotlin.String?
+
+  SimpleTypeScope, index = 0
+    classifiers: 0
+    callables: 4
+      fun memberInA()
+      fun equals(other: kotlin.Any?): kotlin.Boolean
+      fun hashCode(): kotlin.Int
+      fun toString(): kotlin.String
+
+  SimpleTypeScope, index = 1
+    classifiers: 0
+    callables: 4
+      fun memberInB()
+      fun equals(other: kotlin.Any?): kotlin.Boolean
+      fun hashCode(): kotlin.Int
+      fun toString(): kotlin.String
+
+  SimpleTypeScope, index = 2
+    classifiers: 0
+    callables: 4
+      fun <T> methodInC(param: kotlin.String?)
+      fun equals(other: kotlin.Any?): kotlin.Boolean
+      fun hashCode(): kotlin.Int
+      fun toString(): kotlin.String
+
+  TypeParameterScope, index = 0
+    classifiers: 1
+      T
+    callables: 0
+
+  ExplicitSimpleImportingScope, index = 1
+    classifiers: 0
+    callables: 0
+
+  PackageMemberScope, index = 2
+    classifiers: 3
+      class C
+      class B
+      class A
+    callables: 3
+      fun topLevel(): kotlin.Int
+      fun withB(f: B.() -> kotlin.Unit)
+      fun withA(f: A.() -> kotlin.Unit)
+
+  DefaultSimpleImportingScope, index = 3
+
+  DefaultSimpleImportingScope, index = 4
+
+  ExplicitStarImportingScope, index = 5
+    classifiers: 0
+    callables: 0
+
+  DefaultSimpleImportingScope, index = 6
+
+  DefaultStarImportingScope, index = 7
+
+  DefaultStarImportingScope, index = 8
+

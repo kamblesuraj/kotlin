@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.analysis.api.components.KtImplicitReceiver
 import org.jetbrains.kotlin.analysis.api.components.KtScopeContext
 import org.jetbrains.kotlin.analysis.api.components.KtScopeProvider
+import org.jetbrains.kotlin.analysis.api.components.KtScopeKind
 import org.jetbrains.kotlin.analysis.api.fir.KtFirAnalysisSession
 import org.jetbrains.kotlin.analysis.api.fir.KtSymbolByFirBuilder
 import org.jetbrains.kotlin.analysis.api.fir.scopes.*
@@ -166,7 +167,7 @@ internal class KtFirScopeProvider(
             analysisSession.firResolveSession.getTowerContextProvider(originalFile).getClosestAvailableParentContext(positionInFakeFile)
                 ?: error("Cannot find enclosing declaration for ${positionInFakeFile.getElementTextInContext()}")
 
-        val implicitReceivers = towerDataContext.nonLocalTowerDataElements.mapNotNull { it.implicitReceiver }.distinct()
+        val implicitReceivers = towerDataContext.nonLocalTowerDataElements.mapNotNull { it.implicitReceiver }.distinct().asReversed()
         val implicitKtReceivers = implicitReceivers.map { receiver ->
             KtImplicitReceiver(
                 token,
@@ -174,22 +175,18 @@ internal class KtFirScopeProvider(
                 builder.buildSymbol(receiver.boundSymbol.fir),
             )
         }
-
         val implicitReceiverScopes = implicitReceivers.mapNotNull { it.implicitScope }
-        val nonLocalScopes = towerDataContext.nonLocalTowerDataElements.mapNotNull { it.scope }.distinct()
-        val firLocalScopes = towerDataContext.localScopes
 
-        val allKtScopes = buildList<KtScope> {
-            implicitReceiverScopes.mapTo(this, ::convertToKtScope)
-            nonLocalScopes.mapTo(this, ::convertToKtScope)
-            firLocalScopes.mapTo(this, ::convertToKtScope)
+        val nonLocalScopes = towerDataContext.nonLocalTowerDataElements.asReversed().mapNotNull { it.scope }.distinct()
+        val firLocalScopes = towerDataContext.localScopes.asReversed()
+
+        val scopes = buildList {
+            firLocalScopes.mapIndexedTo(this) { index, scope -> convertToKtScope(scope) to KtScopeKind.LocalScope(index) }
+            implicitReceiverScopes.mapIndexedTo(this) { index, scope -> convertToKtScope(scope) to KtScopeKind.SimpleTypeScope(index) }
+            nonLocalScopes.mapIndexedTo(this) { index, scope -> convertToKtScope(scope) to getScopeKind(scope, index) }
         }
 
-        return KtScopeContext(
-            getCompositeScope(allKtScopes.asReversed()),
-            implicitKtReceivers.asReversed(),
-            token
-        )
+        return KtScopeContext(scopes, implicitKtReceivers, token)
     }
 
     private fun convertToKtScope(firScope: FirScope): KtScope {
@@ -200,6 +197,17 @@ internal class KtFirScopeProvider(
             is FirContainingNamesAwareScope -> KtFirDelegatingScope(firScope, builder)
             else -> TODO(firScope::class.toString())
         }
+    }
+
+    private fun getScopeKind(firScope: FirScope, indexInTower: Int): KtScopeKind = when (firScope) {
+        is FirTypeParameterScope -> KtScopeKind.TypeParameterScope(indexInTower)
+        is FirPackageMemberScope -> KtScopeKind.PackageMemberScope(indexInTower)
+        is FirExplicitSimpleImportingScope -> KtScopeKind.ExplicitSimpleImportingScope(indexInTower)
+        is FirExplicitStarImportingScope -> KtScopeKind.ExplicitStarImportingScope(indexInTower)
+        is FirDefaultSimpleImportingScope -> KtScopeKind.DefaultSimpleImportingScope(indexInTower)
+        is FirDefaultStarImportingScope -> KtScopeKind.DefaultStarImportingScope(indexInTower)
+        is FirContainingNamesAwareScope -> KtScopeKind.NamesAwareScope(indexInTower)
+        else -> error("Unexpected scope kind: ${firScope::class}")
     }
 
     private fun createPackageScope(fqName: FqName): KtFirPackageScope {

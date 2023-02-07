@@ -111,15 +111,20 @@ public interface KtScopeProviderMixIn : KtAnalysisSessionMixIn {
 
     public fun KtFile.getScopeContextForFile(): KtScopeContext =
         withValidityAssertion { analysisSession.scopeProvider.getScopeContextForPosition(this, this) }
+
+    public fun KtScopeContext.getCompositeScope(filter: (KtScopeKind) -> Boolean = { true }): KtScope = withValidityAssertion {
+        val subScopes = scopes.filter { (_, scopeType) -> filter(scopeType) }.map { it.first }
+        subScopes.asCompositeScope()
+    }
 }
 
 public class KtScopeContext(
-    private val _scopes: KtScope,
+    private val _scopes: List<Pair<KtScope, KtScopeKind>>,
     private val _implicitReceivers: List<KtImplicitReceiver>,
     override val token: KtLifetimeToken
 ) : KtLifetimeOwner {
     public val implicitReceivers: List<KtImplicitReceiver> get() = withValidityAssertion { _implicitReceivers }
-    public val scopes: KtScope get() = withValidityAssertion { _scopes }
+    public val scopes: List<Pair<KtScope, KtScopeKind>> get() = withValidityAssertion { _scopes }
 }
 
 public class KtImplicitReceiver(
@@ -129,4 +134,55 @@ public class KtImplicitReceiver(
 ) : KtLifetimeOwner {
     public val ownerSymbol: KtSymbol get() = withValidityAssertion { _ownerSymbol }
     public val type: KtType get() = withValidityAssertion { _type }
+}
+
+public sealed class KtScopeKind {
+    /**
+     * @param indexInTower index in scope tower. The index of the closest local scope is 0.
+     */
+    public class LocalScope(public val indexInTower: Int) : KtScopeKind()
+
+    /**
+     * @param receiverIndex index of the implicit receiver, which corresponds to type scope. For example:
+     * ```
+     * fun f(a: A, b: B) {
+     *     with(a) {       // type scope for A: receiverIndex = 1
+     *         with(b) {   // type scope for B: receiverIndex = 0
+     *             <caret>
+     *         }
+     *     }
+     * }
+     * ```
+     */
+    public sealed class TypeScope : KtScopeKind() {
+        public abstract val receiverIndex: Int
+    }
+
+    public class SimpleTypeScope(override val receiverIndex: Int) : TypeScope()
+    public class SyntheticJavaPropertiesScope(override val receiverIndex: Int) : TypeScope()
+
+    /**
+     * @param indexInTower index in scope tower. The order in the scope tower depends on priorities of scopes.
+     */
+    public sealed class NonLocalScope : KtScopeKind() {
+        public abstract val indexInTower: Int
+    }
+
+    public class TypeParameterScope(override val indexInTower: Int) : NonLocalScope()
+    public class PackageMemberScope(override val indexInTower: Int) : NonLocalScope()
+
+    public sealed class ImportingScope : NonLocalScope()
+    public class ExplicitSimpleImportingScope(override val indexInTower: Int) : ImportingScope()
+    public class ExplicitStarImportingScope(override val indexInTower: Int) : ImportingScope()
+    public class DefaultSimpleImportingScope(override val indexInTower: Int) : ImportingScope()
+    public class DefaultStarImportingScope(override val indexInTower: Int) : ImportingScope()
+
+    /**
+     * Non-local names-aware scope that can't be attributed to any of the listed above kinds.
+     */
+    public class NamesAwareScope(override val indexInTower: Int) : NonLocalScope()
+
+    public companion object {
+        public val UNKNOWN_INDEX: Int = Int.MAX_VALUE
+    }
 }

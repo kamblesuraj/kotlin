@@ -9,6 +9,7 @@ import com.intellij.openapi.diagnostic.Logger
 import org.jetbrains.kotlin.analysis.api.components.KtImplicitReceiver
 import org.jetbrains.kotlin.analysis.api.components.KtScopeContext
 import org.jetbrains.kotlin.analysis.api.components.KtScopeProvider
+import org.jetbrains.kotlin.analysis.api.components.KtScopeKind
 import org.jetbrains.kotlin.analysis.api.descriptors.KtFe10AnalysisSession
 import org.jetbrains.kotlin.analysis.api.descriptors.components.base.Fe10KtAnalysisSessionComponent
 import org.jetbrains.kotlin.analysis.api.descriptors.scopes.KtFe10FileScope
@@ -200,15 +201,16 @@ internal class KtFe10ScopeProvider(
         val elementToAnalyze = positionInFakeFile.containingNonLocalDeclaration() ?: originalFile
         val bindingContext = analysisContext.analyze(elementToAnalyze)
 
+        val scopeKind = KtScopeKind.NamesAwareScope(indexInTower = KtScopeKind.UNKNOWN_INDEX)
         val lexicalScope = positionInFakeFile.getResolutionScope(bindingContext)
         if (lexicalScope != null) {
             val compositeScope = KtCompositeScope(listOf(KtFe10ScopeLexical(lexicalScope, analysisContext)), token)
-            return KtScopeContext(compositeScope, collectImplicitReceivers(lexicalScope), token)
+            return KtScopeContext(listOf(compositeScope to scopeKind), collectImplicitReceivers(lexicalScope), token)
         }
 
         val fileScope = analysisContext.resolveSession.fileScopeProvider.getFileResolutionScope(originalFile)
         val compositeScope = KtCompositeScope(listOf(KtFe10ScopeLexical(fileScope, analysisContext)), token)
-        return KtScopeContext(compositeScope, collectImplicitReceivers(fileScope), token)
+        return KtScopeContext(listOf(compositeScope to scopeKind), collectImplicitReceivers(fileScope), token)
     }
 
     private inline fun <reified T : DeclarationDescriptor> getDescriptor(symbol: KtSymbol): T? {
