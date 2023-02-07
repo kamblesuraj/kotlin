@@ -25613,6 +25613,42 @@ public class IrBlackBoxCodegenTestGenerated extends AbstractIrBlackBoxCodegenTes
             public void testInlineClasInSignatureNullable() throws Exception {
                 runTest("compiler/testData/codegen/box/inlineClasses/javaInterop/inlineClasInSignatureNullable.kt");
             }
+
+            @Test
+            @TestMetadata("kt55945.kt")
+            public void testKt55945() throws Exception {
+                runTest("compiler/testData/codegen/box/inlineClasses/javaInterop/kt55945.kt");
+            }
+
+            @Test
+            @TestMetadata("methodWithInlineClassDeclaredInJava.kt")
+            public void testMethodWithInlineClassDeclaredInJava() throws Exception {
+                runTest("compiler/testData/codegen/box/inlineClasses/javaInterop/methodWithInlineClassDeclaredInJava.kt");
+            }
+
+            @Test
+            @TestMetadata("methodWithInlineClassDeclaredInJavaOverriddenInKotlin.kt")
+            public void testMethodWithInlineClassDeclaredInJavaOverriddenInKotlin() throws Exception {
+                runTest("compiler/testData/codegen/box/inlineClasses/javaInterop/methodWithInlineClassDeclaredInJavaOverriddenInKotlin.kt");
+            }
+
+            @Test
+            @TestMetadata("methodWithInlineClassInheritedBothFromJavaAndKotlin.kt")
+            public void testMethodWithInlineClassInheritedBothFromJavaAndKotlin() throws Exception {
+                runTest("compiler/testData/codegen/box/inlineClasses/javaInterop/methodWithInlineClassInheritedBothFromJavaAndKotlin.kt");
+            }
+
+            @Test
+            @TestMetadata("methodWithInlineClassInheritedInJavaOverriddenInKotlin.kt")
+            public void testMethodWithInlineClassInheritedInJavaOverriddenInKotlin() throws Exception {
+                runTest("compiler/testData/codegen/box/inlineClasses/javaInterop/methodWithInlineClassInheritedInJavaOverriddenInKotlin.kt");
+            }
+
+            @Test
+            @TestMetadata("properFunctionManglingForJavaInteropOff.kt")
+            public void testProperFunctionManglingForJavaInteropOff() throws Exception {
+                runTest("compiler/testData/codegen/box/inlineClasses/javaInterop/properFunctionManglingForJavaInteropOff.kt");
+            }
         }
 
         @Nested
@@ -51215,6 +51251,40 @@ public class IrBlackBoxCodegenTestGenerated extends AbstractIrBlackBoxCodegenTes
         @TestMetadata("visibility.kt")
         public void testVisibility() throws Exception {
             runTest("compiler/testData/codegen/box/valueClasses/visibility.kt");
+        }
+
+        @Nested
+        @TestMetadata("compiler/testData/codegen/box/valueClasses/javaInterop")
+        @TestDataPath("$PROJECT_ROOT")
+        public class JavaInterop {
+            @Test
+            public void testAllFilesPresentInJavaInterop() throws Exception {
+                KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/valueClasses/javaInterop"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JVM_IR, true);
+            }
+
+            @Test
+            @TestMetadata("methodWithValueClassDeclaredInJava.kt")
+            public void testMethodWithValueClassDeclaredInJava() throws Exception {
+                runTest("compiler/testData/codegen/box/valueClasses/javaInterop/methodWithValueClassDeclaredInJava.kt");
+            }
+
+            @Test
+            @TestMetadata("methodWithValueClassDeclaredInJavaOverriddenInKotlin.kt")
+            public void testMethodWithValueClassDeclaredInJavaOverriddenInKotlin() throws Exception {
+                runTest("compiler/testData/codegen/box/valueClasses/javaInterop/methodWithValueClassDeclaredInJavaOverriddenInKotlin.kt");
+            }
+
+            @Test
+            @TestMetadata("methodWithValueClassInheritedBothFromJavaAndKotlin.kt")
+            public void testMethodWithValueClassInheritedBothFromJavaAndKotlin() throws Exception {
+                runTest("compiler/testData/codegen/box/valueClasses/javaInterop/methodWithValueClassInheritedBothFromJavaAndKotlin.kt");
+            }
+
+            @Test
+            @TestMetadata("methodWithValueClassInheritedInJavaOverriddenInKotlin.kt")
+            public void testMethodWithValueClassInheritedInJavaOverriddenInKotlin() throws Exception {
+                runTest("compiler/testData/codegen/box/valueClasses/javaInterop/methodWithValueClassInheritedInJavaOverriddenInKotlin.kt");
+            }
         }
     }
 

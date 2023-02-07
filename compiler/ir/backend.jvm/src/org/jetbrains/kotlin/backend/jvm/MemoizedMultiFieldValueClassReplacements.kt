@@ -251,7 +251,7 @@ class MemoizedMultiFieldValueClassReplacements(
                         createStaticReplacement(function)
                 }
 
-                function is IrSimpleFunction && !function.isFromJava() &&
+                function is IrSimpleFunction && !(function.isFromJava() && function.overridesOnlyMethodsFromJava()) &&
                         function.fullValueParameterList.any { it.type.needsMfvcFlattening() } &&
                         (!function.isFakeOverride ||
                                 findSuperDeclaration(function, false, context.state.jvmDefaultMode)

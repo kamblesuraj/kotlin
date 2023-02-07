@@ -133,4 +133,7 @@ abstract class MemoizedValueClassAbstractReplacements(
         }
 
     abstract fun quickCheckIfFunctionIsNotApplicable(function: IrFunction): Boolean
+
+    protected fun IrSimpleFunction.overridesOnlyMethodsFromJava(): Boolean =
+        overriddenSymbols.all { it.owner.isFromJava() && it.owner.overridesOnlyMethodsFromJava() }
 }

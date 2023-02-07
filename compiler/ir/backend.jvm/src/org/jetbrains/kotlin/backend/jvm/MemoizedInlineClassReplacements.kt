@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.backend.jvm
 
 import org.jetbrains.kotlin.backend.jvm.ir.*
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper
+import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.IrBuiltIns
@@ -74,13 +75,19 @@ class MemoizedInlineClassReplacements(
                     }
 
                 // Otherwise, mangle functions with mangled parameters, ignoring constructors
-                it is IrSimpleFunction && !it.isFromJava() &&
-                        (it.hasMangledParameters(includeMFVC = false) || mangleReturnTypes && it.hasMangledReturnType) ->
-                    createMethodReplacement(it)
+                it is IrSimpleFunction && it.needsReplacement -> createMethodReplacement(it)
 
                 else ->
                     null
             }
+        }
+
+    private val IrSimpleFunction.needsReplacement: Boolean
+        get() {
+            if (!hasMangledParameters(includeMFVC = false) && !(mangleReturnTypes && hasMangledReturnType)) return false
+            val useProperMangling =
+                context.state.languageVersionSettings.supportsFeature(LanguageFeature.ProperFunctionManglingForJavaInterop)
+            return !(isFromJava() && (!useProperMangling || overridesOnlyMethodsFromJava()))
         }
 
     override fun quickCheckIfFunctionIsNotApplicable(function: IrFunction) = !(
