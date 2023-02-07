@@ -15,8 +15,10 @@ import org.jetbrains.kotlin.fir.checkers.registerExtendedCommonCheckers
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
 import org.jetbrains.kotlin.fir.java.FirProjectSessionProvider
 import org.jetbrains.kotlin.fir.pipeline.*
+import org.jetbrains.kotlin.fir.resolve.ImplicitIntegerCoercionModuleCapability
 import org.jetbrains.kotlin.fir.session.FirNativeSessionFactory
 import org.jetbrains.kotlin.fir.session.FirSessionConfigurator
+import org.jetbrains.kotlin.library.isInterop
 import org.jetbrains.kotlin.library.metadata.resolver.KotlinResolvedLibrary
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.platform.CommonPlatforms
@@ -46,7 +48,17 @@ internal fun PhaseContext.firFrontend(
     }
     val binaryModuleData = BinaryModuleData.initialize(mainModuleName, CommonPlatforms.defaultCommonPlatform, NativePlatformAnalyzerServices)
     val dependencyList = DependencyListForCliModule.build(binaryModuleData) {
-        dependencies(config.resolvedLibraries.getFullList().map { it.libraryFile.absolutePath })
+        val (interopLibs, regularLibs) = config.resolvedLibraries.getFullList().partition { it.isInterop }
+        dependencies(regularLibs.map { it.libraryFile.absolutePath })
+        if (interopLibs.isNotEmpty()) {
+            val interopModuleData =
+                    BinaryModuleData.createDependencyModuleData(
+                            Name.special("<regular interop dependencies of $mainModuleName>"),
+                            CommonPlatforms.defaultCommonPlatform, NativePlatformAnalyzerServices,
+                            FirModuleCapabilities.create(listOf(ImplicitIntegerCoercionModuleCapability))
+                    )
+            dependencies(interopModuleData, interopLibs.map { it.libraryFile.absolutePath })
+        }
         friendDependencies(config.friendModuleFiles.map { it.absolutePath })
         // TODO: !!! dependencies module data?
     }
