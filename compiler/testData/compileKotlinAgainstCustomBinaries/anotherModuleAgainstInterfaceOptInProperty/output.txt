@@ -1,0 +1,4 @@
+compiler/testData/compileKotlinAgainstCustomBinaries/anotherModuleAgainstInterfaceOptInProperty/optInUsage.kt:2:17: error: this declaration needs opt-in. Its usage must be marked with '@SomeOptIn' or '@OptIn(SomeOptIn::class)'
+    return base.foo
+                ^
+COMPILATION_ERROR

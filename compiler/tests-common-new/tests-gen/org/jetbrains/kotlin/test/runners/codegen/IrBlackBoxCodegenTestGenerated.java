@@ -18494,6 +18494,12 @@ public class IrBlackBoxCodegenTestGenerated extends AbstractIrBlackBoxCodegenTes
         }
 
         @Test
+        @TestMetadata("optInOnPropertyAnotherModule.kt")
+        public void testOptInOnPropertyAnotherModule() throws Exception {
+            runTest("compiler/testData/codegen/box/fir/optInOnPropertyAnotherModule.kt");
+        }
+
+        @Test
         @TestMetadata("SamWithReceiverMavenProjectImportHandler.kt")
         public void testSamWithReceiverMavenProjectImportHandler() throws Exception {
             runTest("compiler/testData/codegen/box/fir/SamWithReceiverMavenProjectImportHandler.kt");

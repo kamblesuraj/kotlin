@@ -155,6 +155,10 @@ class CompileKotlinAgainstCustomBinariesTest : AbstractKotlinCompilerIntegration
         compileKotlin("main.kt", tmpdir, listOf(compileLibrary("library")))
     }
 
+    fun testAnotherModuleAgainstInterfaceOptInProperty() {
+        compileKotlin("optInUsage.kt", tmpdir, listOf(compileLibrary("library")))
+    }
+
     fun testSuspensionPointInMonitor() {
         compileKotlin(
             "source.kt",
