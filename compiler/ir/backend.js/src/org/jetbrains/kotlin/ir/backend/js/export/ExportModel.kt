@@ -9,8 +9,15 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.serialization.js.ModuleKind
+import java.util.EnumSet
 
-sealed class ExportedDeclaration
+sealed class ExportedDeclaration {
+    val attributes = EnumSet.noneOf(ExportedAttribute::class.java)
+}
+
+enum class ExportedAttribute {
+    DEPRECATED_ATTRIBUTE
+}
 
 data class ExportedModule(
     val name: String,
