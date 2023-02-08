@@ -551,9 +551,7 @@ class ExportModelGenerator(val context: JsIrBackendContext, val generateNamespac
     }
 
     private fun ExportedDeclaration.withAttributesFor(declaration: IrDeclaration): ExportedDeclaration {
-        if (declaration.hasAnnotation(StandardNames.FqNames.deprecated)) {
-            attributes.add(ExportedAttribute.DEPRECATED_ATTRIBUTE)
-        }
+        declaration.getDeprecated()?.let { attributes.add(ExportedAttribute.DeprecatedAttribute(it)) }
 
         return this
     }

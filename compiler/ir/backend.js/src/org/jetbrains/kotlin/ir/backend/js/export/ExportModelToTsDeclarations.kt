@@ -107,14 +107,14 @@ class ExportModelToTsDeclarations {
             is ExportedObject -> generateTypeScriptString(indent, prefix, esModules)
         }
 
-    private fun Set<ExportedAttribute>.toTypeScript(indent: String): String {
+    private fun Iterable<ExportedAttribute>.toTypeScript(indent: String): String {
         return joinToString("\n") { it.toTypeScript(indent) }
             .run { if (isNotEmpty()) plus("\n") else this }
     }
 
     private fun ExportedAttribute.toTypeScript(indent: String): String {
         return when (this) {
-            ExportedAttribute.DEPRECATED_ATTRIBUTE -> indent + tsDeprecated()
+            is ExportedAttribute.DeprecatedAttribute -> indent + tsDeprecated(message)
         }
     }
 
@@ -483,7 +483,7 @@ class ExportModelToTsDeclarations {
         return "/* @ts-ignore: $reason */"
     }
 
-    private fun tsDeprecated(): String {
-        return "/** @deprecated */"
+    private fun tsDeprecated(message: String): String {
+        return "/** @deprecated $message */"
     }
 }

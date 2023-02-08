@@ -1,3 +1,6 @@
+import bar = JS_TESTS.foo.bar
+import foo = JS_TESTS.foo.foo
+
 function assert(condition: boolean) {
     if (!condition) {
         throw "Assertion failed";
@@ -5,8 +8,8 @@ function assert(condition: boolean) {
 }
 
 function box(): string {
-    assert(JS_TESTS.foo.bar == "Test");
-    assert(JS_TESTS.foo.foo() == undefined);
+    assert(bar == "Test");
+    assert(foo() == undefined);
 
     return "OK";
 }

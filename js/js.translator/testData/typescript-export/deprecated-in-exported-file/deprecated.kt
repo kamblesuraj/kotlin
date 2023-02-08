@@ -6,64 +6,55 @@
 // SKIP_NODE_JS
 // INFER_MAIN_MODULE
 // MODULE: JS_TESTS
-// FILE: abstract-classes.kt
+// FILE: deprecated.kt
 
 @file:JsExport
 
 package foo
 
 
-@Deprecated
+@Deprecated("message 1")
 fun foo() {}
 
 
-@Deprecated
+@Deprecated("message 2")
 val bar: String = "Test"
 
 
-var test: String
-    get() = "Test"
-    @Deprecated set() { console.log("Test") }
-
-
-@Deprecated
+@Deprecated("message 3")
 class TestClass
 
 
-class AnotherClass @Deprecated constructor(val value: String) {
+class AnotherClass @Deprecated("message 4") constructor(val value: String) {
     @JsName("fromNothing")
-    @Deprecated constructor(): this("Test")
+    @Deprecated("message 5") constructor(): this("Test")
 
     @JsName("fromInt")
     constructor(value: Int): this(value.toString())
 
-    @Deprecated
+    @Deprecated("message 6")
     fun foo() {}
 
     fun baz() {}
 
-    @Deprecated
+    @Deprecated("message 7")
     val bar: String = "Test"
-
-    var test: String
-        get() = "Test"
-        @Deprecated set() { console.log("Test") }
 }
 
 
 interface TestInterface {
-    @Deprecated
+    @Deprecated("message 8")
     fun foo()
     fun bar()
-    @Deprecated
-    val bar: String
+    @Deprecated("message 9")
+    val baz: String
 }
 
 
 object TestObject {
-    @Deprecated
+    @Deprecated("message 10")
     fun foo() {}
     fun bar() {}
-    @Deprecated
-    val bar: String = "Test"
+    @Deprecated("message 11")
+    val baz: String = "Test"
 }

@@ -1,4 +1,5 @@
-import TestAbstract = JS_TESTS.foo.TestAbstract;
+import bar = JS_TESTS.foo.bar
+import foo = JS_TESTS.foo.foo
 
 function assert(condition: boolean) {
     if (!condition) {
@@ -7,11 +8,8 @@ function assert(condition: boolean) {
 }
 
 function box(): string {
-    assert(new TestAbstract.AA().name == "AA");
-    assert(new TestAbstract.AA().bar() == "bar");
-    assert(new TestAbstract.BB().name == "BB");
-    assert(new TestAbstract.BB().baz() == "baz");
-
+    assert(bar == "Test");
+    assert(foo() == undefined);
 
     return "OK";
 }

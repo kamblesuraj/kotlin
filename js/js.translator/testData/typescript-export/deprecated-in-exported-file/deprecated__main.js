@@ -1,14 +1,13 @@
 "use strict";
-var TestAbstract = JS_TESTS.foo.TestAbstract;
+var bar = JS_TESTS.foo.bar;
+var foo = JS_TESTS.foo.foo;
 function assert(condition) {
     if (!condition) {
         throw "Assertion failed";
     }
 }
 function box() {
-    assert(new TestAbstract.AA().name == "AA");
-    assert(new TestAbstract.AA().bar() == "bar");
-    assert(new TestAbstract.BB().name == "BB");
-    assert(new TestAbstract.BB().baz() == "baz");
+    assert(bar == "Test");
+    assert(foo() == undefined);
     return "OK";
 }

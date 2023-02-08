@@ -9,14 +9,13 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.serialization.js.ModuleKind
-import java.util.EnumSet
 
 sealed class ExportedDeclaration {
-    val attributes = EnumSet.noneOf(ExportedAttribute::class.java)
+    val attributes = mutableListOf<ExportedAttribute>()
 }
 
-enum class ExportedAttribute {
-    DEPRECATED_ATTRIBUTE
+sealed class ExportedAttribute {
+    class DeprecatedAttribute(val message: String): ExportedAttribute()
 }
 
 data class ExportedModule(
