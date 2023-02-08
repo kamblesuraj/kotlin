@@ -39525,6 +39525,12 @@ public class FirOldFrontendDiagnosticsTestGenerated extends AbstractFirDiagnosti
             }
 
             @Test
+            @TestMetadata("smartCastOnAlienPropertyFromInnerClass.kt")
+            public void testSmartCastOnAlienPropertyFromInnerClass() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/smartCastOnAlienPropertyFromInnerClass.kt");
+            }
+
+            @Test
             @TestMetadata("valReassignmentNullability.kt")
             public void testValReassignmentNullability() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/valReassignmentNullability.kt");
