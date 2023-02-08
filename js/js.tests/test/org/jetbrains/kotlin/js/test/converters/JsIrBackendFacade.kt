@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.js.test.converters
 
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.toPhaseMap
+import org.jetbrains.kotlin.backend.common.serialization.cityHash64
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
 import org.jetbrains.kotlin.cli.common.isWindows
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
@@ -310,7 +311,8 @@ val TestModule.kind: ModuleKind
     get() = directives.moduleKind
 
 fun String.augmentWithModuleName(moduleName: String): String {
-    val normalizedName = moduleName.run { if (isWindows) minify() else this }
+    val shouldMinimize = isWindows && moduleName.isPath()
+    val normalizedName = moduleName.run { if (shouldMinimize) minify() else this }
 
     return if (normalizedName.isPath()) {
         replaceAfterLast(File.separator, normalizedName.replace("./", ""))
@@ -328,8 +330,11 @@ fun String.augmentWithModuleName(moduleName: String): String {
 // The hack should be deleted when D8 fixes the bug.
 // The issue is here: https://bugs.chromium.org/p/v8/issues/detail?id=13318
 fun String.minify(): String {
-    return replace("kotlin_org_jetbrains_kotlin_kotlin_", "")
-        .replace("_minimal_for_test", "_min")
+    if (length <= 80) return this
+
+    val separatorIndex = lastIndexOf('/') + 1
+    val extensionIndex = lastIndexOf("_v5")
+    return substring(0, separatorIndex) + substring(separatorIndex, extensionIndex).cityHash64().toULong().toString(16) + substring(extensionIndex)
 }
 
 private fun String.isPath(): Boolean = contains("/")
