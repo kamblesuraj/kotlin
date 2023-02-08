@@ -1732,13 +1732,14 @@ class DeclarationsConverter(
                     ).map { it.firValueParameter }
                 }
 
-                val allowLegacyContractDescription = outerContractDescription == null && !isLocal
+                val allowLegacyContractDescription = outerContractDescription == null
                 val bodyWithContractDescription = convertFunctionBody(block, expression, allowLegacyContractDescription)
                 this.body = bodyWithContractDescription.first
                 val contractDescription = outerContractDescription ?: bodyWithContractDescription.second
                 contractDescription?.let {
-                    // TODO: add error reporting for contracts on lambdas
                     if (this is FirSimpleFunctionBuilder) {
+                        this.contractDescription = it
+                    } else if (this is FirAnonymousFunctionBuilder) {
                         this.contractDescription = it
                     }
                 }

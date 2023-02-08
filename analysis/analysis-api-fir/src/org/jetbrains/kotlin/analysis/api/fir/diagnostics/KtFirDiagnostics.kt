@@ -2562,6 +2562,11 @@ sealed class KtFirDiagnostic<PSI : PsiElement> : KtDiagnosticWithPsi<PSI> {
         abstract val reason: String
     }
 
+    abstract class ContractNotAllowed : KtFirDiagnostic<KtElement>() {
+        override val diagnosticClass get() = ContractNotAllowed::class
+        abstract val reason: String
+    }
+
     abstract class NoGetMethod : KtFirDiagnostic<KtArrayAccessExpression>() {
         override val diagnosticClass get() = NoGetMethod::class
     }

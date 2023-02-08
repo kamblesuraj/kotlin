@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.fir.builder
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
-import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.AstLoadingFilter
 import org.jetbrains.kotlin.*
 import org.jetbrains.kotlin.builtins.StandardNames
@@ -24,6 +23,7 @@ import org.jetbrains.kotlin.fir.declarations.utils.*
 import org.jetbrains.kotlin.fir.diagnostics.*
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.builder.*
+import org.jetbrains.kotlin.fir.expressions.impl.FirContractCallBlock
 import org.jetbrains.kotlin.fir.expressions.impl.FirSingleExpressionBlock
 import org.jetbrains.kotlin.fir.extensions.extensionService
 import org.jetbrains.kotlin.fir.references.builder.*
@@ -367,13 +367,13 @@ open class RawFirBuilder(
                 }
             }
 
-        private fun KtDeclarationWithBody.buildFirBody(allowLegacyContractDescription: Boolean): Pair<FirBlock?, FirContractDescription?> =
+        private fun KtDeclarationWithBody.buildFirBody(): Pair<FirBlock?, FirContractDescription?> =
             if (hasBody()) {
                 buildOrLazyBlock {
                     if (hasBlockBody()) {
                         val block = bodyBlockExpression?.accept(this@Visitor, Unit) as? FirBlock
                         val contractDescription = when {
-                            allowLegacyContractDescription && !hasContractEffectList() -> block?.let(::processLegacyContractDescription)
+                            !hasContractEffectList() -> block?.let(::processLegacyContractDescription)
                             else -> null
                         }
                         return@buildFirBody block to contractDescription
@@ -473,7 +473,7 @@ open class RawFirBuilder(
                             }
                         }
                         val outerContractDescription = this@toFirPropertyAccessor.obtainContractDescription()
-                        val bodyWithContractDescription = this@toFirPropertyAccessor.buildFirBody(allowLegacyContractDescription = true)
+                        val bodyWithContractDescription = this@toFirPropertyAccessor.buildFirBody()
                         this.body = bodyWithContractDescription.first
                         val contractDescription = outerContractDescription ?: bodyWithContractDescription.second
                         contractDescription?.let {
@@ -1490,12 +1490,13 @@ open class RawFirBuilder(
                     listOf()
                 withCapturedTypeParameters(true, functionSource, actualTypeParameters) {
                     val outerContractDescription = function.obtainContractDescription()
-                    val bodyWithContractDescription = function.buildFirBody(!isLocalFunction)
+                    val bodyWithContractDescription = function.buildFirBody()
                     this.body = bodyWithContractDescription.first
                     val contractDescription = outerContractDescription ?: bodyWithContractDescription.second
                     contractDescription?.let {
-                        // TODO: add error reporting for contracts on lambdas
                         if (this is FirSimpleFunctionBuilder) {
+                            this.contractDescription = it
+                        } else if (this is FirAnonymousFunctionBuilder) {
                             this.contractDescription = it
                         }
                     }
@@ -1604,6 +1605,13 @@ open class RawFirBuilder(
                     FirSingleExpressionBlock(errorExpression.toReturn())
                 } else {
                     configureBlockWithoutBuilding(ktBody).apply {
+                        statements.firstOrNull()?.let {
+                            if (it.isContractBlockFirCheck()) {
+                                this@buildAnonymousFunction.contractDescription = it.toLegacyRawContractDescription()
+                                statements[0] = FirContractCallBlock(it)
+                            }
+                        }
+
                         if (statements.isEmpty()) {
                             statements.add(
                                 buildReturnExpression {
@@ -1663,7 +1671,7 @@ open class RawFirBuilder(
                 extractValueParametersTo(this, symbol, ValueParameterDeclaration.FUNCTION)
 
 
-                val (body, _) = buildFirBody(allowLegacyContractDescription = true)
+                val (body, _) = buildFirBody()
                 this.body = body
                 this@RawFirBuilder.context.firFunctionTargets.removeLast()
             }.also {
@@ -2760,7 +2768,7 @@ open class RawFirBuilder(
             }
         }
 
-        private fun buildErrorTopLevelDeclarationForDanglingModifierList(modifierList : KtModifierList) = buildDanglingModifierList {
+        private fun buildErrorTopLevelDeclarationForDanglingModifierList(modifierList: KtModifierList) = buildDanglingModifierList {
             this.source = modifierList.toFirSourceElement(KtFakeSourceElementKind.DanglingModifierList)
             moduleData = baseModuleData
             origin = FirDeclarationOrigin.Source
