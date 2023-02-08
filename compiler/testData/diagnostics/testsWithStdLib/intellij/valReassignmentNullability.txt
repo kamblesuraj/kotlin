@@ -1,0 +1,20 @@
+package
+
+public fun test(/*0*/ s: kotlin.String): kotlin.Unit
+
+public interface Base {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    @org.jetbrains.annotations.NotNull public abstract fun getFoo(): kotlin.String
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public abstract fun setFoo(/*0*/ arg: kotlin.String!): kotlin.Unit
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public open class SomeClass : Base {
+    public constructor SomeClass()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    @java.lang.Override @org.jetbrains.annotations.NotNull public open override /*1*/ fun getFoo(): kotlin.String
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    @java.lang.Override public open override /*1*/ fun setFoo(/*0*/ @org.jetbrains.annotations.Nullable arg: kotlin.String?): kotlin.Unit
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}

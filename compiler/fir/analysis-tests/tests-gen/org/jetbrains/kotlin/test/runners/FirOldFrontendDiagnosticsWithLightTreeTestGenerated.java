@@ -39420,6 +39420,22 @@ public class FirOldFrontendDiagnosticsWithLightTreeTestGenerated extends Abstrac
         }
 
         @Nested
+        @TestMetadata("compiler/testData/diagnostics/testsWithStdLib/intellij")
+        @TestDataPath("$PROJECT_ROOT")
+        public class Intellij {
+            @Test
+            public void testAllFilesPresentInIntellij() throws Exception {
+                KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/testsWithStdLib/intellij"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.(fir|ll)\\.kts?$"), true);
+            }
+
+            @Test
+            @TestMetadata("valReassignmentNullability.kt")
+            public void testValReassignmentNullability() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/valReassignmentNullability.kt");
+            }
+        }
+
+        @Nested
         @TestMetadata("compiler/testData/diagnostics/testsWithStdLib/java")
         @TestDataPath("$PROJECT_ROOT")
         public class Java {
