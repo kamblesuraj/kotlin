@@ -39525,6 +39525,12 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
             }
 
             @Test
+            @TestMetadata("nullabilityInSamConstructor.kt")
+            public void testNullabilityInSamConstructor() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/nullabilityInSamConstructor.kt");
+            }
+
+            @Test
             @TestMetadata("smartCastOnAlienPropertyFromInnerClass.kt")
             public void testSmartCastOnAlienPropertyFromInnerClass() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/smartCastOnAlienPropertyFromInnerClass.kt");
