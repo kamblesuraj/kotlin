@@ -51,7 +51,7 @@ class IrConstTransformer(
 
     private fun IrExpression.canBeInterpreted(containingDeclaration: IrElement? = null): Boolean {
         return try {
-            this.accept(IrCompileTimeChecker(containingDeclaration, mode = mode), null)
+            this.accept(IrCompileTimeChecker(containingDeclaration, mode, interpreter.environment.configuration), null)
         } catch (e: Throwable) {
             if (suppressExceptions) {
                 return false

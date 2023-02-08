@@ -8,8 +8,10 @@ package org.jetbrains.kotlin.ir.interpreter
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.interpreter.exceptions.InterpreterError
 import org.jetbrains.kotlin.ir.interpreter.exceptions.handleUserException
 import org.jetbrains.kotlin.ir.interpreter.exceptions.verify
@@ -389,6 +391,13 @@ private fun unfoldStringConcatenation(expression: IrStringConcatenation, environ
     // this callback is used to check the need for an explicit toString call
     val explicitToStringCheck = fun() {
         when (val state = callStack.peekState()) {
+            is Primitive<*> -> {
+                // This block is not really needed, but this way it is easier to handle `toString` with `treatFloatInSpecialWay` enabled.
+                callStack.popState()
+                val toStringCall = IrCallImpl.fromSymbolOwner(UNDEFINED_OFFSET, UNDEFINED_OFFSET, environment.irBuiltIns.memberToString)
+                callStack.pushSimpleInstruction(toStringCall)
+                callStack.pushState(state)
+            }
             is Common -> {
                 callStack.popState()
                 // TODO this check can be dropped after serialization introduction
