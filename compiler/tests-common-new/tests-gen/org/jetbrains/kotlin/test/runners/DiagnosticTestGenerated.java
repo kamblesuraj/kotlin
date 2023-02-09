@@ -39531,6 +39531,12 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
             }
 
             @Test
+            @TestMetadata("explicitNullableLambdaParameter.kt")
+            public void testExplicitNullableLambdaParameter() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/explicitNullableLambdaParameter.kt");
+            }
+
+            @Test
             @TestMetadata("hashMap.kt")
             public void testHashMap() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/hashMap.kt");
