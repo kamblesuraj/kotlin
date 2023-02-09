@@ -1,0 +1,8 @@
+FILE: test.kt
+    public final fun foo(): R|kotlin/Any?| {
+        ^foo Null(null)
+    }
+    public final fun test(): R|kotlin/Unit| {
+        lval map: <ERROR TYPE REF: Ambiguity: HashMap, [java/util/HashMap, some/HashMap]> = (R|/foo|() as <ERROR TYPE REF: Ambiguity: HashMap, [java/util/HashMap, some/HashMap]>)
+        lval map2: R|java/util/HashMap<kotlin/String, kotlin/String>| = R|java/util/HashMap.HashMap|<R|kotlin/String|, R|kotlin/String|>()
+    }
