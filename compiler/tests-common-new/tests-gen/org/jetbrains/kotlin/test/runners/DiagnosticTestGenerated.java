@@ -39547,6 +39547,12 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
             public void testValReassignmentNullability() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/valReassignmentNullability.kt");
             }
+
+            @Test
+            @TestMetadata("varHandleSet.kt")
+            public void testVarHandleSet() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/varHandleSet.kt");
+            }
         }
 
         @Nested
