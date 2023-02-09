@@ -5,11 +5,14 @@
 
 package org.jetbrains.kotlin.fir.pipeline
 
+import org.jetbrains.kotlin.KtDiagnosticReporterWithImplicitIrBasedContext
 import org.jetbrains.kotlin.backend.common.actualizer.IrActualizer
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.jvm.serialization.JvmIdSignatureDescriptor
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.config.LanguageVersionSettings
+import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.backend.*
 import org.jetbrains.kotlin.fir.backend.jvm.Fir2IrJvmSpecialAnnotationSymbolProvider
@@ -39,6 +42,8 @@ fun FirResult.convertToIrAndActualizeForJvm(
     fir2IrExtensions: Fir2IrExtensions,
     irGeneratorExtensions: Collection<IrGenerationExtension>,
     linkViaSignatures: Boolean,
+    diagnosticsReporter: DiagnosticReporter,
+    languageVersionSettings: LanguageVersionSettings,
 ): Fir2IrResult = this.convertToIrAndActualize(
     fir2IrExtensions,
     irGeneratorExtensions,
@@ -46,6 +51,8 @@ fun FirResult.convertToIrAndActualizeForJvm(
     signatureComposerCreator = { JvmIdSignatureDescriptor(JvmDescriptorMangler(null)) },
     irMangler = JvmIrMangler,
     visibilityConverter = FirJvmVisibilityConverter,
+    diagnosticsReporter = diagnosticsReporter,
+    languageVersionSettings = languageVersionSettings,
     kotlinBuiltIns = DefaultBuiltIns.Instance,
 )
 
@@ -57,6 +64,8 @@ fun FirResult.convertToIrAndActualize(
     irMangler: KotlinMangler.IrMangler,
     visibilityConverter: Fir2IrVisibilityConverter,
     kotlinBuiltIns: KotlinBuiltIns,
+    diagnosticsReporter: DiagnosticReporter,
+    languageVersionSettings: LanguageVersionSettings,
     fir2IrResultPostCompute: Fir2IrResult.() -> Unit = {},
 ): Fir2IrResult {
     val result: Fir2IrResult
@@ -92,9 +101,13 @@ fun FirResult.convertToIrAndActualize(
         ).also {
             fir2IrResultPostCompute(it)
         }
+
+        val ktDiagnosticReporter = KtDiagnosticReporterWithImplicitIrBasedContext(diagnosticsReporter, languageVersionSettings)
+
         IrActualizer.actualize(
             result.irModuleFragment,
-            listOf(commonIrOutput.irModuleFragment)
+            listOf(commonIrOutput.irModuleFragment),
+            ktDiagnosticReporter
         )
     } else {
         result = platformOutput.convertToIr(

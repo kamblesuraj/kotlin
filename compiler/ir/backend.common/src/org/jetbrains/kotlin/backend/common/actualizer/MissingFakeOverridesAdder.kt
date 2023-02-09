@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.backend.common.actualizer
 
+import org.jetbrains.kotlin.KtDiagnosticReporterWithImplicitIrBasedContext
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
@@ -19,10 +20,13 @@ import org.jetbrains.kotlin.ir.util.deepCopyWithSymbols
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 
-class MissingFakeOverridesAdder(private val expectActualMap: Map<IrSymbol, IrSymbol>) : IrElementVisitorVoid {
+class MissingFakeOverridesAdder(
+    private val expectActualMap: Map<IrSymbol, IrSymbol>,
+    private val diagnosticsReporter: KtDiagnosticReporterWithImplicitIrBasedContext
+) : IrElementVisitorVoid {
     override fun visitClass(declaration: IrClass) {
         if (!declaration.isExpect) {
-            processSupertypes(declaration, expectActualMap)
+            processSupertypes(declaration, expectActualMap, diagnosticsReporter)
         }
         visitElement(declaration)
     }
@@ -32,7 +36,10 @@ class MissingFakeOverridesAdder(private val expectActualMap: Map<IrSymbol, IrSym
     }
 }
 
-private fun processSupertypes(declaration: IrClass, expectActualMap: Map<IrSymbol, IrSymbol>) {
+private fun processSupertypes(
+    declaration: IrClass, expectActualMap: Map<IrSymbol, IrSymbol>,
+    diagnosticsReporter: KtDiagnosticReporterWithImplicitIrBasedContext
+) {
     val members by lazy(LazyThreadSafetyMode.NONE) {
         declaration.declarations.filter { !it.isBuiltinMember() }.filterIsInstance<IrDeclarationWithName>()
             .groupBy { it.name }
@@ -59,7 +66,7 @@ private fun processSupertypes(declaration: IrClass, expectActualMap: Map<IrSymbo
                     }
 
                     if (isActualFunctionFound) {
-                        reportManyInterfacesMembersNotImplemented(declaration, actualMember)
+                        diagnosticsReporter.reportManyInterfacesMembersNotImplemented(declaration, actualMember)
                         continue
                     }
 
@@ -67,7 +74,7 @@ private fun processSupertypes(declaration: IrClass, expectActualMap: Map<IrSymbo
                 }
                 is IrPropertyImpl -> {
                     if (members[actualMember.name] != null) {
-                        reportManyInterfacesMembersNotImplemented(declaration, actualMember)
+                        diagnosticsReporter.reportManyInterfacesMembersNotImplemented(declaration, actualMember)
                         continue
                     }
 

@@ -15,7 +15,6 @@ import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.jvm.JvmIrDeserializerImpl
 import org.jetbrains.kotlin.build.DEFAULT_KOTLIN_SOURCE_FILES_EXTENSIONS
 import org.jetbrains.kotlin.build.report.BuildReporter
-import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
@@ -40,26 +39,15 @@ import org.jetbrains.kotlin.cli.jvm.config.*
 import org.jetbrains.kotlin.cli.jvm.plugins.PluginCliParser
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporterFactory
-import org.jetbrains.kotlin.fir.FirSession
-import org.jetbrains.kotlin.fir.backend.Fir2IrConverter
-import org.jetbrains.kotlin.fir.backend.jvm.Fir2IrJvmSpecialAnnotationSymbolProvider
-import org.jetbrains.kotlin.fir.backend.jvm.FirJvmKotlinMangler
-import org.jetbrains.kotlin.fir.backend.jvm.FirJvmVisibilityConverter
 import org.jetbrains.kotlin.fir.backend.jvm.JvmFir2IrExtensions
-import org.jetbrains.kotlin.fir.languageVersionSettings
-import org.jetbrains.kotlin.fir.moduleData
 import org.jetbrains.kotlin.fir.pipeline.FirResult
-import org.jetbrains.kotlin.fir.pipeline.ModuleCompilerAnalyzedOutput
 import org.jetbrains.kotlin.fir.pipeline.convertToIrAndActualizeForJvm
-import org.jetbrains.kotlin.fir.resolve.providers.firProvider
-import org.jetbrains.kotlin.fir.resolve.providers.impl.FirProviderImpl
 import org.jetbrains.kotlin.fir.session.environment.AbstractProjectFileSearchScope
 import org.jetbrains.kotlin.incremental.components.ExpectActualTracker
 import org.jetbrains.kotlin.incremental.components.InlineConstTracker
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.incremental.multiproject.ModulesApiHistory
 import org.jetbrains.kotlin.ir.backend.jvm.serialization.JvmIrMangler
-import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
 import org.jetbrains.kotlin.ir.util.IrMessageLogger
 import org.jetbrains.kotlin.load.java.JavaClassesTracker
 import org.jetbrains.kotlin.load.kotlin.incremental.components.IncrementalCompilationComponents
@@ -275,7 +263,13 @@ class IncrementalFirJvmCompilerRunner(
             val extensions = JvmFir2IrExtensions(configuration, JvmIrDeserializerImpl(), JvmIrMangler)
             val irGenerationExtensions =
                 (projectEnvironment as? VfsBasedProjectEnvironment)?.project?.let { IrGenerationExtension.getInstances(it) }.orEmpty()
-            val platformIrOutput = cycleResult.convertToIrAndActualizeForJvm(extensions, irGenerationExtensions, linkViaSignatures = false)
+            val platformIrOutput = cycleResult.convertToIrAndActualizeForJvm(
+                extensions,
+                irGenerationExtensions,
+                linkViaSignatures = false,
+                compilerEnvironment.diagnosticsReporter,
+                configuration.languageVersionSettings
+            )
 
             performanceManager?.notifyIRTranslationFinished()
 

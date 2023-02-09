@@ -5,14 +5,13 @@
 
 package org.jetbrains.kotlin.backend.common.actualizer
 
-import org.jetbrains.kotlin.ir.IrElement
-import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
-import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrValueParameter
+import org.jetbrains.kotlin.KtDiagnosticReporterWithImplicitIrBasedContext
+import org.jetbrains.kotlin.backend.common.CommonBackendErrors
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.types.classifierOrFail
-import org.jetbrains.kotlin.ir.util.render
+import org.jetbrains.kotlin.ir.util.module
 
 fun checkParameters(
     expectFunction: IrFunction,
@@ -49,12 +48,11 @@ fun checkParameters(
     return true
 }
 
-fun reportMissingActual(irElement: IrElement) {
-    // TODO: set up diagnostics reporting
-    throw AssertionError("Missing actual for ${irElement.render()}")
+@OptIn(ObsoleteDescriptorBasedAPI::class)
+fun KtDiagnosticReporterWithImplicitIrBasedContext.reportMissingActual(irDeclaration: IrDeclaration) {
+    at(irDeclaration).report(CommonBackendErrors.NO_ACTUAL_FOR_EXPECT, irDeclaration.module)
 }
 
-fun reportManyInterfacesMembersNotImplemented(declaration: IrClass, actualMember: IrDeclarationWithName) {
-    // TODO: set up diagnostics reporting
-    throw AssertionError("${declaration.name} must override ${actualMember.name} because it inherits multiple interface methods of it")
+fun KtDiagnosticReporterWithImplicitIrBasedContext.reportManyInterfacesMembersNotImplemented(declaration: IrClass, actualMember: IrDeclarationWithName) {
+    at(declaration).report(CommonBackendErrors.MANY_INTERFACES_MEMBER_NOT_IMPLEMENTED, actualMember.name.asString())
 }

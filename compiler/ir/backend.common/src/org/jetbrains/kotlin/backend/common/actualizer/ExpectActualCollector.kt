@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.backend.common.actualizer
 
+import org.jetbrains.kotlin.KtDiagnosticReporterWithImplicitIrBasedContext
 import org.jetbrains.kotlin.backend.common.ir.isExpect
 import org.jetbrains.kotlin.backend.common.ir.isProperExpect
 import org.jetbrains.kotlin.ir.IrElement
@@ -19,7 +20,11 @@ import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 
-internal class ExpectActualCollector(private val mainFragment: IrModuleFragment, private val dependentFragments: List<IrModuleFragment>) {
+internal class ExpectActualCollector(
+    private val mainFragment: IrModuleFragment,
+    private val dependentFragments: List<IrModuleFragment>,
+    val diagnosticsReporter: KtDiagnosticReporterWithImplicitIrBasedContext
+) {
     fun collect(): Map<IrSymbol, IrSymbol> {
         val result = mutableMapOf<IrSymbol, IrSymbol>()
         // Collect and link classifiers at first to make it possible to expand type aliases on the callables linking
@@ -36,7 +41,7 @@ internal class ExpectActualCollector(private val mainFragment: IrModuleFragment,
 
         ActualClassifiersCollector(actualClassifiers, allActualDeclarations, typeAliasMap).visitModuleFragment(mainFragment, false)
 
-        val linkCollector = ClassifiersLinkCollector(this, actualClassifiers)
+        val linkCollector = ClassifiersLinkCollector(this, actualClassifiers, diagnosticsReporter)
         dependentFragments.forEach { linkCollector.visitModuleFragment(it) }
 
         return allActualDeclarations to typeAliasMap
@@ -101,14 +106,15 @@ internal class ExpectActualCollector(private val mainFragment: IrModuleFragment,
 
     class ClassifiersLinkCollector(
         private val expectActualMap: MutableMap<IrSymbol, IrSymbol>,
-        private val actualClassifiers: Map<FqName, IrSymbol>
+        private val actualClassifiers: Map<FqName, IrSymbol>,
+        val diagnosticsReporter: KtDiagnosticReporterWithImplicitIrBasedContext
     ) : IrElementVisitorVoid {
-        private fun addLinkOrReportMissing(expectElement: IrSymbolOwner, actualTypeId: FqName) {
+        private fun addLinkOrReportMissing(expectElement: IrDeclaration, actualTypeId: FqName) {
             val actualClassifier = actualClassifiers[actualTypeId]
             if (actualClassifier != null) {
                 expectActualMap[expectElement.symbol] = actualClassifier
             } else {
-                reportMissingActual(expectElement)
+                diagnosticsReporter.reportMissingActual(expectElement)
             }
         }
 
@@ -152,7 +158,7 @@ internal class ExpectActualCollector(private val mainFragment: IrModuleFragment,
         val actualProperties = mutableMapOf<CallableId, IrProperty>()
 
         collectActualCallables(actualFunctions, actualProperties, allActualDeclarations)
-        val collector = CallablesLinkCollector(this, actualFunctions, actualProperties, typeAliasMap)
+        val collector = CallablesLinkCollector(this, actualFunctions, actualProperties, typeAliasMap, diagnosticsReporter)
         dependentFragments.forEach { collector.visitModuleFragment(it) }
     }
 
@@ -190,7 +196,8 @@ internal class ExpectActualCollector(private val mainFragment: IrModuleFragment,
         private val expectActualMap: MutableMap<IrSymbol, IrSymbol>,
         private val actualFunctions: MutableMap<CallableId, MutableList<IrFunction>>,
         private val actualProperties: MutableMap<CallableId, IrProperty>,
-        private val typeAliasMap: Map<FqName, FqName>
+        private val typeAliasMap: Map<FqName, FqName>,
+        val diagnosticsReporter: KtDiagnosticReporterWithImplicitIrBasedContext
     ) : IrElementVisitorVoid {
         private fun actualizeCallable(declaration: IrDeclarationWithName): CallableId {
             val fullName = declaration.parent.kotlinFqName
@@ -211,7 +218,7 @@ internal class ExpectActualCollector(private val mainFragment: IrModuleFragment,
                 }
             }
             if (!isActualFunctionFound) {
-                reportMissingActual(declaration)
+                diagnosticsReporter.reportMissingActual(declaration)
             }
         }
 
@@ -223,7 +230,7 @@ internal class ExpectActualCollector(private val mainFragment: IrModuleFragment,
                 declaration.getter?.symbol?.let { expectActualMap[it] = properties.getter!!.symbol }
                 declaration.setter?.symbol?.let { expectActualMap[it] = properties.setter!!.symbol }
             } else {
-                reportMissingActual(declaration)
+                diagnosticsReporter.reportMissingActual(declaration)
             }
         }
 
