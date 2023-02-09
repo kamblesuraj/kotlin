@@ -73,7 +73,7 @@ internal fun PhaseContext.fir2Ir(
             signatureComposerCreator = null,
             irMangler = KonanManglerIr,
             visibilityConverter = Fir2IrVisibilityConverter.Default,
-            diagnosticsReporter = diagnosticsReporter,
+            diagnosticReporter = diagnosticsReporter,
             languageVersionSettings = configuration.languageVersionSettings,
             kotlinBuiltIns = builtInsModule ?: DefaultBuiltIns.Instance,
     ).also {
