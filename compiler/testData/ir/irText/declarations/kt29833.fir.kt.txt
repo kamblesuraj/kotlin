@@ -8,7 +8,7 @@ object Definitions {
   }
 
   const val KT_CONSTANT: String
-    field = "constant"
+    field = #CONSTANT
     get
 
   val ktValue: String
