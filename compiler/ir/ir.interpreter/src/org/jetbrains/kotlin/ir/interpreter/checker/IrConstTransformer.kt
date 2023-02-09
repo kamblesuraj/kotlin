@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrStringConcatenationImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
 import org.jetbrains.kotlin.ir.interpreter.IrInterpreter
 import org.jetbrains.kotlin.ir.interpreter.isPrimitiveArray
@@ -20,6 +21,8 @@ import org.jetbrains.kotlin.ir.interpreter.toIrConst
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
+import kotlin.math.max
+import kotlin.math.min
 
 class IrConstTransformer(
     private val interpreter: IrInterpreter,
@@ -92,6 +95,40 @@ class IrConstTransformer(
         }
 
         return super.visitField(declaration)
+    }
+
+    override fun visitStringConcatenation(expression: IrStringConcatenation): IrExpression {
+        fun IrExpression.wrapInStringConcat(): IrExpression = IrStringConcatenationImpl(
+            this.startOffset, this.endOffset, expression.type, listOf(this@wrapInStringConcat)
+        )
+
+        fun IrExpression.wrapInToStringConcatAndInterpret(): IrExpression = wrapInStringConcat().interpret(failAsError = false)
+
+        val folded = mutableListOf<IrExpression>()
+        for (next in expression.arguments) {
+            val last = folded.lastOrNull()
+            when {
+                !next.wrapInStringConcat().canBeInterpreted() -> folded += next
+                last == null || !last.wrapInStringConcat().canBeInterpreted() -> folded += next.wrapInToStringConcatAndInterpret()
+                else -> {
+                    val lastAsConst = last.wrapInToStringConcatAndInterpret() as IrConst<*>
+                    val nextAsConst = next.wrapInToStringConcatAndInterpret() as IrConst<*>
+                    folded[folded.size - 1] = IrConstImpl.string(
+                        // Inlined strings may have `last.startOffset > next.endOffset`
+                        min(last.startOffset, next.startOffset), max(last.endOffset, next.endOffset),
+                        expression.type,
+                        lastAsConst.value.toString() + nextAsConst.value.toString()
+                    )
+                }
+            }
+        }
+
+        val foldedConst = folded.singleOrNull() as? IrConst<*>
+        if (foldedConst != null) {
+            return IrConstImpl.string(expression.startOffset, expression.endOffset, expression.type, foldedConst.value.toString())
+        }
+
+        return IrStringConcatenationImpl(expression.startOffset, expression.endOffset, expression.type, folded)
     }
 
     override fun visitDeclaration(declaration: IrDeclarationBase): IrStatement {
