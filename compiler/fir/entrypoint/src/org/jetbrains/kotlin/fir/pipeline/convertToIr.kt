@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.fir.pipeline
 
-import org.jetbrains.kotlin.KtDiagnosticReporterWithImplicitIrBasedContext
 import org.jetbrains.kotlin.backend.common.actualizer.IrActualizer
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.jvm.serialization.JvmIdSignatureDescriptor
@@ -42,7 +41,7 @@ fun FirResult.convertToIrAndActualizeForJvm(
     fir2IrExtensions: Fir2IrExtensions,
     irGeneratorExtensions: Collection<IrGenerationExtension>,
     linkViaSignatures: Boolean,
-    diagnosticsReporter: DiagnosticReporter,
+    diagnosticReporter: DiagnosticReporter,
     languageVersionSettings: LanguageVersionSettings,
 ): Fir2IrResult = this.convertToIrAndActualize(
     fir2IrExtensions,
@@ -51,7 +50,7 @@ fun FirResult.convertToIrAndActualizeForJvm(
     signatureComposerCreator = { JvmIdSignatureDescriptor(JvmDescriptorMangler(null)) },
     irMangler = JvmIrMangler,
     visibilityConverter = FirJvmVisibilityConverter,
-    diagnosticsReporter = diagnosticsReporter,
+    diagnosticReporter = diagnosticReporter,
     languageVersionSettings = languageVersionSettings,
     kotlinBuiltIns = DefaultBuiltIns.Instance,
 )
@@ -64,7 +63,7 @@ fun FirResult.convertToIrAndActualize(
     irMangler: KotlinMangler.IrMangler,
     visibilityConverter: Fir2IrVisibilityConverter,
     kotlinBuiltIns: KotlinBuiltIns,
-    diagnosticsReporter: DiagnosticReporter,
+    diagnosticReporter: DiagnosticReporter,
     languageVersionSettings: LanguageVersionSettings,
     fir2IrResultPostCompute: Fir2IrResult.() -> Unit = {},
 ): Fir2IrResult {
@@ -102,12 +101,11 @@ fun FirResult.convertToIrAndActualize(
             fir2IrResultPostCompute(it)
         }
 
-        val ktDiagnosticReporter = KtDiagnosticReporterWithImplicitIrBasedContext(diagnosticsReporter, languageVersionSettings)
-
         IrActualizer.actualize(
             result.irModuleFragment,
             listOf(commonIrOutput.irModuleFragment),
-            ktDiagnosticReporter
+            diagnosticReporter,
+            languageVersionSettings
         )
     } else {
         result = platformOutput.convertToIr(

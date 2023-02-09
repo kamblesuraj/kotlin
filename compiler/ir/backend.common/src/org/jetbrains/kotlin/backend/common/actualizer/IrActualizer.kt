@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.backend.common.actualizer
 
 import org.jetbrains.kotlin.KtDiagnosticReporterWithImplicitIrBasedContext
 import org.jetbrains.kotlin.backend.common.ir.isProperExpect
+import org.jetbrains.kotlin.config.LanguageVersionSettings
+import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 
@@ -14,11 +16,13 @@ object IrActualizer {
     fun actualize(
         mainFragment: IrModuleFragment,
         dependentFragments: List<IrModuleFragment>,
-        diagnosticsReporter: KtDiagnosticReporterWithImplicitIrBasedContext,
+        diagnosticReporter: DiagnosticReporter,
+        languageVersionSettings: LanguageVersionSettings
     ) {
-        val expectActualMap = ExpectActualCollector(mainFragment, dependentFragments, diagnosticsReporter).collect()
+        val ktDiagnosticReporter = KtDiagnosticReporterWithImplicitIrBasedContext(diagnosticReporter, languageVersionSettings)
+        val expectActualMap = ExpectActualCollector(mainFragment, dependentFragments, ktDiagnosticReporter).collect()
         removeExpectDeclaration(dependentFragments) // TODO: consider removing this call. See ExpectDeclarationRemover.kt
-        addMissingFakeOverrides(expectActualMap, dependentFragments, diagnosticsReporter)
+        addMissingFakeOverrides(expectActualMap, dependentFragments, ktDiagnosticReporter)
         linkExpectToActual(expectActualMap, dependentFragments)
         mergeIrFragments(mainFragment, dependentFragments)
     }
