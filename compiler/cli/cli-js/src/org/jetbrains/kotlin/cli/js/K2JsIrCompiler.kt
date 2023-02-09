@@ -618,7 +618,7 @@ class K2JsIrCompiler : CLICompiler<K2JSCompilerArguments>() {
             irMangler = JsManglerIr,
             visibilityConverter = Fir2IrVisibilityConverter.Default,
             kotlinBuiltIns = builtInsModule ?: DefaultBuiltIns.Instance,
-            diagnosticsReporter = diagnosticsReporter,
+            diagnosticReporter = diagnosticsReporter,
             languageVersionSettings = configuration.languageVersionSettings,
             fir2IrResultPostCompute = {
                 (this.irModuleFragment.descriptor as? FirModuleDescriptor)?.let { it.allDependencyModules = librariesDescriptors }
