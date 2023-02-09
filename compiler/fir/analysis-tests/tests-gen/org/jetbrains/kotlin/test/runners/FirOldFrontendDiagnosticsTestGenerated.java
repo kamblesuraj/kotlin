@@ -39525,6 +39525,12 @@ public class FirOldFrontendDiagnosticsTestGenerated extends AbstractFirDiagnosti
             }
 
             @Test
+            @TestMetadata("callOfOverriddenGenericMethodFromInternalInterface.kt")
+            public void testCallOfOverriddenGenericMethodFromInternalInterface() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/callOfOverriddenGenericMethodFromInternalInterface.kt");
+            }
+
+            @Test
             @TestMetadata("hashMap.kt")
             public void testHashMap() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/hashMap.kt");

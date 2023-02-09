@@ -1,0 +1,37 @@
+package
+
+private fun getVariantAndModuleDependenciesAction(/*0*/ moduleConfiguration: kotlin.String): ActionToRun<SyncVariantResult?>
+private fun test(/*0*/ runner: SyncActionRunner, /*1*/ moduleConfigurationsToRequest: kotlin.collections.List<kotlin.String>, /*2*/ preResolvedVariants: kotlin.collections.Map<kotlin.String, SyncVariantResult>): kotlin.Unit
+
+public final data class ActionToRun</*0*/ T> {
+    public constructor ActionToRun</*0*/ T>(/*0*/ action: (kotlin.String) -> T)
+    private final val action: (kotlin.String) -> T
+    private final operator /*synthesized*/ fun component1(): (kotlin.String) -> T
+    public final /*synthesized*/ fun copy(/*0*/ action: (kotlin.String) -> T = ...): ActionToRun<T>
+    public open override /*1*/ /*synthesized*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*synthesized*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*synthesized*/ fun toString(): kotlin.String
+}
+
+internal interface GradleInjectedSyncActionRunner {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public abstract fun </*0*/ T> runActions(/*0*/ actionsToRun: kotlin.collections.List<ActionToRun<T>>): kotlin.collections.List<T>
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public final class SyncActionRunner : GradleInjectedSyncActionRunner {
+    public constructor SyncActionRunner()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ fun </*0*/ T> runActions(/*0*/ actionsToRun: kotlin.collections.List<ActionToRun<T>>): kotlin.collections.List<T>
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+internal final class SyncVariantResult {
+    public constructor SyncVariantResult()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
