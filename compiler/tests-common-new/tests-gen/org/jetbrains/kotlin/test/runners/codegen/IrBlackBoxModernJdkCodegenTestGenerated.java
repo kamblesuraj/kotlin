@@ -411,6 +411,12 @@ public class IrBlackBoxModernJdkCodegenTestGenerated extends AbstractIrBlackBoxC
             public void testRecordWithCompanion() throws Exception {
                 runTest("compiler/testData/codegen/boxModernJdk/testsWithJava17/records/recordWithCompanion.kt");
             }
+
+            @Test
+            @TestMetadata("recordWithNotNullInConstructor.kt")
+            public void testRecordWithNotNullInConstructor() throws Exception {
+                runTest("compiler/testData/codegen/boxModernJdk/testsWithJava17/records/recordWithNotNullInConstructor.kt");
+            }
         }
 
         @Nested
