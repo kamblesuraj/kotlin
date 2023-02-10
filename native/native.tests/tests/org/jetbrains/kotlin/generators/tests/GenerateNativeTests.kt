@@ -52,6 +52,16 @@ fun main() {
             }
         }
 
+        testGroup("native/native.tests/tests-gen", "native/native.tests/testData") {
+            testClass<AbstractNativeBlackBoxTest>(
+                suiteTestClassName = "InfrastructureK2TestGenerated",
+                annotations = listOf(infrastructure(), provider<UseStandardTestCaseGroupProvider>(), provider<K2Pipeline>())
+            ) {
+                model("samples")
+                model("samples2")
+            }
+        }
+
         // KLIB ABI tests.
         testGroup("native/native.tests/tests-gen", "compiler/testData") {
             testClass<AbstractNativeKlibABITest>(
