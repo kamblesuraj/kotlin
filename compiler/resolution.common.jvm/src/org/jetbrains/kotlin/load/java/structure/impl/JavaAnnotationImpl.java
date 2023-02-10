@@ -96,6 +96,16 @@ public class JavaAnnotationImpl extends JavaElementImpl<PsiAnnotation> implement
     }
 
     @Override
+    public boolean isResolvedTo(@NotNull FqName fqName) {
+        PsiJavaCodeReferenceElement referenceElement = getPsi().getNameReferenceElement();
+        if (referenceElement == null || !referenceElement.getReferenceName().equals(fqName.shortNameOrSpecial().asString())) {
+            return false;
+        }
+        ClassId classId = getClassId();
+        return classId != null && classId.asSingleFqName().equals(fqName);
+    }
+
+    @Override
     public boolean isFreshlySupportedTypeUseAnnotation() {
         return false;
     }
