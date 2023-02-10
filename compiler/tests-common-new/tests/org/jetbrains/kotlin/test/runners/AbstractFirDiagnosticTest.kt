@@ -9,13 +9,13 @@ import org.jetbrains.kotlin.config.ExplicitApiMode
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.symbols.FirLazyDeclarationResolver
 import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
-import org.jetbrains.kotlin.test.Constructor
-import org.jetbrains.kotlin.test.TestJdkKind
-import org.jetbrains.kotlin.test.bind
+import org.jetbrains.kotlin.test.*
+import org.jetbrains.kotlin.test.backend.ir.ActualizerOnlyFacade
+import org.jetbrains.kotlin.test.backend.ir.IrDiagnosticsHandler
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.builders.configureFirHandlersStep
 import org.jetbrains.kotlin.test.builders.firHandlersStep
-import org.jetbrains.kotlin.test.coerce
+import org.jetbrains.kotlin.test.builders.irHandlersStep
 import org.jetbrains.kotlin.test.directives.ConfigurationDirectives.WITH_STDLIB
 import org.jetbrains.kotlin.test.directives.FirDiagnosticsDirectives.FIR_DUMP
 import org.jetbrains.kotlin.test.directives.FirDiagnosticsDirectives.USE_LIGHT_TREE
@@ -45,6 +45,34 @@ abstract class AbstractFirDiagnosticTest : AbstractKotlinCompilerTest() {
 }
 
 abstract class AbstractFirDiagnosticsWithLightTreeTest : AbstractFirDiagnosticTest() {
+    override fun configure(builder: TestConfigurationBuilder) {
+        super.configure(builder)
+        with(builder) {
+            defaultDirectives {
+                +USE_LIGHT_TREE
+            }
+        }
+    }
+}
+
+open class AbstractFirWithActualizerDiagnosticsTest() : AbstractKotlinCompilerWithTargetBackendTest(TargetBackend.JVM_IR) {
+
+    override fun TestConfigurationBuilder.configuration() {
+
+        baseFirDiagnosticTestConfiguration()
+
+        facadeStep(::Fir2IrResultsConverter)
+        facadeStep(::ActualizerOnlyFacade)
+        irHandlersStep {
+            useHandlers(
+                ::IrDiagnosticsHandler
+            )
+        }
+    }
+}
+
+open class AbstractFirLightTreeWithActualizerDiagnosticsTest() : AbstractFirWithActualizerDiagnosticsTest() {
+
     override fun configure(builder: TestConfigurationBuilder) {
         super.configure(builder)
         with(builder) {

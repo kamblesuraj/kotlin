@@ -192,15 +192,31 @@ fun generateJUnit5CompilerTests(args: Array<String>) {
 
         testGroup(testsRoot = "compiler/fir/analysis-tests/tests-gen", testDataRoot = "compiler/testData") {
             testClass<AbstractFirDiagnosticTest>(suiteTestClassName = "FirOldFrontendDiagnosticsTestGenerated") {
-                model("diagnostics/tests", pattern = "^(.*)\\.kts?$", excludedPattern = excludedCustomTestdataPattern)
+                model(
+                    "diagnostics/tests", pattern = "^(.*)\\.kts?$",
+                    excludeDirsRecursively = listOf("multiplatform"),
+                    excludedPattern = excludedCustomTestdataPattern
+                )
                 model("diagnostics/testsWithStdLib", excludedPattern = excludedCustomTestdataPattern)
+            }
+
+            testClass<AbstractFirWithActualizerDiagnosticsTest>(suiteTestClassName = "FirOldFrontendMPPDiagnosticsTestGenerated") {
+                model("diagnostics/tests/multiplatform", pattern = "^(.*)\\.kts?$", excludedPattern = excludedCustomTestdataPattern)
             }
 
             testClass<AbstractFirDiagnosticsWithLightTreeTest>(
                 suiteTestClassName = "FirOldFrontendDiagnosticsWithLightTreeTestGenerated"
             ) {
-                model("diagnostics/tests", excludedPattern = excludedCustomTestdataPattern)
+                model(
+                    "diagnostics/tests",
+                    excludeDirsRecursively = listOf("multiplatform"),
+                    excludedPattern = excludedCustomTestdataPattern
+                )
                 model("diagnostics/testsWithStdLib", excludedPattern = excludedCustomTestdataPattern)
+            }
+
+            testClass<AbstractFirLightTreeWithActualizerDiagnosticsTest>(suiteTestClassName = "FirOldFrontendMPPDiagnosticsWithLightTreeTestGenerated") {
+                model("diagnostics/tests/multiplatform", pattern = "^(.*)\\.kts?$", excludedPattern = excludedCustomTestdataPattern)
             }
 
             testClass<AbstractFirForeignAnnotationsSourceJavaTest>(
