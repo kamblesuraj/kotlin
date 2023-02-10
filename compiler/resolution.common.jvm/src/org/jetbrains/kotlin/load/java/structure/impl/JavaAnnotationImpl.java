@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.name.Name;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import static org.jetbrains.kotlin.load.java.structure.impl.JavaElementCollectionFromPsiArrayUtil.namedAnnotationArguments;
 
@@ -98,7 +99,7 @@ public class JavaAnnotationImpl extends JavaElementImpl<PsiAnnotation> implement
     @Override
     public boolean isResolvedTo(@NotNull FqName fqName) {
         PsiJavaCodeReferenceElement referenceElement = getPsi().getNameReferenceElement();
-        if (referenceElement == null || !referenceElement.getReferenceName().equals(fqName.shortNameOrSpecial().asString())) {
+        if (referenceElement == null || !Objects.equals(referenceElement.getReferenceName(), fqName.shortNameOrSpecial().asString())) {
             return false;
         }
         ClassId classId = getClassId();
