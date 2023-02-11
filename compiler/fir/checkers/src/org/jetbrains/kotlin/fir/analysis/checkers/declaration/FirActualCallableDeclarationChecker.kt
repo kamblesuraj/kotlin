@@ -17,16 +17,14 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.resolve.multiplatform.ExpectActualCompatibility
 
-object FirActualDeclarationChecker : FirBasicDeclarationChecker() {
-    override fun check(declaration: FirDeclaration, context: CheckerContext, reporter: DiagnosticReporter) {
-        if (declaration !is FirMemberDeclaration || !declaration.isActual) return
+object FirActualCallableDeclarationChecker : FirCallableDeclarationChecker() {
+    override fun check(declaration: FirCallableDeclaration, context: CheckerContext, reporter: DiagnosticReporter) {
+        if (!declaration.isActual) return
 
-        if (declaration is FirCallableDeclaration) {
-            if (declaration is FirFunction) {
-                checkActualFunctionWithDefaultArguments(declaration, reporter, context)
-            }
-            checkReturnTypes(declaration, context, reporter)
+        if (declaration is FirFunction) {
+            checkActualFunctionWithDefaultArguments(declaration, reporter, context)
         }
+        checkReturnTypes(declaration, context, reporter)
     }
 
     private fun checkActualFunctionWithDefaultArguments(function: FirFunction, reporter: DiagnosticReporter, context: CheckerContext) {
