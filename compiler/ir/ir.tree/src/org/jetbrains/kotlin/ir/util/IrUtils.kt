@@ -1389,3 +1389,12 @@ val IrFunction.isValueClassTypedEquals: Boolean
                 && contextReceiverParametersCount == 0 && extensionReceiverParameter == null
                 && (parentClass.isValue)
     }
+
+fun IrAttributeContainer.extractDeclaration(): IrDeclaration? {
+    return when (this) {
+        is IrClass -> return this
+        is IrFunctionExpression -> function
+        is IrFunctionReference -> symbol.owner
+        else -> null
+    }
+}
