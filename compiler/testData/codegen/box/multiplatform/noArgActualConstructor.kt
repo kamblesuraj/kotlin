@@ -1,12 +1,14 @@
 // !LANGUAGE: +MultiPlatformProjects
-// IGNORE_BACKEND_K2: JVM_IR, JS_IR
-// FIR status: expect/actual in the same module (ACTUAL_WITHOUT_EXPECT)
 // TARGET_BACKEND: JVM
 // WITH_STDLIB
+
+// MODULE: common
+// TARGET_PLATFORM: Common
 // FILE: common.kt
 
 expect class Foo(a: String = "", b: Int = 42)
 
+// MODULE: jvm()()(common)
 // FILE: J.java
 
 public class J {

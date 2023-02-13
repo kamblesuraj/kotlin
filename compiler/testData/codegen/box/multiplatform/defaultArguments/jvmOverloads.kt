@@ -1,8 +1,15 @@
 // !LANGUAGE: +MultiPlatformProjects
-// IGNORE_BACKEND_K2: JVM_IR, JS_IR
-// FIR status: default argument mapping in MPP isn't designed yet
 // TARGET_BACKEND: JVM
 // WITH_STDLIB
+
+// MODULE: common
+// TARGET_PLATFORM: Common
+// FILE: common.kt
+
+expect fun foo(j: Int, i: Int = -1)
+
+// MODULE: jvm()()(common)
+// TARGET_PLATFORM: JVM
 // FILE: J.java
 
 public class J {
@@ -12,10 +19,6 @@ public class J {
         return "OK";
     }
 }
-
-// FILE: common.kt
-
-expect fun foo(j: Int, i: Int = -1)
 
 // FILE: jvm.kt
 
