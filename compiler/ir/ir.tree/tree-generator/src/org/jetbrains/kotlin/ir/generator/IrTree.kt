@@ -176,13 +176,13 @@ object IrTree : AbstractTreeBuilder() {
             useful, for example, to keep track of generated names for anonymous declarations.
             @property attributeOwnerId original element before copying. Always satisfies the following
               invariant: `this.attributeOwnerId == this.attributeOwnerId.attributeOwnerId`.
-            @property attributeOwnerIdBeforeInline original element before inlining. Useful only with IR
+            @property originalBeforeInline original element before inlining. Useful only with IR
               inliner. `null` if the element wasn't inlined. Unlike [attributeOwnerId], doesn't have the
               idempotence invariant and can contain a chain of declarations.
         """.trimIndent()
 
         +field("attributeOwnerId", attributeContainer, mutable = true)
-        +field("attributeOwnerIdBeforeInline", attributeContainer, mutable = true, nullable = true) // null <=> this element wasn't inlined
+        +field("originalBeforeInline", attributeContainer, mutable = true, nullable = true) // null <=> this element wasn't inlined
     }
     val anonymousInitializer: ElementConfig by element(Declaration) {
         visitorParent = declarationBase
@@ -508,7 +508,7 @@ object IrTree : AbstractTreeBuilder() {
         +field("attributeOwnerId", attributeContainer, mutable = true) {
             baseDefaultValue = code("this")
         }
-        +field("attributeOwnerIdBeforeInline", attributeContainer, mutable = true, nullable = true) {
+        +field("originalBeforeInline", attributeContainer, mutable = true, nullable = true) {
             baseDefaultValue = code("null")
         }
         +field("type", irTypeType, mutable = true)

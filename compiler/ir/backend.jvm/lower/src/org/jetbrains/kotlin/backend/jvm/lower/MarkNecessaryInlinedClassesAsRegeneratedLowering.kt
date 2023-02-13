@@ -102,7 +102,7 @@ class MarkNecessaryInlinedClassesAsRegeneratedLowering(val context: JvmBackendCo
                 }
                 if (!processingBeforeInlineDeclaration) {
                     processingBeforeInlineDeclaration = true
-                    declaration.attributeOwnerIdBeforeInline?.acceptChildrenVoid(this) // check if we need to save THIS declaration
+                    declaration.originalBeforeInline?.acceptChildrenVoid(this) // check if we need to save THIS declaration
                     processingBeforeInlineDeclaration = false
                 }
                 declaration.acceptChildrenVoid(this) // check if we need to save INNER declarations
@@ -212,7 +212,7 @@ class MarkNecessaryInlinedClassesAsRegeneratedLowering(val context: JvmBackendCo
         this.acceptChildrenVoid(object : IrElementVisitorVoid {
             private fun checkAndSetUpCorrectAttributes(element: IrAttributeContainer) {
                 when {
-                    element !in mustBeRegenerated && element.attributeOwnerIdBeforeInline != null -> element.setUpOriginalAttributes()
+                    element !in mustBeRegenerated && element.originalBeforeInline != null -> element.setUpOriginalAttributes()
                     else -> element.acceptChildrenVoid(this)
                 }
             }
@@ -238,12 +238,12 @@ class MarkNecessaryInlinedClassesAsRegeneratedLowering(val context: JvmBackendCo
     private fun IrElement.setUpOriginalAttributes() {
         acceptVoid(object : IrElementVisitorVoid {
             override fun visitElement(element: IrElement) {
-                if (element is IrAttributeContainer && element.attributeOwnerIdBeforeInline != null) {
-                    // Basically we need to generate SEQUENCE of `element.attributeOwnerIdBeforeInline` and find the original one.
-                    //  But we process nested inlined functions first, so `element.attributeOwnerIdBeforeInline` will be processed already.
+                if (element is IrAttributeContainer && element.originalBeforeInline != null) {
+                    // Basically we need to generate SEQUENCE of `element.originalBeforeInline` and find the original one.
+                    //  But we process nested inlined functions first, so `element.originalBeforeInline` will be processed already.
                     //  This mean that when we start to precess current container, all inner ones in SEQUENCE will already be processed.
-                    element.attributeOwnerId = element.attributeOwnerIdBeforeInline!!.attributeOwnerId
-                    element.attributeOwnerIdBeforeInline = null
+                    element.attributeOwnerId = element.originalBeforeInline!!.attributeOwnerId
+                    element.originalBeforeInline = null
                 }
                 element.acceptChildrenVoid(this)
             }
