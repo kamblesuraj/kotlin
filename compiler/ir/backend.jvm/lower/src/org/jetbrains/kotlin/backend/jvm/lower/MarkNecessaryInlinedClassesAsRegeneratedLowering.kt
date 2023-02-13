@@ -8,7 +8,7 @@ package org.jetbrains.kotlin.backend.jvm.lower
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.ir.inlineDeclaration
 import org.jetbrains.kotlin.backend.common.ir.isFunctionInlining
-import org.jetbrains.kotlin.backend.common.lower.inline.InlinedFunctionReference
+import org.jetbrains.kotlin.backend.common.lower.inline.INLINED_FUNCTION_REFERENCE
 import org.jetbrains.kotlin.backend.common.phaser.makeIrModulePhase
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.functionInliningPhase
@@ -138,7 +138,7 @@ class MarkNecessaryInlinedClassesAsRegeneratedLowering(val context: JvmBackendCo
                     return
                 }
 
-                if (expression.origin is InlinedFunctionReference) {
+                if (expression.origin == INLINED_FUNCTION_REFERENCE) {
                     saveDeclarationsFromStackIntoRegenerationPool()
                 }
                 super.visitCall(expression)

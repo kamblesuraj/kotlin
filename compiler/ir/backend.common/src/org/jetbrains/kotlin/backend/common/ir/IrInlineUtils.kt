@@ -6,8 +6,8 @@
 package org.jetbrains.kotlin.backend.common.ir
 
 import org.jetbrains.kotlin.backend.common.lower.VariableRemapper
-import org.jetbrains.kotlin.backend.common.lower.inline.InlinedFunctionArguments
-import org.jetbrains.kotlin.backend.common.lower.inline.InlinedFunctionDefaultArguments
+import org.jetbrains.kotlin.backend.common.lower.inline.INLINED_FUNCTION_ARGUMENTS
+import org.jetbrains.kotlin.backend.common.lower.inline.INLINED_FUNCTION_DEFAULT_ARGUMENTS
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
@@ -158,31 +158,31 @@ fun IrInlinedFunctionBlock.isLambdaInlining(): Boolean {
 fun IrInlinedFunctionBlock.getAdditionalStatementsFromInlinedBlock(): List<IrStatement> {
     return this.statements
         .filterIsInstance<IrComposite>()
-        .filter { it.origin is InlinedFunctionArguments || it.origin is InlinedFunctionDefaultArguments }
+        .filter { it.origin == INLINED_FUNCTION_ARGUMENTS || it.origin == INLINED_FUNCTION_DEFAULT_ARGUMENTS }
         .flatMap { it.statements }
 }
 
 fun IrInlinedFunctionBlock.getNonDefaultAdditionalStatementsFromInlinedBlock(): List<IrStatement> {
     return this.statements
         .filterIsInstance<IrComposite>()
-        .singleOrNull { it.origin is InlinedFunctionArguments }?.statements ?: emptyList()
+        .singleOrNull { it.origin == INLINED_FUNCTION_ARGUMENTS }?.statements ?: emptyList()
 }
 
 fun IrInlinedFunctionBlock.getDefaultAdditionalStatementsFromInlinedBlock(): List<IrStatement> {
     return this.statements
         .filterIsInstance<IrComposite>()
-        .singleOrNull { it.origin is InlinedFunctionDefaultArguments }?.statements ?: emptyList()
+        .singleOrNull { it.origin == INLINED_FUNCTION_DEFAULT_ARGUMENTS }?.statements ?: emptyList()
 }
 
 fun IrInlinedFunctionBlock.getOriginalStatementsFromInlinedBlock(): List<IrStatement> {
     return this.statements
-        .filter { it !is IrComposite || !(it.origin is InlinedFunctionArguments || it.origin is InlinedFunctionDefaultArguments) }
+        .filter { it !is IrComposite || !(it.origin == INLINED_FUNCTION_ARGUMENTS || it.origin == INLINED_FUNCTION_DEFAULT_ARGUMENTS) }
 }
 
 fun IrInlinedFunctionBlock.putStatementBeforeActualInline(builder: IrBuilderWithScope, statement: IrStatement) {
     val evaluateStatements = this.statements
         .filterIsInstance<IrComposite>()
-        .singleOrNull { it.origin is InlinedFunctionArguments }?.statements
+        .singleOrNull { it.origin == INLINED_FUNCTION_ARGUMENTS }?.statements
 
     if (evaluateStatements != null) {
         evaluateStatements.add(0, statement)
@@ -190,13 +190,13 @@ fun IrInlinedFunctionBlock.putStatementBeforeActualInline(builder: IrBuilderWith
     }
 
     val newInlinedArgumentsBlock = builder
-        .irComposite(UNDEFINED_OFFSET, UNDEFINED_OFFSET, InlinedFunctionArguments, builder.context.irBuiltIns.unitType) { +statement }
+        .irComposite(UNDEFINED_OFFSET, UNDEFINED_OFFSET, INLINED_FUNCTION_ARGUMENTS, builder.context.irBuiltIns.unitType) { +statement }
     this.statements.add(0, newInlinedArgumentsBlock)
 }
 
 fun IrInlinedFunctionBlock.putStatementsInFrontOfInlinedFunction(statements: List<IrStatement>) {
     val insertAfter = this.statements
-        .indexOfLast { it is IrComposite && (it.origin is InlinedFunctionArguments || it.origin is InlinedFunctionDefaultArguments) }
+        .indexOfLast { it is IrComposite && (it.origin == INLINED_FUNCTION_ARGUMENTS || it.origin == INLINED_FUNCTION_DEFAULT_ARGUMENTS) }
 
     this.statements.addAll(if (insertAfter == -1) 0 else insertAfter + 1, statements)
 }

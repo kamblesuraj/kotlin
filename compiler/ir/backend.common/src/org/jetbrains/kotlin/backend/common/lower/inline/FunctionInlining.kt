@@ -320,7 +320,7 @@ class FunctionInlining(
             private fun inlinePropertyReference(expression: IrCall, propertyReference: IrPropertyReference): IrExpression {
                 val getterCall = IrCallImpl.fromSymbolOwner(
                     expression.startOffset, expression.endOffset, expression.type, propertyReference.getter!!,
-                    origin = InlinedFunctionReference
+                    origin = INLINED_FUNCTION_REFERENCE
                 )
 
                 fun tryToGetArg(i: Int): IrExpression? {
@@ -416,7 +416,7 @@ class FunctionInlining(
                             inlinedFunction.returnType,
                             inlinedFunction.symbol,
                             classTypeParametersCount,
-                            InlinedFunctionReference
+                            INLINED_FUNCTION_REFERENCE
                         )
                     }
                     is IrSimpleFunction ->
@@ -427,7 +427,7 @@ class FunctionInlining(
                             inlinedFunction.symbol,
                             inlinedFunction.typeParameters.size,
                             inlinedFunction.valueParameters.size,
-                            InlinedFunctionReference
+                            INLINED_FUNCTION_REFERENCE
                         )
                     else -> error("Unknown function kind : ${inlinedFunction.render()}")
                 }.apply {
@@ -803,12 +803,12 @@ class FunctionInlining(
             // This is needed because these two groups of variables need slightly different processing on (JVM) backend.
             val blockForNewStatements = IrCompositeImpl(
                 UNDEFINED_OFFSET, UNDEFINED_OFFSET, context.irBuiltIns.unitType,
-                InlinedFunctionArguments, statements = evaluationStatements
+                INLINED_FUNCTION_ARGUMENTS, statements = evaluationStatements
             )
 
             val blockForNewStatementsFromDefault = IrCompositeImpl(
                 UNDEFINED_OFFSET, UNDEFINED_OFFSET, context.irBuiltIns.unitType,
-                InlinedFunctionDefaultArguments, statements = evaluationStatementsFromDefault
+                INLINED_FUNCTION_DEFAULT_ARGUMENTS, statements = evaluationStatementsFromDefault
             )
 
             return listOfNotNull(
@@ -874,9 +874,9 @@ class FunctionInlining(
     }
 }
 
-object InlinedFunctionReference : IrStatementOrigin
-object InlinedFunctionArguments : IrStatementOrigin
-object InlinedFunctionDefaultArguments : IrStatementOrigin
+object INLINED_FUNCTION_REFERENCE : IrStatementOrigin
+object INLINED_FUNCTION_ARGUMENTS : IrStatementOrigin
+object INLINED_FUNCTION_DEFAULT_ARGUMENTS : IrStatementOrigin
 
 class InlinerExpressionLocationHint(val inlineAtSymbol: IrSymbol) : IrStatementOrigin {
     override fun toString(): String =
