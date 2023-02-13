@@ -39435,6 +39435,12 @@ public class DiagnosisCompilerTestFE10TestdataTestGenerated extends AbstractDiag
             }
 
             @Test
+            @TestMetadata("castToRawTypeWithTypeAliasArgument.kt")
+            public void testCastToRawTypeWithTypeAliasArgument() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/castToRawTypeWithTypeAliasArgument.kt");
+            }
+
+            @Test
             @TestMetadata("explicitNullableLambdaParameter.kt")
             public void testExplicitNullableLambdaParameter() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/explicitNullableLambdaParameter.kt");
