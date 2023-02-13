@@ -8,7 +8,7 @@
  */
 fun case_1(x: ClassWithCustomEquals) {
     val y = null
-    if (x == y) {
+    if (<!SENSELESS_COMPARISON!>x == y<!>) {
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>.inv()
     }
@@ -16,7 +16,7 @@ fun case_1(x: ClassWithCustomEquals) {
 
 // TESTCASE NUMBER: 2
 fun case_2(x: ClassWithCustomEquals) {
-    if (x == null) {
+    if (<!SENSELESS_COMPARISON!>x == null<!>) {
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>.inv()
     }
@@ -28,7 +28,7 @@ fun case_2(x: ClassWithCustomEquals) {
  * ISSUES: KT-28243
  */
 fun case_3(x: ClassWithCustomEquals, y: Nothing?) {
-    if (x == y) {
+    if (<!SENSELESS_COMPARISON!>x == y<!>) {
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>.inv()
     }
@@ -41,7 +41,7 @@ fun case_3(x: ClassWithCustomEquals, y: Nothing?) {
  */
 fun case_4(x: ClassWithCustomEquals) {
     val y = null
-    if (y == x) {
+    if (<!SENSELESS_COMPARISON!>y == x<!>) {
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>.inv()
     }
@@ -53,7 +53,7 @@ fun case_4(x: ClassWithCustomEquals) {
  * ISSUES: KT-28243
  */
 fun case_5(x: ClassWithCustomEquals, y: Nothing?) {
-    if (y == x) {
+    if (<!SENSELESS_COMPARISON!>y == x<!>) {
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>.inv()
     }
@@ -66,7 +66,7 @@ fun case_5(x: ClassWithCustomEquals, y: Nothing?) {
  */
 fun case_6(x: ClassWithCustomEquals) {
     val y = null
-    if (x == y == true) {
+    if (<!SENSELESS_COMPARISON!>x == y<!> == true) {
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>.inv()
     }
@@ -74,7 +74,7 @@ fun case_6(x: ClassWithCustomEquals) {
 
 // TESTCASE NUMBER: 7
 fun case_7(x: ClassWithCustomEquals) {
-    if ((x != null) == false) {
+    if ((<!SENSELESS_COMPARISON!>x != null<!>) == false) {
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>.inv()
     }
@@ -86,7 +86,7 @@ fun case_7(x: ClassWithCustomEquals) {
  * ISSUES: KT-28243
  */
 fun case_8(x: ClassWithCustomEquals, y: Nothing?) {
-    if (!(y == x) == false) {
+    if (!(<!SENSELESS_COMPARISON!>y == x<!>) == false) {
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("ClassWithCustomEquals & kotlin.Nothing")!>x<!>.inv()
     }

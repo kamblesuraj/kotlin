@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.analysis.checkers.expression
 
+import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.KtRealSourceElementKind
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
@@ -38,6 +39,11 @@ object FirEqualityCompatibilityChecker : FirEqualityOperatorCallChecker() {
         val (lArgument, lType) = arguments[0].selfWithMostOriginalTypeIfSmartCast
         val (rArgument, rType) = arguments[1].selfWithMostOriginalTypeIfSmartCast
 
+        val lSmartCastType = lArgument.typeRef.coneType
+        val rSmartCastType = rArgument.typeRef.coneType
+
+        checkSensibleness(lSmartCastType, rSmartCastType, context, expression, reporter)
+
         val checkApplicability = when (expression.operation) {
             FirOperation.EQ, FirOperation.NOT_EQ -> ::checkEqualityApplicability
             FirOperation.IDENTITY, FirOperation.NOT_IDENTITY -> ::checkIdentityApplicability
@@ -54,9 +60,6 @@ object FirEqualityCompatibilityChecker : FirEqualityOperatorCallChecker() {
         if (lArgument !is FirSmartCastExpression && rArgument !is FirSmartCastExpression) {
             return
         }
-
-        val lSmartCastType = lArgument.typeRef.coneType
-        val rSmartCastType = rArgument.typeRef.coneType
 
         checkApplicability(lSmartCastType, rSmartCastType, context).ifInapplicable {
             return reporter.reportOn(
@@ -115,9 +118,7 @@ object FirEqualityCompatibilityChecker : FirEqualityOperatorCallChecker() {
         }
     }
 
-    private fun ConeKotlinType.isIdentityLess(context: CheckerContext) = isIdentityLess(context.session)
-
-    private fun ConeKotlinType.isIdentityLess(session: FirSession) = isPrimitive || !isNullable && isValueClass(session)
+    private fun ConeKotlinType.isIdentityLess(context: CheckerContext) = isPrimitive || !isNullable && isValueClass(context.session)
 
     private fun shouldReportAsPerRules1(lType: ConeKotlinType, rType: ConeKotlinType, context: CheckerContext): Boolean {
         val lClass = lType.representativeClassType(context)
@@ -285,5 +286,37 @@ object FirEqualityCompatibilityChecker : FirEqualityOperatorCallChecker() {
         if (isEnum) return true
         val firRegularClassSymbol = (this as? ConeClassLikeType)?.lookupTag?.toFirRegularClassSymbol(context.session) ?: return false
         return firRegularClassSymbol.isEnumClass
+    }
+
+    private fun checkSensibleness(
+        lType: ConeKotlinType,
+        rType: ConeKotlinType,
+        context: CheckerContext,
+        expression: FirEqualityOperatorCall,
+        reporter: DiagnosticReporter
+    ) {
+        val type = when {
+            rType.isNullableNothing -> lType
+            lType.isNullableNothing -> rType
+            else -> return
+        }
+        if (type is ConeErrorType) return
+        val isPositiveCompare = expression.operation == FirOperation.EQ || expression.operation == FirOperation.IDENTITY
+        val compareResult = with(context.session.typeContext) {
+            when {
+                // `null` literal has type `Nothing?`
+                type.isNullableNothing -> isPositiveCompare
+                !type.isNullableType() -> !isPositiveCompare
+                else -> return
+            }
+        }
+        // We only report `SENSELESS_NULL_IN_WHEN` if `lType = type` because `lType` is the type of the when subject. This diagnostic is
+        // only intended for cases where the branch condition contains a null. Also, the error message for SENSELESS_NULL_IN_WHEN
+        // says the value is *never* equal to null, so we can't report it if the value is *always* equal to null.
+        if (expression.source?.elementType != KtNodeTypes.BINARY_EXPRESSION && type === lType && !compareResult) {
+            reporter.reportOn(expression.source, FirErrors.SENSELESS_NULL_IN_WHEN, context)
+        } else {
+            reporter.reportOn(expression.source, FirErrors.SENSELESS_COMPARISON, expression, compareResult, context)
+        }
     }
 }

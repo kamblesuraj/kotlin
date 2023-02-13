@@ -4,7 +4,7 @@ import kotlin.contracts.*
 @OptIn(ExperimentalContracts::class)
 fun testAlwaysNotNull(x: String?): Any? {
     contract {
-        returnsNotNull() implies (x is String && x != null)
+        returnsNotNull() implies (x is String && <!SENSELESS_COMPARISON!>x != null<!>)
     }
 
     return x
