@@ -27,7 +27,6 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
-import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.types.*
@@ -71,7 +70,7 @@ fun IrFrameMap.leave(irDeclaration: IrSymbolOwner): Int {
 
 fun JvmBackendContext.getSourceMapper(declaration: IrClass): SourceMapper {
     val irFile = declaration.fileParentBeforeInline
-    val type = declaration.getAttributeBeforeInline()?.let { getLocalClassType(it) } ?: defaultTypeMapper.mapClass(declaration)
+    val type = declaration.getAttributeOwnerBeforeInline()?.let { getLocalClassType(it) } ?: defaultTypeMapper.mapClass(declaration)
 
     val fileEntry = irFile.fileEntry
     // NOTE: apparently inliner requires the source range to cover the

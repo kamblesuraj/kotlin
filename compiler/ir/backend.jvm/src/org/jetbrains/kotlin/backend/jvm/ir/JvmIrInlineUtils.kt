@@ -101,7 +101,7 @@ private fun IrAttributeContainer.getDeclarationBeforeInline(): IrDeclaration? {
     }
 }
 
-fun IrAttributeContainer.getAttributeBeforeInline(): IrAttributeContainer? {
+fun IrAttributeContainer.getAttributeOwnerBeforeInline(): IrAttributeContainer? {
     if (this.originalBeforeInline == null) return null
     return generateSequence(this) { it.originalBeforeInline }.last()
 }
