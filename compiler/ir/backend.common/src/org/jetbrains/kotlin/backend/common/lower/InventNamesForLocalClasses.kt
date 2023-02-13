@@ -39,12 +39,11 @@ abstract class InventNamesForLocalClasses(
      * @property enclosingName internal name of the enclosing class (including anonymous classes, local objects and callable references)
      * @property isLocal true if the next declaration to be encountered in the IR tree is local
      */
-    private data class Data(val enclosingName: String?, val isLocal: Boolean) {
+    private data class Data(val enclosingName: String?, val isLocal: Boolean, val processingInlinedFunction: Boolean = false) {
         fun makeLocal(): Data = if (isLocal) this else copy(isLocal = true)
     }
 
     private inner class NameInventor : IrElementVisitor<Unit, Data> {
-        private var processingInlinedFunction = false
         private val anonymousClassesCount = mutableMapOf<String, Int>()
         private val localFunctionNames = mutableMapOf<IrFunctionSymbol, String>()
 
@@ -53,14 +52,14 @@ abstract class InventNamesForLocalClasses(
                 return expression.getNonDefaultAdditionalStatementsFromInlinedBlock().forEach { it.accept(this, data) }
             }
 
-            if (!processingInlinedFunction && expression is IrInlinedFunctionBlock && expression.isFunctionInlining()) {
+            if (!data.processingInlinedFunction && expression is IrInlinedFunctionBlock && expression.isFunctionInlining()) {
                 expression.getAdditionalStatementsFromInlinedBlock().forEach { it.accept(this, data) }
 
-                processingInlinedFunction = true
                 val inlinedAt = expression.inlineCall.symbol.owner.name.asString()
-                val newData = data.copy(enclosingName = data.enclosingName + "$\$inlined\$$inlinedAt", isLocal = true)
+                val newData = data.copy(
+                    enclosingName = data.enclosingName + "$\$inlined\$$inlinedAt", isLocal = true, processingInlinedFunction = true
+                )
                 expression.getOriginalStatementsFromInlinedBlock().forEach { it.accept(this, newData) }
-                processingInlinedFunction = false
 
                 return
             }
@@ -126,7 +125,7 @@ abstract class InventNamesForLocalClasses(
                     }
                 }
 
-                declaration is IrVariable && generateNamesForRegeneratedObjects || processingInlinedFunction -> enclosingName
+                declaration is IrVariable && generateNamesForRegeneratedObjects || data.processingInlinedFunction -> enclosingName
                 enclosingName != null -> "$enclosingName$$simpleName"
                 else -> simpleName
             }
@@ -143,7 +142,7 @@ abstract class InventNamesForLocalClasses(
         }
 
         override fun visitFunctionReference(expression: IrFunctionReference, data: Data) {
-            if (processingInlinedFunction && expression.attributeOwnerIdBeforeInline == null) {
+            if (data.processingInlinedFunction && expression.attributeOwnerIdBeforeInline == null) {
                 // skip IrFunctionReference from `singleArgumentInlineFunction`
                 return
             }
