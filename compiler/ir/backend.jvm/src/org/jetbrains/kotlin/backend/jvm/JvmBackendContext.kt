@@ -176,6 +176,8 @@ class JvmBackendContext(
 
     val publicAbiSymbols = mutableSetOf<IrClassSymbol>()
 
+    val visitedDeclarationsForRegenerationLowering: MutableSet<IrDeclaration> = ConcurrentHashMap.newKeySet()
+
     init {
         state.mapInlineClass = { descriptor ->
             defaultTypeMapper.mapType(referenceClass(descriptor).defaultType)

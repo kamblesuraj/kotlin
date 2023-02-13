@@ -33,8 +33,6 @@ internal val markNecessaryInlinedClassesAsRegenerated = makeIrModulePhase(
 )
 
 class MarkNecessaryInlinedClassesAsRegeneratedLowering(val context: JvmBackendContext) : IrElementVisitorVoid, FileLoweringPass {
-    private val visited = mutableSetOf<IrDeclaration>() // TODO how to properly cache this set to avoid redoing work in several files
-
     override fun lower(irFile: IrFile) {
         irFile.acceptChildrenVoid(this)
     }
@@ -46,7 +44,7 @@ class MarkNecessaryInlinedClassesAsRegeneratedLowering(val context: JvmBackendCo
     override fun visitBlock(expression: IrBlock) {
         if (expression is IrInlinedFunctionBlock && expression.isFunctionInlining()) {
             val element = expression.inlineDeclaration
-            if (visited.add(element)) {
+            if (context.visitedDeclarationsForRegenerationLowering.add(element)) {
                 // TODO that if callee is located in other module? can we lower it from file lowering?
                 element.acceptVoid(this)
             }
