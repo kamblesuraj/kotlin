@@ -21,7 +21,6 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.getClass
 import org.jetbrains.kotlin.ir.types.typeOrNull
 import org.jetbrains.kotlin.ir.util.getAllArgumentsWithIr
-import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
@@ -33,27 +32,31 @@ internal val markNecessaryInlinedClassesAsRegenerated = makeIrModulePhase(
     prerequisite = setOf(functionInliningPhase, createSeparateCallForInlinedLambdas)
 )
 
-class MarkNecessaryInlinedClassesAsRegeneratedLowering(val context: JvmBackendContext) : IrElementTransformerVoid(), FileLoweringPass {
+class MarkNecessaryInlinedClassesAsRegeneratedLowering(val context: JvmBackendContext) : IrElementVisitorVoid, FileLoweringPass {
     private val visited = mutableSetOf<IrDeclaration>() // TODO how to properly cache this set to avoid redoing work in several files
 
     override fun lower(irFile: IrFile) {
-        irFile.transformChildrenVoid()
+        irFile.acceptChildrenVoid(this)
     }
 
-    override fun visitBlock(expression: IrBlock): IrExpression {
+    override fun visitElement(element: IrElement) {
+        element.acceptChildrenVoid(this)
+    }
+
+    override fun visitBlock(expression: IrBlock) {
         if (expression is IrInlinedFunctionBlock && expression.isFunctionInlining()) {
             val element = expression.inlineDeclaration
             if (visited.add(element)) {
                 // TODO that if callee is located in other module? can we lower it from file lowering?
-                element.transform(this, null)
+                element.acceptVoid(this)
             }
 
             val mustBeRegenerated = expression.collectDeclarationsThatMustBeRegenerated()
             expression.setUpCorrectAttributesForAllInnerElements(mustBeRegenerated)
-            return expression
+            return
         }
 
-        return super.visitBlock(expression)
+        super.visitBlock(expression)
     }
 
     private fun IrInlinedFunctionBlock.collectDeclarationsThatMustBeRegenerated(): Set<IrAttributeContainer> {
