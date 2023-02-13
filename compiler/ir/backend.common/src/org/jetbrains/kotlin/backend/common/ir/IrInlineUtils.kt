@@ -207,6 +207,5 @@ val IrContainerExpression.innerInlinedBlockOrThis: IrContainerExpression
 val IrReturnableBlock.inlineFunction: IrFunction?
     get() = (this.statements.singleOrNull() as? IrInlinedFunctionBlock)?.inlineFunction
 
-@Suppress("unused") // Used in kotlin-native
 val IrReturnableBlock.sourceFileSymbol: IrFileSymbol?
     get() = inlineFunction?.fileOrNull?.symbol
