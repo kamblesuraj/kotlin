@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.backend.common.linkage.partial
 
 import gnu.trove.THashMap
 import gnu.trove.THashSet
+import org.jetbrains.kotlin.ir.linkage.partial.ExploredClassifier
 import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 
 internal class ExploredClassifiers {
