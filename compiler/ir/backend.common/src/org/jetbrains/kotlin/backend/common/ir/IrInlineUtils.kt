@@ -127,9 +127,6 @@ fun IrInlinable.inline(target: IrDeclarationParent, arguments: List<IrValueDecla
         }
     }
 
-// -----------------------------------------------------------------------------
-// Here goes utils for IrInlinedFunctionBlock
-
 val IrInlinedFunctionBlock.inlineDeclaration: IrDeclaration
     get() = when (val element = inlinedElement) {
         is IrFunction -> element
