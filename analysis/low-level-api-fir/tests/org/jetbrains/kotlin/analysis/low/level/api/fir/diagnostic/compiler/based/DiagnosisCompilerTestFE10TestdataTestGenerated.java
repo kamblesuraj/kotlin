@@ -39429,6 +39429,12 @@ public class DiagnosisCompilerTestFE10TestdataTestGenerated extends AbstractDiag
             }
 
             @Test
+            @TestMetadata("arrayTypeInferenceFromJavaGenericMethod.kt")
+            public void testArrayTypeInferenceFromJavaGenericMethod() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/arrayTypeInferenceFromJavaGenericMethod.kt");
+            }
+
+            @Test
             @TestMetadata("callOfOverriddenGenericMethodFromInternalInterface.kt")
             public void testCallOfOverriddenGenericMethodFromInternalInterface() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/callOfOverriddenGenericMethodFromInternalInterface.kt");

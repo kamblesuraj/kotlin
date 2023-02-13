@@ -1,0 +1,32 @@
+package
+
+private val STRING_TEMPLATE_EMPTY_ARRAY: kotlin.Array<KtStringTemplateExpression>
+public fun StubBasedBsiElement<*>.foo(): KtStringTemplateExpression?
+
+public open class KtStringTemplateExpression : PsiElement {
+    public constructor KtStringTemplateExpression()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public interface PsiElement {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public interface StubBasedBsiElement</*0*/ Stub : StubElement<(raw) PsiElement!>!> : PsiElement {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public abstract fun getStub(): Stub!
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public interface StubElement</*0*/ T : PsiElement!> {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public abstract fun </*0*/ E : PsiElement!> getChildrenByType(/*0*/ @org.jetbrains.annotations.NotNull filter: kotlin.String, /*1*/ array: kotlin.Array<(out) E!>!): (@org.jetbrains.annotations.NotNull kotlin.Array<E!>..@org.jetbrains.annotations.NotNull kotlin.Array<out E!>)
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
