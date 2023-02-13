@@ -733,21 +733,16 @@ class FunctionInlining(
                 return callee.typeParameters[typeClassifier.index].defaultType
             }
 
-            if (callee.dispatchReceiverParameter == this) {
-                return original.dispatchReceiverParameter?.getTypeIfFromTypeParameter() ?: callee.dispatchReceiverParameter!!.type
-            }
-
-            if (callee.extensionReceiverParameter == this) {
-                return original.extensionReceiverParameter?.getTypeIfFromTypeParameter() ?: callee.extensionReceiverParameter!!.type
-            }
-
-            for (valueParameter in callee.valueParameters) {
-                if (valueParameter == this) {
-                    return original.valueParameters[valueParameter.index].getTypeIfFromTypeParameter() ?: valueParameter.type
+            return when (this) {
+                callee.dispatchReceiverParameter -> original.dispatchReceiverParameter?.getTypeIfFromTypeParameter()
+                    ?: callee.dispatchReceiverParameter!!.type
+                callee.extensionReceiverParameter -> original.extensionReceiverParameter?.getTypeIfFromTypeParameter()
+                    ?: callee.extensionReceiverParameter!!.type
+                else -> callee.valueParameters.first { it == this }.let { valueParameter ->
+                    original.valueParameters[valueParameter.index].getTypeIfFromTypeParameter()
+                        ?: valueParameter.type
                 }
             }
-
-            throw AssertionError("type not found")
         }
 
         private fun evaluateArguments(callSite: IrFunctionAccessExpression, callee: IrFunction): List<IrStatement> {
