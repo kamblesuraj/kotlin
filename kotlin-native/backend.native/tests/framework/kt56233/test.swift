@@ -9,7 +9,7 @@ func threadRoutine(pointer: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer?
 }
 
 func launchThreads(
-    _ f: @escaping () -> (),
+    _ f: @convention(c) () -> (),
     threadCount: Int = 4
 ) throws {
     var threads: [pthread_t] = []
@@ -26,32 +26,10 @@ func launchThreads(
     }
 }
 
-func enums() {
+func kt56233() {
     // Stress testing for race conditions.
     for _ in 0..<50000000 {
         _ = Kt56233.SimpleEnum.two.ordinal
-    }
-}
-
-class WeakX {
-    weak var x: X?
-    init(num: Int32) {
-        self.x = Kt56233.KnlibraryKt.getX(num: num)
-    }
-}
-
-func weaks(_ weakX: WeakX) {
-    for i in 0..<50000000 {
-        autoreleasepool {
-            if let x = weakX.x {
-                try! assertEquals(actual: x.num, expected: 42)
-            } else {
-                return
-            }
-        }
-        if i % 100 == 0 {
-            Kt56233.KnlibraryKt.scheduleGC()
-        }
     }
 }
 
@@ -61,12 +39,6 @@ class TestTests : SimpleTestProvider {
     override init() {
         super.init()
 
-        // test("Kt56233_enums", { try launchThreads(enums) })
-        test("Kt56233_weaks", {
-            let weakX = WeakX(num: 42)
-            try launchThreads({
-                weaks(weakX)
-            })
-        })
+        test("Kt56233", { try launchThreads(kt56233) })
     }
 }
