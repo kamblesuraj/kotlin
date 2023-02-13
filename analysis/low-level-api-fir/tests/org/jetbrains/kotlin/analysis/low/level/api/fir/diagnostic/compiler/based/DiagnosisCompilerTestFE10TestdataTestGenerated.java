@@ -39459,6 +39459,12 @@ public class DiagnosisCompilerTestFE10TestdataTestGenerated extends AbstractDiag
             }
 
             @Test
+            @TestMetadata("javaMethodOverrideWithSelfTypeNotFound.kt")
+            public void testJavaMethodOverrideWithSelfTypeNotFound() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/javaMethodOverrideWithSelfTypeNotFound.kt");
+            }
+
+            @Test
             @TestMetadata("nullabilityInSamConstructor.kt")
             public void testNullabilityInSamConstructor() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/nullabilityInSamConstructor.kt");
