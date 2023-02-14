@@ -39591,6 +39591,12 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
             }
 
             @Test
+            @TestMetadata("triangleJavaMapWithDifferentNullability.kt")
+            public void testTriangleJavaMapWithDifferentNullability() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/triangleJavaMapWithDifferentNullability.kt");
+            }
+
+            @Test
             @TestMetadata("valReassignmentNullability.kt")
             public void testValReassignmentNullability() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/valReassignmentNullability.kt");

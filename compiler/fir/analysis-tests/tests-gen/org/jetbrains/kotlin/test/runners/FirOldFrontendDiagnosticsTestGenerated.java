@@ -39591,6 +39591,12 @@ public class FirOldFrontendDiagnosticsTestGenerated extends AbstractFirDiagnosti
             }
 
             @Test
+            @TestMetadata("triangleJavaMapWithDifferentNullability.kt")
+            public void testTriangleJavaMapWithDifferentNullability() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/triangleJavaMapWithDifferentNullability.kt");
+            }
+
+            @Test
             @TestMetadata("valReassignmentNullability.kt")
             public void testValReassignmentNullability() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/valReassignmentNullability.kt");

@@ -1,0 +1,30 @@
+FILE: test.kt
+    public final class Factory : R|kotlin/Any| {
+        public constructor(): R|Factory| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final fun <T> foo(config: R|ConcreteConfiguration|, bar: R|(T) -> T|): R|kotlin/Unit| {
+            lval envs: R|ft<kotlin/collections/MutableMap<kotlin/String!, kotlin/String!>, kotlin/collections/Map<kotlin/String!, kotlin/String!>>| = R|<local>/config|.R|/AbstractConfiguration.envs|
+            lval consoleEnvs: R|kotlin/collections/MutableMap<kotlin/String, kotlin/String>| = R|kotlin/collections/mutableMapOf|<R|kotlin/String|, R|kotlin/String|>()
+            R|<local>/consoleEnvs|.R|SubstitutionOverride<kotlin/collections/MutableMap.putAll: R|kotlin/Unit|>|(R|<local>/envs|)
+             {
+                lval <iterator>: R|kotlin/collections/MutableIterator<kotlin/collections/MutableMap.MutableEntry<kotlin/String!, kotlin/String!>>| = R|<local>/envs|.R|kotlin/collections/iterator|<R|kotlin/String!|, R|kotlin/String!|>()
+                while(R|<local>/<iterator>|.R|SubstitutionOverride<kotlin/collections/MutableIterator.hasNext: R|kotlin/Boolean|>|()) {
+                    lval <destruct>: R|kotlin/collections/MutableMap.MutableEntry<kotlin/String!, kotlin/String!>| = R|<local>/<iterator>|.R|SubstitutionOverride<kotlin/collections/MutableIterator.next: R|kotlin/collections/MutableMap.MutableEntry<kotlin/String!, kotlin/String!>|>|()
+                    lval key: R|kotlin/String!| = R|<local>/<destruct>|.R|kotlin/collections/component1|<R|kotlin/String!|, R|kotlin/String!|>()
+                    lval value: R|kotlin/String!| = R|<local>/<destruct>|.R|kotlin/collections/component2|<R|kotlin/String!|, R|kotlin/String!|>()
+                    R|kotlin/io/println|(<strcat>(R|<local>/key|.R|/bar|(), String( = ), R|<local>/value|.R|/bar|()))
+                }
+
+            }
+
+        }
+
+    }
+    public final fun R|kotlin/String|.bar(): R|kotlin/String| {
+        ^bar String()
+    }
+    public final fun R|kotlin/Int|.bar(): R|kotlin/String| {
+        ^bar String()
+    }

@@ -1,0 +1,55 @@
+package
+
+public fun kotlin.Int.bar(): kotlin.String
+public fun kotlin.String.bar(): kotlin.String
+
+public abstract class AbstractConfiguration {
+    public constructor AbstractConfiguration()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    @org.jetbrains.annotations.NotNull public open fun getEnvs(): kotlin.collections.(Mutable)Map<kotlin.String!, kotlin.String!>
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open fun setEnvs(/*0*/ @org.jetbrains.annotations.NotNull envs: kotlin.collections.(Mutable)Map<kotlin.String!, kotlin.String!>): kotlin.Unit
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public open class AbstractConfigurationWithParams : AbstractConfiguration, AbstractParams {
+    public constructor AbstractConfigurationWithParams()
+    public open override /*2*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    @org.jetbrains.annotations.NotNull public open override /*2*/ /*fake_override*/ fun getEnvs(): kotlin.collections.(Mutable)Map<kotlin.String!, kotlin.String!>
+    public open override /*2*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*2*/ /*fake_override*/ fun setEnvs(/*0*/ @org.jetbrains.annotations.NotNull envs: kotlin.collections.(Mutable)Map<kotlin.String!, kotlin.String!>): kotlin.Unit
+    public open override /*2*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public interface AbstractParams : Params {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public abstract override /*1*/ /*fake_override*/ fun getEnvs(): kotlin.collections.(Mutable)Map<kotlin.String!, kotlin.String!>!
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public abstract override /*1*/ /*fake_override*/ fun setEnvs(/*0*/ envs: kotlin.collections.(Mutable)Map<kotlin.String!, kotlin.String!>!): kotlin.Unit
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public open class ConcreteConfiguration : AbstractConfigurationWithParams, AbstractParams {
+    public constructor ConcreteConfiguration()
+    public open override /*2*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    @org.jetbrains.annotations.NotNull public open override /*2*/ /*fake_override*/ fun getEnvs(): kotlin.collections.(Mutable)Map<kotlin.String!, kotlin.String!>
+    public open override /*2*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*2*/ /*fake_override*/ fun setEnvs(/*0*/ @org.jetbrains.annotations.NotNull envs: kotlin.collections.(Mutable)Map<kotlin.String!, kotlin.String!>): kotlin.Unit
+    public open override /*2*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public final class Factory {
+    public constructor Factory()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public final fun </*0*/ T> foo(/*0*/ config: ConcreteConfiguration, /*1*/ bar: (T) -> T): kotlin.Unit
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public interface Params {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public abstract fun getEnvs(): kotlin.collections.(Mutable)Map<kotlin.String!, kotlin.String!>!
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public abstract fun setEnvs(/*0*/ envs: kotlin.collections.(Mutable)Map<kotlin.String!, kotlin.String!>!): kotlin.Unit
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
