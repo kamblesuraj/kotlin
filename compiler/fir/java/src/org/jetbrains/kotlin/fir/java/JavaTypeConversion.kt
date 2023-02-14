@@ -193,7 +193,8 @@ private fun JavaClassifierType.toConeKotlinTypeForFlexibleBound(
                             ?.toFirRegularClassSymbol(session)?.typeParameterSymbols
                     // Given `C<T : X>`, `C` -> `C<X>..C<*>?`.
                     when (mode) {
-                        FirJavaTypeConversionMode.ANNOTATION_MEMBER -> Array(classifier.typeParameters.size) { ConeStarProjection }
+                        FirJavaTypeConversionMode.ANNOTATION_MEMBER,
+                        FirJavaTypeConversionMode.SUPERTYPE -> Array(classifier.typeParameters.size) { ConeStarProjection }
                         else -> typeParameterSymbols?.eraseToUpperBounds(session)
                             ?: Array(classifier.typeParameters.size) { ConeStarProjection }
                     }
