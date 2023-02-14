@@ -39459,6 +39459,12 @@ public class DiagnosisCompilerTestFE10TestdataTestGenerated extends AbstractDiag
             }
 
             @Test
+            @TestMetadata("invisibleInternalLateinitSetter.kt")
+            public void testInvisibleInternalLateinitSetter() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/invisibleInternalLateinitSetter.kt");
+            }
+
+            @Test
             @TestMetadata("javaMethodOverrideWithSelfTypeNotFound.kt")
             public void testJavaMethodOverrideWithSelfTypeNotFound() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/javaMethodOverrideWithSelfTypeNotFound.kt");
