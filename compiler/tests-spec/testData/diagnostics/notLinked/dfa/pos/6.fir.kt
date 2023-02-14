@@ -299,7 +299,7 @@ fun case_16() {
     val x: TypealiasNullableNothing = null
     val y: Nothing? = null
 
-    if (x !== y) {
+    if (<!SENSELESS_COMPARISON!>x !== y<!>) {
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableNothing & kotlin.Nothing")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableNothing & kotlin.Nothing")!>x<!>.hashCode()
     }
@@ -909,7 +909,7 @@ fun case_51() {
     val x: TypealiasNullableNothing = null
     val z: Nothing? = null
 
-    if (x === z || <!SENSELESS_COMPARISON!>z == x<!> && <!SENSELESS_COMPARISON!>x == z<!> || false || false || false) {
+    if (<!SENSELESS_COMPARISON!>x === z<!> || <!SENSELESS_COMPARISON!>z == x<!> && <!SENSELESS_COMPARISON!>x == z<!> || false || false || false) {
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableNothing")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableNothing")!>x<!>.hashCode()
     }

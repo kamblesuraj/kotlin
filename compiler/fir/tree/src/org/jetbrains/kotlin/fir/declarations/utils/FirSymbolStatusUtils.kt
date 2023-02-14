@@ -92,6 +92,9 @@ inline val FirClassSymbol<*>.isInterface: Boolean
 inline val FirClassSymbol<*>.isEnumClass: Boolean
     get() = classKind.isEnumClass
 
+inline val FirClassSymbol<*>.isEnumEntry: Boolean
+    get() = classKind.isEnumEntry
+
 // ---------------------- specific callables ----------------------
 
 inline val FirPropertyAccessorSymbol.allowsToHaveFakeOverride: Boolean get() = visibility.allowsToHaveFakeOverride

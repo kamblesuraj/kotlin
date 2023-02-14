@@ -2390,18 +2390,8 @@ sealed class KtFirDiagnostic<PSI : PsiElement> : KtDiagnosticWithPsi<PSI> {
         abstract val compareResult: Boolean
     }
 
-    abstract class SenselessComparisonError : KtFirDiagnostic<KtExpression>() {
-        override val diagnosticClass get() = SenselessComparisonError::class
-        abstract val expression: KtExpression
-        abstract val compareResult: Boolean
-    }
-
     abstract class SenselessNullInWhen : KtFirDiagnostic<KtElement>() {
         override val diagnosticClass get() = SenselessNullInWhen::class
-    }
-
-    abstract class SenselessNullInWhenError : KtFirDiagnostic<KtElement>() {
-        override val diagnosticClass get() = SenselessNullInWhenError::class
     }
 
     abstract class TypecheckerHasRunIntoRecursiveProblem : KtFirDiagnostic<KtExpression>() {

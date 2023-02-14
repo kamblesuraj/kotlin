@@ -283,7 +283,7 @@ fun case_16() {
     val x: TypealiasNothing? = null
     val y: Nothing? = null
 
-    if (x != null || x !== null || x != y) {
+    if (<!SENSELESS_COMPARISON!>x != null<!> || <!SENSELESS_COMPARISON!>x !== null<!> || <!SENSELESS_COMPARISON!>x != y<!>) {
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNothing? & kotlin.Nothing")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNothing? & kotlin.Nothing")!>x<!>.hashCode()
     }

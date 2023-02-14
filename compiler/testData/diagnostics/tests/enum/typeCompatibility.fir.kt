@@ -83,7 +83,7 @@ fun foo(
     bOutString2 == bInInt2
     bInString2 == bOutInt2
 
-    e == i
+    <!INCOMPATIBLE_ENUM_COMPARISON_ERROR!>e == i<!>
     <!EQUALITY_NOT_APPLICABLE!>"" == i<!>
     ac == ad
 

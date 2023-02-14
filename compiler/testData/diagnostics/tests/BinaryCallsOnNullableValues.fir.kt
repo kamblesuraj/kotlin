@@ -15,8 +15,8 @@ fun f(): Unit {
 
     <!EQUALITY_NOT_APPLICABLE!>A() == 1<!>
 
-    x === "1"
-    x !== "1"
+    <!EQUALITY_NOT_APPLICABLE!>x === "1"<!>
+    <!EQUALITY_NOT_APPLICABLE!>x !== "1"<!>
 
     <!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x === 1<!>
     <!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x !== 1<!>

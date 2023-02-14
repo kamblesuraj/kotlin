@@ -9,13 +9,13 @@ enum class E2 {
 }
 
 fun foo1(e1: E1, e2: E2) {
-    e1 == e2
-    e1 != e2
+    <!INCOMPATIBLE_ENUM_COMPARISON!>e1 == e2<!>
+    <!INCOMPATIBLE_ENUM_COMPARISON!>e1 != e2<!>
 
-    e1 == E2.A
-    E1.B == e2
+    <!INCOMPATIBLE_ENUM_COMPARISON!>e1 == E2.A<!>
+    <!INCOMPATIBLE_ENUM_COMPARISON!>E1.B == e2<!>
 
-    E1.A == E2.B
+    <!INCOMPATIBLE_ENUM_COMPARISON!>E1.A == E2.B<!>
 
     e1 == E1.A
     E1.A == e1
@@ -26,10 +26,10 @@ fun foo1(e1: E1, e2: E2) {
 fun foo2(e1: E1, e2: E2) {
     when (e1) {
         E1.A -> {}
-        E2.A -> {}
-        E2.B -> {}
+        <!INCOMPATIBLE_ENUM_COMPARISON!>E2.A<!> -> {}
+        <!INCOMPATIBLE_ENUM_COMPARISON!>E2.B<!> -> {}
         e1 -> {}
-        e2 -> {}
+        <!INCOMPATIBLE_ENUM_COMPARISON!>e2<!> -> {}
         else -> {}
     }
 }
@@ -63,14 +63,14 @@ interface MyInterface
 open class MyOpenClass
 
 fun foo4(e1: E1, i: MyInterface, c: MyOpenClass) {
-    e1 == i
-    i == e1
+    <!INCOMPATIBLE_ENUM_COMPARISON!>e1 == i<!>
+    <!INCOMPATIBLE_ENUM_COMPARISON!>i == e1<!>
 
     <!INCOMPATIBLE_ENUM_COMPARISON!>e1 == c<!>
     <!INCOMPATIBLE_ENUM_COMPARISON!>c == e1<!>
 
     when (e1) {
-        i -> {}
+        <!INCOMPATIBLE_ENUM_COMPARISON!>i<!> -> {}
         <!INCOMPATIBLE_ENUM_COMPARISON!>c<!> -> {}
         else -> {}
     }
@@ -90,10 +90,10 @@ fun foo6(e1: E1?, e2: E2) {
     e1 == null
     null == e1
 
-    e1 == E2.A
-    E2.A == e1
-    e1 == e2
-    e2 == e1
+    <!INCOMPATIBLE_ENUM_COMPARISON!>e1 == E2.A<!>
+    <!INCOMPATIBLE_ENUM_COMPARISON!>E2.A == e1<!>
+    <!INCOMPATIBLE_ENUM_COMPARISON!>e1 == e2<!>
+    <!INCOMPATIBLE_ENUM_COMPARISON!>e2 == e1<!>
 
     <!SENSELESS_COMPARISON!>e2 == null<!>
     <!SENSELESS_COMPARISON!>null == e2<!>
@@ -102,7 +102,7 @@ fun foo6(e1: E1?, e2: E2) {
 }
 
 fun foo7(e1: E1?, e2: E2?) {
-    e1 == e2 // There should be an IDE-inspection for such cases
+    <!INCOMPATIBLE_ENUM_COMPARISON!>e1 == e2<!> // There should be an IDE-inspection for such cases
 }
 
 fun <T> foo8(e1: E1?, e2: E2, t: T) {
