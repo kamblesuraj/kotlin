@@ -34,8 +34,8 @@ import org.jetbrains.org.objectweb.asm.Opcodes
 internal class SyntheticAccessorLowering(val context: JvmBackendContext) : FileLoweringPass {
     override fun lower(irFile: IrFile) {
         val pendingAccessorsToAdd = mutableSetOf<IrFunction>()
-        irFile.transformChildrenVoid(SyntheticAccessorTransformer(context, irFile.findInlineCallSites(context), pendingAccessorsToAdd))
-        for (accessor in pendingAccessorsToAdd.filter { it.fileOrNull == irFile }) {
+        irFile.transformChildrenVoid(SyntheticAccessorTransformer(context, irFile, pendingAccessorsToAdd))
+        for (accessor in pendingAccessorsToAdd) {
             (accessor.parent as IrDeclarationContainer).declarations.add(accessor)
         }
     }
@@ -99,13 +99,33 @@ internal class SyntheticAccessorLowering(val context: JvmBackendContext) : FileL
 
 private class SyntheticAccessorTransformer(
     val context: JvmBackendContext,
-    val inlineScopeResolver: IrInlineScopeResolver,
+    val irFile: IrFile,
     val pendingAccessorsToAdd: MutableSet<IrFunction>
 ) : IrElementTransformerVoidWithContext() {
     private val accessorGenerator = context.cachedDeclarations.syntheticAccessorGenerator
+    private val inlineScopeResolver: IrInlineScopeResolver = irFile.findInlineCallSites(context)
+    private var processingIrInlinedFun = false
+
+    private inline fun <T> withinIrInlinedFun(block: () -> T): T {
+        val oldProcessingInline = processingIrInlinedFun
+        try {
+            processingIrInlinedFun = true
+            return block()
+        } finally {
+            processingIrInlinedFun = oldProcessingInline
+        }
+    }
 
     private fun <T : IrFunctionSymbol> T.save(): T {
-        pendingAccessorsToAdd += this.owner
+        assert(owner.fileOrNull == irFile || processingIrInlinedFun) {
+            "SyntheticAccessorLowering should not attempt to modify other files!\n" +
+                    "While lowering this file: ${irFile.render()}\n" +
+                    "Trying to add this accessor: ${owner.render()}"
+        }
+
+        if (owner.fileOrNull == irFile) {
+            pendingAccessorsToAdd += this.owner
+        }
         return this
     }
 
@@ -273,9 +293,11 @@ private class SyntheticAccessorTransformer(
         if (expression is IrInlinedFunctionBlock && expression.isFunctionInlining()) {
             val callee = expression.inlineDeclaration
             val parentClass = callee.parentClassOrNull ?: return super.visitBlock(expression)
-            return withinScope(parentClass) {
-                withinScope(callee) {
-                    super.visitBlock(expression)
+            return withinIrInlinedFun {
+                withinScope(parentClass) {
+                    withinScope(callee) {
+                        super.visitBlock(expression)
+                    }
                 }
             }
         }
