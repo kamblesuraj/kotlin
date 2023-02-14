@@ -23,7 +23,6 @@
 #include "FixedBlockPage.hpp"
 #include "GCImpl.hpp"
 #include "TypeInfo.h"
-#include "Types.h"
 
 namespace kotlin::alloc {
 
