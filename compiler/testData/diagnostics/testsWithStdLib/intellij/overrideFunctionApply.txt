@@ -1,0 +1,30 @@
+package
+
+@ParametersAreNonnullByDefault /* annotation class not found */ public interface Function</*0*/ F, /*1*/ T> : java.util.function.Function<F, T> {
+    public open override /*1*/ /*fake_override*/ fun </*0*/ V : kotlin.Any!> andThen(/*0*/ p0: java.util.function.Function<in T!, out V!>!): java.util.function.Function<F!, V!>!
+    @java.lang.Override public abstract override /*1*/ fun apply(/*0*/ input: F): T
+    public open override /*1*/ /*fake_override*/ fun </*0*/ V : kotlin.Any!> compose(/*0*/ p0: java.util.function.Function<in V!, out F!>!): java.util.function.Function<V!, T!>!
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public final class Store : Function<Store.Key<*>?, kotlin.Any?> {
+    public constructor Store()
+    public open override /*1*/ /*fake_override*/ fun </*0*/ V : kotlin.Any!> andThen(/*0*/ p0: java.util.function.Function<in kotlin.Any?, out V!>!): java.util.function.Function<Store.Key<*>?, V!>!
+    public open override /*1*/ fun apply(/*0*/ input: Store.Key<*>?): kotlin.Any?
+    public open override /*1*/ /*fake_override*/ fun </*0*/ V : kotlin.Any!> compose(/*0*/ p0: java.util.function.Function<in V!, out Store.Key<*>?>!): java.util.function.Function<V!, kotlin.Any?>!
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+
+    public final data class Key</*0*/ T> {
+        public constructor Key</*0*/ T>(/*0*/ expectedClass: java.lang.Class<T>)
+        public final val expectedClass: java.lang.Class<T>
+        public final operator /*synthesized*/ fun component1(): java.lang.Class<T>
+        public final /*synthesized*/ fun copy(/*0*/ expectedClass: java.lang.Class<T> = ...): Store.Key<T>
+        public open override /*1*/ /*synthesized*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+        public open override /*1*/ /*synthesized*/ fun hashCode(): kotlin.Int
+        public open override /*1*/ /*synthesized*/ fun toString(): kotlin.String
+    }
+}

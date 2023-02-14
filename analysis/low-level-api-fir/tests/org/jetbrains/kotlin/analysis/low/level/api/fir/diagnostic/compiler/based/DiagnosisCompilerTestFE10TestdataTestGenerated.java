@@ -39471,6 +39471,12 @@ public class DiagnosisCompilerTestFE10TestdataTestGenerated extends AbstractDiag
             }
 
             @Test
+            @TestMetadata("overrideFunctionApply.kt")
+            public void testOverrideFunctionApply() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/overrideFunctionApply.kt");
+            }
+
+            @Test
             @TestMetadata("smartCastOnAlienPropertyFromInnerClass.kt")
             public void testSmartCastOnAlienPropertyFromInnerClass() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/smartCastOnAlienPropertyFromInnerClass.kt");
