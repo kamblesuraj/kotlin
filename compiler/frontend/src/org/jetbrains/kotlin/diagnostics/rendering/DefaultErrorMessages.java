@@ -487,6 +487,11 @@ public class DefaultErrorMessages {
                 "Extension receiver type mismatch: inferred type is {1} but {0} was expected. This warning will be an error soon. See https://youtrack.jetbrains.com/issue/KT-49404 for details",
                 RENDER_TYPE, RENDER_TYPE
         );
+        MAP.put(
+                RECEIVER_TYPE_MISMATCH_WARNING_FOR_BUILDER_INFERENCE,
+                "Extension receiver type mismatch in builder inference: inferred type is {1} but {0} was expected. This warning will be an error soon. See https://youtrack.jetbrains.com/issue/KT-55056 for details",
+                RENDER_TYPE, RENDER_TYPE
+        );
         MAP.put(LOCAL_EXTENSION_PROPERTY, "Local extension properties are not allowed");
         MAP.put(LOCAL_VARIABLE_WITH_GETTER, "Local variables are not allowed to have getters");
         MAP.put(LOCAL_VARIABLE_WITH_SETTER, "Local variables are not allowed to have setters");

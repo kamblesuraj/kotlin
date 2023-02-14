@@ -1,0 +1,13 @@
+/inconsistentTypeInference.kt:6:9: warning: extension receiver type mismatch in builder inference: inferred type is String but Int was expected. This warning will be an error soon. See https://youtrack.jetbrains.com/issue/KT-55056 for details
+        add("Boom")
+        ^
+/inconsistentTypeInference.kt:7:9: warning: extension receiver type mismatch in builder inference: inferred type is String but Int was expected. This warning will be an error soon. See https://youtrack.jetbrains.com/issue/KT-55056 for details
+        println(plus(1)[0])
+        ^
+/inconsistentTypeInference.kt:7:17: warning: extension receiver type mismatch in builder inference: inferred type is String but Int was expected. This warning will be an error soon. See https://youtrack.jetbrains.com/issue/KT-55056 for details
+        println(plus(1)[0])
+                ^
+/inconsistentTypeInference.kt:7:17: warning: extension receiver type mismatch in builder inference: inferred type is String but Int was expected. This warning will be an error soon. See https://youtrack.jetbrains.com/issue/KT-55056 for details
+        println(plus(1)[0])
+                ^
+

@@ -471,7 +471,17 @@ class DiagnosticReporterByTrackingStrategy(
                 return
             }
 
-            val expression = argument.psiExpression ?: return
+            val expression = argument.psiExpression ?: run {
+                val calleeExpression = psiKotlinCall.psiCall.calleeExpression
+                if (calleeExpression != null) {
+                    report(
+                        RECEIVER_TYPE_MISMATCH_WARNING_FOR_BUILDER_INFERENCE.on(
+                            calleeExpression, error.upperKotlinType, error.lowerKotlinType
+                        )
+                    )
+                }
+                return
+            }
             val deparenthesized = KtPsiUtil.safeDeparenthesize(expression)
             if (reportConstantTypeMismatch(error, deparenthesized)) return
 

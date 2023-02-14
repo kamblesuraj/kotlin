@@ -51,8 +51,8 @@ val test6 = generate {
 }
 
 val test7 = generate {
-    yield(<!TYPE_MISMATCH!>"baz"<!>)
-    genericExtension<Int>()
+    <!RECEIVER_TYPE_MISMATCH_WARNING_FOR_BUILDER_INFERENCE!>yield<!>(<!TYPE_MISMATCH!>"baz"<!>)
+    <!RECEIVER_TYPE_MISMATCH_WARNING_FOR_BUILDER_INFERENCE!>genericExtension<!><Int>()
 }
 
 val test8 = generate {

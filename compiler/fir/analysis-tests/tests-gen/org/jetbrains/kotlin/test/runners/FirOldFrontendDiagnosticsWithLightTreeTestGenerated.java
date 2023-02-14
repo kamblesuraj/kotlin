@@ -36681,6 +36681,18 @@ public class FirOldFrontendDiagnosticsWithLightTreeTestGenerated extends Abstrac
             }
 
             @Test
+            @TestMetadata("inconsistentTypeInference.kt")
+            public void testInconsistentTypeInference() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/builderInference/inconsistentTypeInference.kt");
+            }
+
+            @Test
+            @TestMetadata("inconsistentTypeInference2.kt")
+            public void testInconsistentTypeInference2() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/builderInference/inconsistentTypeInference2.kt");
+            }
+
+            @Test
             @TestMetadata("incorrectCalls.kt")
             public void testIncorrectCalls() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/builderInference/incorrectCalls.kt");
