@@ -16,7 +16,7 @@
 #include "ObjectTraversal.hpp"
 #include "RootSet.hpp"
 #include "Runtime.h"
-#include "StableRefRegistry.hpp"
+#include "SpecialRefRegistry.hpp"
 #include "ThreadData.hpp"
 #include "Types.h"
 
@@ -108,26 +108,30 @@ void Mark(GCHandle handle, typename Traits::MarkQueue& markQueue) noexcept {
 }
 
 template <typename Traits>
-void SweepExtraObjects(GCHandle handle, typename Traits::ExtraObjectsFactory& objectFactory) noexcept {
-    objectFactory.ProcessDeletions();
+void SweepExtraObjects(GCHandle handle, typename Traits::ExtraObjectsFactory::Iterable& factoryIter) noexcept {
     auto sweepHandle = handle.sweepExtraObjects();
-    auto iter = objectFactory.LockForIter();
-    for (auto it = iter.begin(); it != iter.end();) {
+    factoryIter.ApplyDeletions();
+    for (auto it = factoryIter.begin(); it != factoryIter.end();) {
         auto &extraObject = *it;
         if (!extraObject.getFlag(mm::ExtraObjectData::FLAGS_IN_FINALIZER_QUEUE) && !Traits::IsMarkedByExtraObject(extraObject)) {
             extraObject.ClearWeakReferenceCounter();
             if (extraObject.HasAssociatedObject()) {
-                extraObject.DetachAssociatedObject();
                 extraObject.setFlag(mm::ExtraObjectData::FLAGS_IN_FINALIZER_QUEUE);
                 ++it;
             } else {
                 extraObject.Uninstall();
-                objectFactory.EraseAndAdvance(it);
+                it.EraseAndAdvance();
             }
         } else {
             ++it;
         }
     }
+}
+
+template <typename Traits>
+void SweepExtraObjects(GCHandle handle, typename Traits::ExtraObjectsFactory& factory) noexcept {
+    auto iter = factory.LockForIter();
+    return SweepExtraObjects<Traits>(handle, iter);
 }
 
 template <typename Traits>
@@ -179,7 +183,6 @@ void collectRootSetForThread(GCHandle gcHandle, typename Traits::MarkQueue& mark
 template <typename Traits>
 void collectRootSetGlobals(GCHandle gcHandle, typename Traits::MarkQueue& markQueue) noexcept {
     auto handle = gcHandle.collectGlobalRoots();
-    mm::StableRefRegistry::Instance().ProcessDeletions();
     // TODO: Remove useless mm::GlobalRootSet abstraction.
     for (auto value : mm::GlobalRootSet()) {
         if (internal::collectRoot<Traits>(markQueue, value.object)) {
@@ -206,6 +209,26 @@ void collectRootSet(GCHandle handle, typename Traits::MarkQueue& markQueue, F&& 
         collectRootSetForThread<Traits>(handle, markQueue, thread);
     }
     collectRootSetGlobals<Traits>(handle, markQueue);
+}
+
+template <typename Traits>
+void processWeaks(GCHandle gcHandle, mm::SpecialRefRegistry& registry) noexcept {
+    for (auto& object : registry.lockForIter()) {
+        // This loop is the only place where we modify object. And it's only ever
+        // executed on a single thread.
+        auto* obj = object.load(std::memory_order_relaxed);
+        if (!obj) {
+            // We already processed it at some point.
+            continue;
+        }
+        if (obj->permanent() || Traits::IsMarked(obj)) {
+            // TODO: Let's not put permanent objects in here at all?
+            // Object is alive. Nothing to do.
+            continue;
+        }
+        // Object is not alive. Clear it out.
+        object.store(nullptr, std::memory_order_release);
+    }
 }
 
 } // namespace gc

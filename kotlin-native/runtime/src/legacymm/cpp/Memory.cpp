@@ -3085,7 +3085,7 @@ void ObjHeader::destroyMetaObject(ObjHeader* object) {
   }
 
 #ifdef KONAN_OBJC_INTEROP
-  Kotlin_ObjCExport_detachAndReleaseAssociatedObject(meta->associatedObject_);
+  Kotlin_ObjCExport_releaseAssociatedObject(meta->associatedObject_);
 #endif
 
   std_support::allocator_delete(objectAllocator, meta);
@@ -3240,10 +3240,6 @@ RUNTIME_NOTHROW void ReleaseHeapRefNoCollectStrict(const ObjHeader* object) {
 }
 RUNTIME_NOTHROW void ReleaseHeapRefNoCollectRelaxed(const ObjHeader* object) {
   releaseHeapRef<false, /* CanCollect = */ false>(const_cast<ObjHeader*>(object));
-}
-
-RUNTIME_NOTHROW OBJ_GETTER(TryRef, ObjHeader* object) {
-    RuntimeFail("Only for experimental MM");
 }
 
 ForeignRefContext InitLocalForeignRef(ObjHeader* object) {
@@ -3734,6 +3730,10 @@ RUNTIME_NOTHROW ALWAYS_INLINE void Kotlin_processEmptyObjectInMark(void* state, 
     // no-op, used by the new MM only.
 }
 
+RUNTIME_NOTHROW void DisposeWeakReferenceCounter(ObjHeader* counter) {
+    RuntimeFail("New MM only");
+}
+
 } // extern "C"
 
 #if !KONAN_NO_EXCEPTIONS
@@ -3784,5 +3784,3 @@ void kotlin::StartFinalizerThreadIfNeeded() noexcept {}
 bool kotlin::FinalizersThreadIsRunning() noexcept {
     return false;
 }
-
-

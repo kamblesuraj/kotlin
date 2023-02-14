@@ -7,11 +7,17 @@
 
 #include <cstdint>
 #include <pthread.h>
+
 #include "Common.h"
-#include "ThreadData.hpp"
+#include "Porting.h"
+#include "Utils.hpp"
 
 #define GCLogInfo(epoch, format, ...) RuntimeLogInfo({kTagGC}, "Epoch #%" PRIu64 ": " format, epoch, ##__VA_ARGS__)
 #define GCLogDebug(epoch, format, ...) RuntimeLogDebug({kTagGC}, "Epoch #%" PRIu64 ": " format, epoch, ##__VA_ARGS__)
+
+namespace kotlin::mm {
+class ThreadData;
+}
 
 namespace kotlin::gc {
 

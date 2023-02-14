@@ -22,6 +22,7 @@
 #include "SingleThreadExecutor.hpp"
 #include "TestSupport.hpp"
 #include "ThreadData.hpp"
+#include "WeakRef.hpp"
 #include "std_support/Vector.hpp"
 
 using namespace kotlin;
@@ -42,20 +43,8 @@ struct Payload {
     };
 };
 
-// TODO: This should go into test support for weak references.
-struct WeakCounterPayload {
-    void* referred;
-    KInt lock;
-    KInt cookie;
-
-    static constexpr std::array<ObjHeader * WeakCounterPayload::*, 0> kFields{};
-};
-
-using WeakCounter = test_support::Object<WeakCounterPayload>;
-
 test_support::TypeInfoHolder typeHolder{test_support::TypeInfoHolder::ObjectBuilder<Payload>()};
 test_support::TypeInfoHolder typeHolderWithFinalizer{test_support::TypeInfoHolder::ObjectBuilder<Payload>().addFlag(TF_HAS_FINALIZER)};
-test_support::TypeInfoHolder typeHolderWeakCounter{test_support::TypeInfoHolder::ObjectBuilder<WeakCounterPayload>()};
 
 // TODO: Clean GlobalObjectHolder after it's gone.
 class GlobalObjectHolder : private Pinned {
@@ -204,13 +193,14 @@ bool IsMarked(ObjHeader* objHeader) {
     return nodeRef.ObjectData().marked();
 }
 
-WeakCounter& InstallWeakCounter(mm::ThreadData& threadData, ObjHeader* objHeader, ObjHeader** location) {
-    mm::AllocateObject(&threadData, typeHolderWeakCounter.typeInfo(), location);
-    auto& weakCounter = WeakCounter::FromObjHeader(*location);
+test_support::WeakReferenceCounter& InstallWeakCounter(mm::ThreadData& threadData, ObjHeader* objHeader, ObjHeader** location) {
+    mm::AllocateObject(&threadData, theWeakReferenceCounterTypeInfo, location);
+    auto& weakCounter = test_support::WeakReferenceCounter::FromObjHeader(*location);
     auto& extraObjectData = mm::ExtraObjectData::GetOrInstall(objHeader);
+    weakCounter->weakRef = static_cast<void*>(mm::WeakRef::create(objHeader));
+    weakCounter->referred = objHeader;
     auto *setCounter = extraObjectData.GetOrSetWeakReferenceCounter(objHeader, weakCounter.header());
     EXPECT_EQ(setCounter, weakCounter.header());
-    weakCounter->referred = objHeader;
     return weakCounter;
 }
 
@@ -223,6 +213,7 @@ public:
 
     ~ConcurrentMarkAndSweepTest() {
         mm::GlobalsRegistry::Instance().ClearForTests();
+        mm::SpecialRefRegistry::instance().clearForTests();
         mm::GlobalData::Instance().extraObjectDataFactory().ClearForTests();
         mm::GlobalData::Instance().gc().ClearForTests();
     }
@@ -349,9 +340,9 @@ TEST_P(ConcurrentMarkAndSweepTest, FreeObjectsWithFinalizers) {
 }
 
 TEST_P(ConcurrentMarkAndSweepTest, FreeObjectWithFreeWeak) {
-    RunInNewThread([](mm::ThreadData& threadData) {
+    RunInNewThread([this](mm::ThreadData& threadData) {
         auto& object1 = AllocateObject(threadData);
-        auto& weak1 = ([&threadData, &object1]() -> WeakCounter& {
+        auto& weak1 = ([&threadData, &object1]() -> test_support::WeakReferenceCounter& {
             ObjHolder holder;
             return InstallWeakCounter(threadData, object1.header(), holder.slot());
         })();
@@ -359,8 +350,9 @@ TEST_P(ConcurrentMarkAndSweepTest, FreeObjectWithFreeWeak) {
         ASSERT_THAT(Alive(threadData), testing::UnorderedElementsAre(object1.header(), weak1.header()));
         ASSERT_THAT(IsMarked(object1.header()), false);
         ASSERT_THAT(IsMarked(weak1.header()), false);
-        ASSERT_THAT(weak1->referred, object1.header());
+        ASSERT_THAT(weak1.get(), object1.header());
 
+        EXPECT_CALL(finalizerHook(), Call(weak1.header()));
         threadData.gc().ScheduleAndWaitFullGCWithFinalizers();
 
         EXPECT_THAT(Alive(threadData), testing::UnorderedElementsAre());
@@ -376,13 +368,13 @@ TEST_P(ConcurrentMarkAndSweepTest, FreeObjectWithHoldedWeak) {
         ASSERT_THAT(Alive(threadData), testing::UnorderedElementsAre(object1.header(), weak1.header(), stack.header()));
         ASSERT_THAT(IsMarked(object1.header()), false);
         ASSERT_THAT(IsMarked(weak1.header()), false);
-        ASSERT_THAT(weak1->referred, object1.header());
+        ASSERT_THAT(weak1.get(), object1.header());
 
         threadData.gc().ScheduleAndWaitFullGC();
 
         EXPECT_THAT(Alive(threadData), testing::UnorderedElementsAre(weak1.header(), stack.header()));
         EXPECT_THAT(IsMarked(weak1.header()), false);
-        EXPECT_THAT(weak1->referred, nullptr);
+        EXPECT_THAT(weak1.get(), nullptr);
     });
 }
 
@@ -971,14 +963,14 @@ TEST_P(ConcurrentMarkAndSweepTest, CrossThreadReference) {
 TEST_P(ConcurrentMarkAndSweepTest, MultipleMutatorsWeaks) {
     std_support::vector<Mutator> mutators(kDefaultThreadCount);
     ObjHeader* globalRoot = nullptr;
-    WeakCounter* weak = nullptr;
+    test_support::WeakReferenceCounter* weak = nullptr;
 
     mutators[0]
             .Execute([&weak, &globalRoot](mm::ThreadData& threadData, Mutator& mutator) {
                 auto& global = mutator.AddGlobalRoot();
 
                 auto& object = AllocateObject(threadData);
-                auto& objectWeak = ([&threadData, &object]() -> WeakCounter& {
+                auto& objectWeak = ([&threadData, &object]() -> test_support::WeakReferenceCounter& {
                     ObjHolder holder;
                     return InstallWeakCounter(threadData, object.header(), holder.slot());
                 })();
@@ -997,7 +989,7 @@ TEST_P(ConcurrentMarkAndSweepTest, MultipleMutatorsWeaks) {
 
     gcFutures[0] = mutators[0].Execute([weak](mm::ThreadData& threadData, Mutator& mutator) {
         threadData.gc().ScheduleAndWaitFullGC();
-        EXPECT_THAT((*weak)->referred, nullptr);
+        EXPECT_THAT(weak->get(), nullptr);
     });
 
     // Spin until thread suspension is requested.
@@ -1007,7 +999,7 @@ TEST_P(ConcurrentMarkAndSweepTest, MultipleMutatorsWeaks) {
     for (int i = 1; i < kDefaultThreadCount; ++i) {
         gcFutures[i] = mutators[i].Execute([weak](mm::ThreadData& threadData, Mutator& mutator) {
             threadData.gc().SafePointFunctionPrologue();
-            EXPECT_THAT((*weak)->referred, nullptr);
+            EXPECT_THAT(weak->get(), nullptr);
         });
     }
 
@@ -1105,7 +1097,7 @@ TEST_P(ConcurrentMarkAndSweepTest, NewThreadsWhileRequestingCollection) {
 TEST_P(ConcurrentMarkAndSweepTest, FreeObjectWithFreeWeakReversedOrder) {
     std_support::vector<Mutator> mutators(2);
     std::atomic<test_support::Object<Payload>*> object1 = nullptr;
-    std::atomic<WeakCounter*> weak = nullptr;
+    std::atomic<test_support::WeakReferenceCounter*> weak = nullptr;
     std::atomic<bool> done = false;
     auto f0 = mutators[0].Execute([&](mm::ThreadData& threadData, Mutator &) {
         GlobalObjectHolder global1{threadData};
@@ -1120,10 +1112,11 @@ TEST_P(ConcurrentMarkAndSweepTest, FreeObjectWithFreeWeakReversedOrder) {
         ASSERT_THAT(IsMarked(global1.header()), false);
         ASSERT_THAT(IsMarked(object1_local.header()), false);
         ASSERT_THAT(IsMarked(weak.load()->header()), false);
-        ASSERT_THAT((*weak.load())->referred, object1_local.header());
+        ASSERT_THAT(weak.load()->get(), object1_local.header());
 
         global1->field1 = nullptr;
 
+        EXPECT_CALL(finalizerHook(), Call(weak.load()->header()));
         threadData.gc().ScheduleAndWaitFullGC();
 
         EXPECT_THAT(Alive(threadData), testing::UnorderedElementsAre(global1.header()));

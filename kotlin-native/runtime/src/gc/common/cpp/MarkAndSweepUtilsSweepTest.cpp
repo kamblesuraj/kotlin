@@ -14,6 +14,7 @@
 #include "ObjectFactory.hpp"
 #include "ObjectTestSupport.hpp"
 #include "ExtraObjectDataFactory.hpp"
+#include "WeakRef.hpp"
 
 using namespace kotlin;
 
@@ -31,18 +32,8 @@ struct Payload {
     };
 };
 
-// TODO: This should go into test support for weak references.
-struct WeakCounterPayload {
-    void* referred;
-    KInt lock;
-    KInt cookie;
-
-    static constexpr std::array<ObjHeader * WeakCounterPayload::*, 0> kFields{};
-};
-
 test_support::TypeInfoHolder typeHolder{test_support::TypeInfoHolder::ObjectBuilder<Payload>()};
 test_support::TypeInfoHolder typeHolderWithFinalizer{test_support::TypeInfoHolder::ObjectBuilder<Payload>().addFlag(TF_HAS_FINALIZER)};
-test_support::TypeInfoHolder typeHolderWeakCounter{test_support::TypeInfoHolder::ObjectBuilder<WeakCounterPayload>()};
 
 struct ObjectFactoryTraits {
     struct ObjectData {
@@ -134,13 +125,11 @@ private:
     ObjectFactoryTraits::ObjectData& objectData() { return ObjectFactory::NodeRef::From(header()).ObjectData(); }
 };
 
-using WeakCounter = test_support::Object<WeakCounterPayload>;
-
-void MarkWeakCounter(WeakCounter& counter) {
+void MarkWeakCounter(test_support::WeakReferenceCounter& counter) {
     ObjectFactory::NodeRef::From(counter.header()).ObjectData().state = ObjectFactoryTraits::ObjectData::State::kMarked;
 }
 
-ObjectFactoryTraits::ObjectData::State GetWeakCounterState(WeakCounter& counter) {
+ObjectFactoryTraits::ObjectData::State GetWeakCounterState(test_support::WeakReferenceCounter& counter) {
     return ObjectFactory::NodeRef::From(counter.header()).ObjectData().state;
 }
 
@@ -164,6 +153,13 @@ struct SweepTraits {
             case ObjectFactoryTraits::ObjectData::State::kMarkReset:
                 RuntimeFail("Trying to reset mark twice.");
         }
+    }
+};
+
+struct ProcessWeakTraits {
+    static bool IsMarked(ObjHeader* object) noexcept {
+        auto& objectData = ObjectFactory::NodeRef::From(object).ObjectData();
+        return objectData.state != ObjectFactoryTraits::ObjectData::State::kUnmarked;
     }
 };
 
@@ -199,6 +195,7 @@ public:
     }
 
     std_support::vector<ObjHeader*> Sweep() {
+        gc::processWeaks<ProcessWeakTraits>(gc::GCHandle::getByEpoch(0), specialRefRegistry_);
         gc::SweepExtraObjects<SweepTraits>(gc::GCHandle::getByEpoch(0), extraObjectFactory_);
         auto finalizers = gc::Sweep<SweepTraits>(gc::GCHandle::getByEpoch(0), objectFactory_);
         std_support::vector<ObjHeader*> objects;
@@ -250,14 +247,16 @@ public:
         return *mm::ExtraObjectData::Get(objHeader);
     }
 
-    WeakCounter& InstallWeakCounter(ObjHeader *objHeader) {
-        auto* weakCounterHeader = objectFactoryThreadQueue_.CreateObject(typeHolderWeakCounter.typeInfo());
+    test_support::WeakReferenceCounter& InstallWeakCounter(ObjHeader* objHeader) {
+        auto* weakCounterHeader = objectFactoryThreadQueue_.CreateObject(theWeakReferenceCounterTypeInfo);
         objectFactoryThreadQueue_.Publish();
-        auto& weakCounter = WeakCounter::FromObjHeader(weakCounterHeader);
+        auto& weakCounter = test_support::WeakReferenceCounter::FromObjHeader(weakCounterHeader);
         auto& extraObjectData = InstallExtraData(objHeader);
         auto *setHeader = extraObjectData.GetOrSetWeakReferenceCounter(objHeader, weakCounter.header());
         EXPECT_EQ(setHeader,  weakCounter.header());
+        weakCounter->weakRef = static_cast<void*>(specialRefRegistryThreadQueue_.createWeakRef(objHeader));
         weakCounter->referred = objHeader;
+        specialRefRegistryThreadQueue_.publish();
         return weakCounter;
     }
 
@@ -271,6 +270,9 @@ private:
     ObjectFactory::ThreadQueue objectFactoryThreadQueue_{objectFactory_, gc::Allocator()};
     ExtraObjectsDataFactory extraObjectFactory_;
     ExtraObjectsDataFactory::ThreadQueue extraObjectFactoryThreadQueue_{extraObjectFactory_};
+    mm::SpecialRefRegistry specialRefRegistry_;
+    mm::SpecialRefRegistry::ThreadQueue specialRefRegistryThreadQueue_{specialRefRegistry_};
+
     std_support::vector<ObjectFactory::FinalizerQueue> finalizers_;
 };
 
@@ -458,8 +460,10 @@ TEST_F(MarkAndSweepUtilsSweepTest, SweepSingleObjectWithWeakCounter) {
 
     auto finalizers = Sweep();
 
-    EXPECT_THAT(finalizers, testing::UnorderedElementsAre());
+    EXPECT_THAT(finalizers, testing::UnorderedElementsAre(weakCounter.header()));
     EXPECT_THAT(Alive(), testing::UnorderedElementsAre());
+
+    EXPECT_CALL(finalizerHook(), Call(weakCounter.header()));
 }
 
 TEST_F(MarkAndSweepUtilsSweepTest, SweepSingleObjectArrayWithWeakCounter) {
@@ -469,8 +473,10 @@ TEST_F(MarkAndSweepUtilsSweepTest, SweepSingleObjectArrayWithWeakCounter) {
 
     auto finalizers = Sweep();
 
-    EXPECT_THAT(finalizers, testing::UnorderedElementsAre());
+    EXPECT_THAT(finalizers, testing::UnorderedElementsAre(weakCounter.header()));
     EXPECT_THAT(Alive(), testing::UnorderedElementsAre());
+
+    EXPECT_CALL(finalizerHook(), Call(weakCounter.header()));
 }
 
 TEST_F(MarkAndSweepUtilsSweepTest, SweepSingleCharArrayWithWeakCounter) {
@@ -480,8 +486,10 @@ TEST_F(MarkAndSweepUtilsSweepTest, SweepSingleCharArrayWithWeakCounter) {
 
     auto finalizers = Sweep();
 
-    EXPECT_THAT(finalizers, testing::UnorderedElementsAre());
+    EXPECT_THAT(finalizers, testing::UnorderedElementsAre(weakCounter.header()));
     EXPECT_THAT(Alive(), testing::UnorderedElementsAre());
+
+    EXPECT_CALL(finalizerHook(), Call(weakCounter.header()));
 }
 
 TEST_F(MarkAndSweepUtilsSweepTest, SweepSingleMarkedObjectWithWeakCounter) {
@@ -498,7 +506,7 @@ TEST_F(MarkAndSweepUtilsSweepTest, SweepSingleMarkedObjectWithWeakCounter) {
     EXPECT_THAT(object.state(), ObjectFactoryTraits::ObjectData::State::kMarkReset);
     EXPECT_THAT(GetWeakCounterState(weakCounter), ObjectFactoryTraits::ObjectData::State::kMarkReset);
     EXPECT_TRUE(object.HasWeakCounter());
-    EXPECT_NE(weakCounter->referred, nullptr);
+    EXPECT_NE(weakCounter.get(), nullptr);
 }
 
 TEST_F(MarkAndSweepUtilsSweepTest, SweepSingleMarkedObjectArrayWithWeakCounter) {
@@ -515,7 +523,7 @@ TEST_F(MarkAndSweepUtilsSweepTest, SweepSingleMarkedObjectArrayWithWeakCounter) 
     EXPECT_THAT(array.state(), ObjectFactoryTraits::ObjectData::State::kMarkReset);
     EXPECT_THAT(GetWeakCounterState(weakCounter), ObjectFactoryTraits::ObjectData::State::kMarkReset);
     EXPECT_TRUE(array.HasWeakCounter());
-    EXPECT_NE(weakCounter->referred, nullptr);
+    EXPECT_NE(weakCounter.get(), nullptr);
 }
 
 TEST_F(MarkAndSweepUtilsSweepTest, SweepSingleMarkedCharArrayWithWeakCounter) {
@@ -532,7 +540,7 @@ TEST_F(MarkAndSweepUtilsSweepTest, SweepSingleMarkedCharArrayWithWeakCounter) {
     EXPECT_THAT(array.state(), ObjectFactoryTraits::ObjectData::State::kMarkReset);
     EXPECT_THAT(GetWeakCounterState(weakCounter), ObjectFactoryTraits::ObjectData::State::kMarkReset);
     EXPECT_TRUE(array.HasWeakCounter());
-    EXPECT_NE(weakCounter->referred, nullptr);
+    EXPECT_NE(weakCounter.get(), nullptr);
 }
 
 TEST_F(MarkAndSweepUtilsSweepTest, SweepObjects) {

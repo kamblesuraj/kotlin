@@ -47,14 +47,13 @@ public:
     std::atomic<void*>& AssociatedObject() noexcept { return associatedObject_; }
 #endif
     bool HasAssociatedObject() noexcept;
-    void DetachAssociatedObject() noexcept;
 
     bool getFlag(Flags value) noexcept { return (flags_.load() & (1u << static_cast<uint32_t>(value))) != 0; }
     void setFlag(Flags value) noexcept { flags_.fetch_or(1u << static_cast<uint32_t>(value)); }
 
 
     bool HasWeakReferenceCounter() noexcept { return hasPointerBits(weakReferenceCounterOrBaseObject_.load(), WEAK_REF_TAG); }
-    void ClearWeakReferenceCounter() noexcept;
+    void ClearWeakReferenceCounter() noexcept; // TODO: Only exists for the sake of GetBaseObject. Refactor to remove the need for it.
     ObjHeader* GetWeakReferenceCounter() noexcept {
         auto *pointer = weakReferenceCounterOrBaseObject_.load();
         if (hasPointerBits(pointer, WEAK_REF_TAG)) return clearPointerBits(pointer, WEAK_REF_TAG);
@@ -70,7 +69,7 @@ public:
     ObjHeader* GetBaseObject() noexcept {
         auto *header = weakReferenceCounterOrBaseObject_.load();
         if (hasPointerBits(header, WEAK_REF_TAG)) {
-            return UnsafeWeakReferenceCounterGet(clearPointerBits(header, WEAK_REF_TAG));
+            return weakReferenceCounterBaseObjectUnsafe(clearPointerBits(header, WEAK_REF_TAG));
         } else {
             return header;
         }

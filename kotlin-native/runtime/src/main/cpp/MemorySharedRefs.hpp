@@ -30,16 +30,14 @@ class KRefSharedHolder {
 
   void dispose() const;
 
-  void disposeFromNative() const {
-    kotlin::CalledFromNativeGuard guard;
-    dispose();
-  }
-
   OBJ_GETTER0(describe) const;
 
  private:
   ObjHeader* obj_;
-  ForeignRefContext context_;
+  union {
+    ForeignRefContext context_; // Legacy MM.
+    void* stablePointer_; // New MM.
+  };
 };
 
 static_assert(std::is_trivially_destructible_v<KRefSharedHolder>, "KRefSharedHolder destructor is not guaranteed to be called.");
@@ -58,17 +56,25 @@ class BackRefFromAssociatedObject {
 
   void releaseRef();
 
+  // This does nothing with the new MM.
   void detach();
-  void assertDetached();
+
+  // This does nothing with legacy MM.
+  void dealloc();
 
   // Error if called from the wrong worker with non-frozen obj_.
   template <ErrorPolicy errorPolicy>
   ObjHeader* ref() const;
 
  private:
-  ObjHeader* obj_; // May be null before [initAndAddRef] or after [detach].
-  ForeignRefContext context_;
-  volatile int refCount;
+  union {
+    struct {
+      ObjHeader* obj_; // May be null before [initAndAddRef] or after [detach].
+      ForeignRefContext context_;
+      volatile int refCount;
+    }; // Legacy MM
+    ForeignRefContext foreignRef_; // New MM
+  };
 };
 
 static_assert(

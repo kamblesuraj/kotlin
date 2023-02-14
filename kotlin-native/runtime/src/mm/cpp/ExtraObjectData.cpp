@@ -63,12 +63,6 @@ void mm::ExtraObjectData::Uninstall() noexcept {
 #endif
 }
 
-void mm::ExtraObjectData::DetachAssociatedObject() noexcept {
-#ifdef KONAN_OBJC_INTEROP
-    Kotlin_ObjCExport_detachAssociatedObject(associatedObject_);
-#endif
-}
-
 bool mm::ExtraObjectData::HasAssociatedObject() noexcept {
 #ifdef KONAN_OBJC_INTEROP
     return associatedObject_ != nullptr;
@@ -77,12 +71,8 @@ bool mm::ExtraObjectData::HasAssociatedObject() noexcept {
 #endif
 }
 
-
 void mm::ExtraObjectData::ClearWeakReferenceCounter() noexcept {
-    if (!HasWeakReferenceCounter()) return;
-
     auto *object = GetBaseObject();
-    WeakReferenceCounterClear(GetWeakReferenceCounter());
     // Not using `mm::SetHeapRef here`, because this code is called during sweep phase by the GC thread,
     // and so cannot affect marking.
     // TODO: Asserts on the above?

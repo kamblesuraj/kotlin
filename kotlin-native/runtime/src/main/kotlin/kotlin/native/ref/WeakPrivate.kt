@@ -6,11 +6,7 @@
 package kotlin.native.ref
 
 import kotlinx.cinterop.COpaquePointer
-import kotlin.native.internal.ExportForCppRuntime
-import kotlin.native.internal.Frozen
-import kotlin.native.internal.GCUnsafeCall
-import kotlin.native.internal.NoReorderFields
-import kotlin.native.internal.Escapes
+import kotlin.native.internal.*
 
 /**
  *   Theory of operations:
@@ -38,13 +34,24 @@ import kotlin.native.internal.Escapes
 @NoReorderFields
 @Frozen
 @OptIn(FreezingIsDeprecated::class)
-internal class WeakReferenceCounter(var referred: COpaquePointer?) : WeakReferenceImpl() {
+internal class WeakReferenceCounterLegacyMM(var referred: COpaquePointer?) : WeakReferenceImpl() {
     // Spinlock, potentially taken when materializing or removing 'referred' object.
     var lock: Int = 0
 
     // Optimization for concurrent access.
     var cookie: Int = 0
 
+    @GCUnsafeCall("Konan_WeakReferenceCounterLegacyMM_get")
+    external override fun get(): Any?
+}
+
+@NoReorderFields
+@ExportTypeInfo("theWeakReferenceCounterTypeInfo")
+@HasFinalizer // TODO: Consider just using Cleaners.
+internal class WeakReferenceCounter(
+    val weakRef: COpaquePointer,
+    val referred: COpaquePointer, // TODO: This exists only for the ExtraObjectData's sake. Refactor and remove.
+) : WeakReferenceImpl() {
     @GCUnsafeCall("Konan_WeakReferenceCounter_get")
     external override fun get(): Any?
 }
@@ -59,9 +66,13 @@ internal abstract class WeakReferenceImpl {
 @Escapes(0b01) // referent escapes.
 external internal fun getWeakReferenceImpl(referent: Any): WeakReferenceImpl
 
+// Create a counter object for legacy MM.
+@ExportForCppRuntime
+internal fun makeWeakReferenceCounterLegacyMM(referred: COpaquePointer) = WeakReferenceCounterLegacyMM(referred)
+
 // Create a counter object.
 @ExportForCppRuntime
-internal fun makeWeakReferenceCounter(referred: COpaquePointer) = WeakReferenceCounter(referred)
+internal fun makeWeakReferenceCounter(weakRef: COpaquePointer, referred: COpaquePointer) = WeakReferenceCounter(weakRef, referred)
 
 internal class PermanentWeakReferenceImpl(val referred: Any): kotlin.native.ref.WeakReferenceImpl() {
     override fun get(): Any? = referred

@@ -50,6 +50,8 @@ kotlin::test_support::TypeInfoHolder theUnitTypeInfoHolder{kotlin::test_support:
 kotlin::test_support::TypeInfoHolder theWorkerBoundReferenceTypeInfoHolder{
         kotlin::test_support::TypeInfoHolder::ObjectBuilder<EmptyPayload>()};
 kotlin::test_support::TypeInfoHolder theCleanerImplTypeInfoHolder{kotlin::test_support::TypeInfoHolder::ObjectBuilder<EmptyPayload>()};
+kotlin::test_support::TypeInfoHolder theWeakReferenceCounterTypeInfoHolder{
+        kotlin::test_support::TypeInfoHolder::ObjectBuilder<kotlin::test_support::WeakReferenceCounterPayload>().addFlag(TF_HAS_FINALIZER)};
 
 ArrayHeader theEmptyStringImpl = {theStringTypeInfoHolder.typeInfo(), /* element count */ 0};
 
@@ -90,6 +92,7 @@ extern const TypeInfo* theThrowableTypeInfo = theThrowableTypeInfoHolder.typeInf
 extern const TypeInfo* theUnitTypeInfo = theUnitTypeInfoHolder.typeInfo();
 extern const TypeInfo* theWorkerBoundReferenceTypeInfo = theWorkerBoundReferenceTypeInfoHolder.typeInfo();
 extern const TypeInfo* theCleanerImplTypeInfo = theCleanerImplTypeInfoHolder.typeInfo();
+extern const TypeInfo* theWeakReferenceCounterTypeInfo = theWeakReferenceCounterTypeInfoHolder.typeInfo();
 
 extern const ArrayHeader theEmptyArray = {theArrayTypeInfoHolder.typeInfo(), /* element count */ 0};
 
@@ -98,6 +101,10 @@ OBJ_GETTER0(TheEmptyString) {
 }
 
 RUNTIME_NORETURN OBJ_GETTER(makeWeakReferenceCounter, void*) {
+    throw std::runtime_error("Not implemented for tests");
+}
+
+RUNTIME_NORETURN OBJ_GETTER(makeWeakReferenceCounterLegacyMM, void*) {
     throw std::runtime_error("Not implemented for tests");
 }
 
