@@ -39585,6 +39585,12 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
             }
 
             @Test
+            @TestMetadata("recursiveTypeAliasInProjection.kt")
+            public void testRecursiveTypeAliasInProjection() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/recursiveTypeAliasInProjection.kt");
+            }
+
+            @Test
             @TestMetadata("smartCastOnAlienPropertyFromInnerClass.kt")
             public void testSmartCastOnAlienPropertyFromInnerClass() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/smartCastOnAlienPropertyFromInnerClass.kt");
