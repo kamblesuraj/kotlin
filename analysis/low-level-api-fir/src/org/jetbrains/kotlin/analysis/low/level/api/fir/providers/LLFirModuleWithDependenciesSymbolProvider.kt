@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
+import org.jetbrains.kotlin.load.kotlin.FacadeClassSource
 import org.jetbrains.kotlin.load.kotlin.JvmPackagePartSource
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
@@ -183,7 +184,7 @@ internal abstract class LLFirDependentModuleProviders(
     }
 
     private fun FirCallableSymbol<*>.jvmClassName(): JvmClassName? {
-        val jvmPackagePartSource = fir.containerSource as? JvmPackagePartSource ?: return null
+        val jvmPackagePartSource = fir.containerSource as? FacadeClassSource ?: return null
         return jvmPackagePartSource.facadeClassName ?: jvmPackagePartSource.className
     }
 
