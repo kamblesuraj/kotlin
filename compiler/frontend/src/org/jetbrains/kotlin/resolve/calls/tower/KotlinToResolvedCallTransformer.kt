@@ -44,6 +44,8 @@ import org.jetbrains.kotlin.types.expressions.DoubleColonExpressionResolver
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingServices
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingUtils
 import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContextDelegate
+import org.jetbrains.kotlin.types.typeUtil.isPrimitiveNumberType
+import org.jetbrains.kotlin.types.typeUtil.isUnsignedNumberType
 
 class KotlinToResolvedCallTransformer(
     private val callCheckers: Iterable<CallChecker>,
@@ -371,17 +373,31 @@ class KotlinToResolvedCallTransformer(
 
         var reportErrorDuringTypeCheck = reportErrorForTypeMismatch
 
-        if (parameter != null && context.languageVersionSettings.supportsFeature(LanguageFeature.ImplicitSignedToUnsignedIntegerConversion)) {
-            val argumentCompileTimeValue = context.trace[BindingContext.COMPILE_TIME_VALUE, deparenthesized]
-            if (argumentCompileTimeValue != null && argumentCompileTimeValue.parameters.isConvertableConstVal) {
-                val generalNumberType = createTypeForConvertableConstant(argumentCompileTimeValue)
-                if (generalNumberType != null) {
-                    updatedType = argumentTypeResolver.updateResultArgumentTypeIfNotDenotable(
-                        context.trace, context.statementFilter, context.expectedType, generalNumberType, expression,
-                    )
-                    reportErrorDuringTypeCheck = true
-                }
+        if (parameter != null) {
+            if (context.languageVersionSettings.supportsFeature(LanguageFeature.ImplicitSignedToUnsignedIntegerConversion)) {
+                val argumentCompileTimeValue = context.trace[BindingContext.COMPILE_TIME_VALUE, deparenthesized]
+                if (argumentCompileTimeValue != null && argumentCompileTimeValue.parameters.isConvertableConstVal) {
+                    val generalNumberType = createTypeForConvertableConstant(argumentCompileTimeValue)
+                    if (generalNumberType != null) {
+                        updatedType = argumentTypeResolver.updateResultArgumentTypeIfNotDenotable(
+                            context.trace, context.statementFilter, context.expectedType, generalNumberType, expression,
+                        )
+                        reportErrorDuringTypeCheck = true
+                    }
 
+                }
+            } else {
+                if (parameter.type.isUnsignedNumberType() && updatedType?.isPrimitiveNumberType() == true) {
+                    val argumentCompileTimeValue = context.trace[BindingContext.COMPILE_TIME_VALUE, deparenthesized]
+                    if (argumentCompileTimeValue != null && !argumentCompileTimeValue.usesNonConstValAsConstant) {
+                        context.trace.report(
+                            Errors.UNSUPPORTED_FEATURE.on(
+                                deparenthesized,
+                                LanguageFeature.ImplicitSignedToUnsignedIntegerConversion to context.languageVersionSettings
+                            )
+                        )
+                    }
+                }
             }
         } else if (convertedArgumentType != null) {
             context.trace.report(Errors.SIGNED_CONSTANT_CONVERTED_TO_UNSIGNED.on(deparenthesized))

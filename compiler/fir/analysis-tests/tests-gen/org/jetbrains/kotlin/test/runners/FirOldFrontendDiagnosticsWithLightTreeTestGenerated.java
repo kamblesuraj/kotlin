@@ -34080,6 +34080,12 @@ public class FirOldFrontendDiagnosticsWithLightTreeTestGenerated extends Abstrac
                 }
 
                 @Test
+                @TestMetadata("disabledConversionOfSignedToUnsigned.kt")
+                public void testDisabledConversionOfSignedToUnsigned() throws Exception {
+                    runTest("compiler/testData/diagnostics/tests/unsignedTypes/conversions/disabledConversionOfSignedToUnsigned.kt");
+                }
+
+                @Test
                 @TestMetadata("inferenceForSignedAndUnsignedTypes.kt")
                 public void testInferenceForSignedAndUnsignedTypes() throws Exception {
                     runTest("compiler/testData/diagnostics/tests/unsignedTypes/conversions/inferenceForSignedAndUnsignedTypes.kt");

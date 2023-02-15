@@ -1,0 +1,17 @@
+package
+
+public const val BIGGER_THAN_UBYTE: kotlin.Int = 256
+public const val EXPLICIT_INT: kotlin.Int = 255
+public const val IMPLICIT_INT: kotlin.Int = 255
+public const val LONG_CONST: kotlin.Long = 255.toLong()
+public val NON_CONST: kotlin.Int = 255
+public const val UINT_CONST: kotlin.UInt = 42.toUInt()
+public fun takeIntWithoutAnnotation(/*0*/ i: kotlin.Int): kotlin.Unit
+public fun takeLong(/*0*/ l: kotlin.Long): kotlin.Unit
+public fun takeUByte(/*0*/ u: kotlin.UByte): kotlin.Unit
+public fun takeUBytes(/*0*/ vararg u: kotlin.UByte /*kotlin.UByteArray*/): kotlin.Unit
+public fun takeUInt(/*0*/ u: kotlin.UInt): kotlin.Unit
+public fun takeUIntWithoutAnnotaion(/*0*/ u: kotlin.UInt): kotlin.Unit
+public fun takeULong(/*0*/ u: kotlin.ULong): kotlin.Unit
+public fun takeUShort(/*0*/ u: kotlin.UShort): kotlin.Unit
+public fun test(): kotlin.Unit
