@@ -33,16 +33,7 @@ fun PsiFile.isScript(): Boolean {
     contract {
         returns(true) implies (this@isScript is KtFile)
     }
-
-    // Do not use psiFile.script, see comments in findScriptDefinition
-    if (this !is KtFile/* || this.script == null*/) return false
-
-    // Sometimes - i.e. when event system is disabled for a view provider - requesting
-    // virtual file directly from the viewProvider is the only way of obtaining it
-    val virtualFile = virtualFile ?: originalFile.virtualFile ?: viewProvider.virtualFile
-    if (virtualFile.isNonScript()) return false
-
-    return true
+    return (this as? KtFile)?.isScript() ?: false
 }
 
 fun PsiFile.findScriptDefinition(): ScriptDefinition? {
@@ -62,7 +53,7 @@ fun VirtualFile.findScriptDefinition(project: Project): ScriptDefinition? {
     return findScriptDefinition(project, VirtualFileScriptSource(this))
 }
 
-fun findScriptDefinition(project: Project, script: SourceCode): ScriptDefinition? {
+fun findScriptDefinition(project: Project, script: SourceCode): ScriptDefinition {
     val scriptDefinitionProvider = ScriptDefinitionProvider.getInstance(project) ?: return null
         ?: throw IllegalStateException("Unable to get script definition: ScriptDefinitionProvider is not configured.")
 
