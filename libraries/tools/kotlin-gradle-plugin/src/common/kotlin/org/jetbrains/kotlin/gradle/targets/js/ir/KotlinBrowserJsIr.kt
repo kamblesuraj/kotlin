@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.distsDirectory
 import org.jetbrains.kotlin.gradle.report.BuildMetricsService
-import org.jetbrains.kotlin.gradle.targets.js.addWasmExperimentalArguments
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalDceDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsBinaryMode
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsBrowserDsl
@@ -66,7 +65,7 @@ abstract class KotlinBrowserJsIr @Inject constructor(target: KotlinJsIrTarget) :
         if (test.testFramework == null) {
             test.useKarma {
                 if (compilation.platformType == KotlinPlatformType.wasm) {
-                    useChromeCanaryHeadlessWasmGc()
+                    useChromeHeadlessWasmGc()
                 } else {
                     useChromeHeadless()
                 }
@@ -140,26 +139,10 @@ abstract class KotlinBrowserJsIr @Inject constructor(target: KotlinJsIrTarget) :
                     )()
                     task.description = "start ${mode.name.toLowerCaseAsciiOnly()} webpack dev server"
 
-                    val openValue = if (compilation.platformType == KotlinPlatformType.wasm) {
-                        KotlinWebpackConfig.DevServer.App(
-                            KotlinWebpackConfig.DevServer.App.Browser(
-                                "chrome canary",
-                                listOf(
-                                    "--js-flags=" +
-                                            mutableListOf<String>()
-                                                .apply { addWasmExperimentalArguments() }
-                                                .joinToString(" ")
-                                )
-                            ),
-                        )
-                    } else {
-                        true
-                    }
-
                     webpackMajorVersion.choose(
                         {
                             task.devServer = KotlinWebpackConfig.DevServer(
-                                open = openValue,
+                                open = true,
                                 static = mutableListOf(
                                     "./kotlin",
                                     compilation.output.resourcesDir.canonicalPath,
