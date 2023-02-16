@@ -1,0 +1,18 @@
+package
+
+public fun foo(/*0*/ option: Option<kotlin.Pair<kotlin.String, kotlin.String>>?): kotlin.Unit
+
+public interface Option</*0*/ T : kotlin.Any!> {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public abstract fun get(): T!
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+
+    public final class Some</*0*/ T : kotlin.Any!> : Option<T!> {
+        public constructor Some</*0*/ T : kotlin.Any!>()
+        public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+        @java.lang.Override public/*package*/ open override /*1*/ fun get(): T!
+        public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+        public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+    }
+}

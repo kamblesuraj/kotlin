@@ -39453,6 +39453,12 @@ public class FirOldFrontendDiagnosticsWithLightTreeTestGenerated extends Abstrac
             }
 
             @Test
+            @TestMetadata("destructionOnIntersectionAfterSmartCast.kt")
+            public void testDestructionOnIntersectionAfterSmartCast() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/destructionOnIntersectionAfterSmartCast.kt");
+            }
+
+            @Test
             @TestMetadata("explicitNullableLambdaParameter.kt")
             public void testExplicitNullableLambdaParameter() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/explicitNullableLambdaParameter.kt");
