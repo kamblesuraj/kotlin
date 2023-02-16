@@ -39579,6 +39579,12 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
             }
 
             @Test
+            @TestMetadata("manyImplFromOneJavaInterface.kt")
+            public void testManyImplFromOneJavaInterface() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/manyImplFromOneJavaInterface.kt");
+            }
+
+            @Test
             @TestMetadata("nullabilityInSamConstructor.kt")
             public void testNullabilityInSamConstructor() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/nullabilityInSamConstructor.kt");
