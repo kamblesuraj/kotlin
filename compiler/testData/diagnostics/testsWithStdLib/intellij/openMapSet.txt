@@ -1,0 +1,54 @@
+package
+
+public inline fun </*0*/ Domain> OpenMap(/*0*/ builder: MutableOpenMap<Domain> /* = MutableBoundedOpenMap<Domain, kotlin.Any> */.() -> kotlin.Unit = ...): OpenMap<Domain> /* = BoundedOpenMap<Domain, kotlin.Any> */
+public fun foo(): EditorData
+
+public interface BoundedOpenMap</*0*/ Domain, /*1*/ V : kotlin.Any> : OpenMapView<Domain> {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public final data class EditorData {
+    public constructor EditorData(/*0*/ meta: OpenMap<EditorData> /* = BoundedOpenMap<EditorData, kotlin.Any> */)
+    public final val meta: OpenMap<EditorData> /* = BoundedOpenMap<EditorData, kotlin.Any> */
+    public final operator /*synthesized*/ fun component1(): OpenMap<EditorData> /* = BoundedOpenMap<EditorData, kotlin.Any> */
+    public final /*synthesized*/ fun copy(/*0*/ meta: OpenMap<EditorData> /* = BoundedOpenMap<EditorData, kotlin.Any> */ = ...): EditorData
+    public open override /*1*/ /*synthesized*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*synthesized*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*synthesized*/ fun toString(): kotlin.String
+}
+
+public interface EditorDataKey</*0*/ T : kotlin.Any> : Key<T, EditorData> {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public interface Key</*0*/ V : kotlin.Any, /*1*/ in Domain> {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public interface MutableBoundedOpenMap</*0*/ Domain, /*1*/ V : kotlin.Any> : BoundedOpenMap<Domain, V> {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public abstract operator fun </*0*/ T : V> set(/*0*/ k: Key<T, Domain>, /*1*/ v: T): kotlin.Unit
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public interface OpenMapView</*0*/ Domain> {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public object SomeKey : EditorDataKey<(kotlin.String, bar: kotlin.Any) -> kotlin.Unit> {
+    private constructor SomeKey()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+public typealias MutableOpenMap</*0*/ D> = MutableBoundedOpenMap<D, kotlin.Any>
+public typealias OpenMap</*0*/ D> = BoundedOpenMap<D, kotlin.Any>

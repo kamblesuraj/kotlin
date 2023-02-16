@@ -39483,6 +39483,12 @@ public class DiagnosisCompilerTestFE10TestdataTestGenerated extends AbstractDiag
             }
 
             @Test
+            @TestMetadata("openMapSet.kt")
+            public void testOpenMapSet() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/openMapSet.kt");
+            }
+
+            @Test
             @TestMetadata("overrideFunctionApply.kt")
             public void testOverrideFunctionApply() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/overrideFunctionApply.kt");
