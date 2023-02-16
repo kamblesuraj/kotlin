@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.fir.declarations
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
+import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.lazyResolveToPhase
 import org.jetbrains.kotlin.resolve.multiplatform.ExpectActualCompatibility
 import java.util.*
@@ -20,6 +21,16 @@ typealias ExpectForActualData = Map<ExpectActualCompatibility<FirBasedSymbol<*>>
 @SymbolInternals
 var FirDeclaration.expectForActual: ExpectForActualData? by FirDeclarationDataRegistry.data(ExpectForActualAttributeKey)
 private var FirDeclaration.actualForExpectMap: WeakHashMap<FirSession, FirBasedSymbol<*>>? by FirDeclarationDataRegistry.data(ActualForExpectAttributeKey)
+
+val FirBasedSymbol<*>.singleExpectForActualOrNull: FirBasedSymbol<*>?
+    get() {
+        return expectForActual?.values?.singleOrNull()?.singleOrNull()
+    }
+
+val FirFunctionSymbol<*>.singleExpectForActualOrNull: FirFunctionSymbol<*>?
+    get() {
+        return expectForActual?.values?.singleOrNull()?.singleOrNull() as? FirFunctionSymbol<*>
+    }
 
 val FirBasedSymbol<*>.expectForActual: ExpectForActualData?
     get() {

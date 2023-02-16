@@ -7,9 +7,11 @@ package org.jetbrains.kotlin.backend.common.actualizer
 
 import org.jetbrains.kotlin.backend.common.ir.isExpect
 import org.jetbrains.kotlin.backend.common.ir.isProperExpect
+import org.jetbrains.kotlin.backend.common.lower.copyAndActualizeDefaultValue
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.types.classifierOrFail
 import org.jetbrains.kotlin.ir.util.kotlinFqName
@@ -173,13 +175,30 @@ private class CallablesLinkCollector(
 
     private fun addLink(declaration: IrDeclarationBase) {
         if (!declaration.isExpect) return
-        val member = actualMembers[generateIrElementFullName(declaration, expectActualMap, typeAliasMap)]
-        if (member != null) {
-            expectActualMap[declaration.symbol] = member.symbol
-            if (declaration is IrProperty) {
-                member as IrProperty
-                declaration.getter?.symbol?.let { expectActualMap[it] = member.getter!!.symbol }
-                declaration.setter?.symbol?.let { expectActualMap[it] = member.setter!!.symbol }
+        val actualMember = actualMembers[generateIrElementFullName(declaration, expectActualMap, typeAliasMap)]
+        if (actualMember != null) {
+            expectActualMap[declaration.symbol] = actualMember.symbol
+            when (declaration) {
+                is IrFunction -> {
+                    val actualFunction = actualMember as IrFunction
+                    declaration.valueParameters.zip(actualFunction.valueParameters).forEach { (expectParameter, actualParameter) ->
+                        val expectDefaultValue = expectParameter.defaultValue
+                        if (actualParameter.defaultValue == null && expectDefaultValue != null) {
+                            actualParameter.defaultValue = expectDefaultValue.copyAndActualizeDefaultValue(
+                                actualFunction,
+                                actualParameter,
+                                mapOf(),
+                                classActualizer = { (expectActualMap[it.symbol] as IrClassSymbol).owner },
+                                functionActualizer = { (expectActualMap[it.symbol] as IrFunctionSymbol).owner }
+                            )
+                        }
+                    }
+                }
+                is IrProperty -> {
+                    val actualProperty = actualMember as IrProperty
+                    declaration.getter?.symbol?.let { expectActualMap[it] = actualProperty.getter!!.symbol }
+                    declaration.setter?.symbol?.let { expectActualMap[it] = actualProperty.setter!!.symbol }
+                }
             }
         } else {
             reportMissingActual(declaration)

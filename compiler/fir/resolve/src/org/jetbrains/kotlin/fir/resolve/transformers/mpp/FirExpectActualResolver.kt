@@ -16,18 +16,13 @@ import org.jetbrains.kotlin.fir.resolve.*
 import org.jetbrains.kotlin.fir.resolve.providers.dependenciesSymbolProvider
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
-import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutorByMap
-import org.jetbrains.kotlin.fir.resolve.substitution.chain
 import org.jetbrains.kotlin.fir.scopes.*
 import org.jetbrains.kotlin.fir.scopes.impl.FirPackageMemberScope
-import org.jetbrains.kotlin.fir.symbols.ConeClassifierLookupTag
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.multiplatform.ExpectActualCompatibility
-import org.jetbrains.kotlin.types.AbstractTypeChecker
-import org.jetbrains.kotlin.types.model.TypeConstructorMarker
 import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.addToStdlib.enumMapOf
@@ -60,7 +55,7 @@ object FirExpectActualResolver {
                         val actualTypeParameters = actualContainingClass
                             ?.typeParameterSymbols
                             .orEmpty()
-                        parentSubstitutor = createTypeParameterSubstitutor(expectTypeParameters, actualTypeParameters, useSiteSession)
+                        parentSubstitutor = createExpectActualTypeParameterSubstitutor(expectTypeParameters, actualTypeParameters, useSiteSession)
                         when (actualSymbol) {
                             is FirConstructorSymbol -> expectContainingClass?.getConstructors(scopeSession)
                             else -> expectContainingClass?.getMembers(callableId.callableName, scopeSession)
@@ -137,7 +132,7 @@ object FirExpectActualResolver {
             return ExpectActualCompatibility.Incompatible.Visibility
         }
 
-        val substitutor = createTypeParameterSubstitutor(expectTypeParameterSymbols, actualTypeParameterSymbols, actualSession)
+        val substitutor = createExpectActualTypeParameterSubstitutor(expectTypeParameterSymbols, actualTypeParameterSymbols, actualSession)
 
         val expectSession = expectClassSymbol.moduleData.session
         areCompatibleTypeParameters(expectTypeParameterSymbols, actualTypeParameterSymbols, actualSession, expectSession, substitutor).let {
@@ -153,7 +148,7 @@ object FirExpectActualResolver {
         if (
             expectSupertypes.map(substitutor::substituteOrSelf).any { expectSupertype ->
                 actualSupertypes.none { actualSupertype ->
-                    areCompatibleTypes(expectSupertype, actualSupertype, expectSession, actualSession)
+                    areCompatibleExpectActualTypes(expectSupertype, actualSupertype, expectSession, actualSession)
                 }
             }
         ) {
@@ -291,7 +286,7 @@ object FirExpectActualResolver {
             return ExpectActualCompatibility.Incompatible.TypeParameterCount
         }
 
-        val substitutor = createTypeParameterSubstitutor(expectedTypeParameters, actualTypeParameters, actualSession, parentSubstitutor)
+        val substitutor = createExpectActualTypeParameterSubstitutor(expectedTypeParameters, actualTypeParameters, actualSession, parentSubstitutor)
 
         if (
             !areCompatibleTypeLists(
@@ -300,7 +295,7 @@ object FirExpectActualResolver {
                 expectSession,
                 actualSession
             ) ||
-            !areCompatibleTypes(
+            !areCompatibleExpectActualTypes(
                 expectedReceiverType?.coneType?.let { substitutor.substituteOrSelf(it) },
                 actualReceiverType?.coneType,
                 expectSession,
@@ -308,16 +303,6 @@ object FirExpectActualResolver {
             )
         ) {
             return ExpectActualCompatibility.Incompatible.ParameterTypes
-        }
-        if (
-            !areCompatibleTypes(
-                substitutor.substituteOrSelf(expectDeclaration.resolvedReturnTypeRef.coneType),
-                actualDeclaration.resolvedReturnTypeRef.coneType,
-                expectSession,
-                actualSession
-            )
-        ) {
-            return ExpectActualCompatibility.Incompatible.ReturnType
         }
 
         // TODO: implement hasStableParameterNames calculation
@@ -386,25 +371,6 @@ object FirExpectActualResolver {
         return ExpectActualCompatibility.Compatible
     }
 
-    private fun createTypeParameterSubstitutor(
-        expectedTypeParameters: List<FirTypeParameterSymbol>,
-        actualTypeParameters: List<FirTypeParameterSymbol>,
-        useSiteSession: FirSession,
-        parentSubstitutor: ConeSubstitutor? = null
-    ): ConeSubstitutor {
-        val substitution = expectedTypeParameters.zip(actualTypeParameters).associate { (expectedParameterSymbol, actualParameterSymbol) ->
-            expectedParameterSymbol to actualParameterSymbol.toLookupTag().constructType(emptyArray(), isNullable = false)
-        }
-        val substitutor = ConeSubstitutorByMap(
-            substitution,
-            useSiteSession
-        )
-        if (parentSubstitutor == null) {
-            return substitutor
-        }
-        return substitutor.chain(parentSubstitutor)
-    }
-
     private fun valueParametersCountCompatible(
         expectDeclaration: FirCallableSymbol<*>,
         actualDeclaration: FirCallableSymbol<*>,
@@ -430,31 +396,11 @@ object FirExpectActualResolver {
         actualSession: FirSession
     ): Boolean {
         for (i in expectedTypes.indices) {
-            if (!areCompatibleTypes(expectedTypes[i], actualTypes[i], expectSession, actualSession)) {
+            if (!areCompatibleExpectActualTypes(expectedTypes[i], actualTypes[i], expectSession, actualSession)) {
                 return false
             }
         }
         return true
-    }
-
-    private fun areCompatibleTypes(
-        expectedType: ConeKotlinType?,
-        actualType: ConeKotlinType?,
-        expectSession: FirSession,
-        actualSession: FirSession
-    ): Boolean {
-        if (expectedType == null) return actualType == null
-        if (actualType == null) return false
-
-        val typeCheckerContext = ConeInferenceContextForExpectActual(expectSession, actualSession).newTypeCheckerState(
-            errorTypesEqualToAnything = false,
-            stubTypesEqualToAnything = true
-        )
-        return AbstractTypeChecker.equalTypes(
-            typeCheckerContext,
-            expectedType,
-            actualType
-        )
     }
 
     private fun areCompatibleModalities(
@@ -572,44 +518,6 @@ object FirExpectActualResolver {
     }
 
     // ---------------------------------------- Utils ----------------------------------------
-
-    private class ConeInferenceContextForExpectActual(val expectSession: FirSession, val actualSession: FirSession) : ConeInferenceContext {
-        override val session: FirSession
-            get() = actualSession
-
-        override fun areEqualTypeConstructors(c1: TypeConstructorMarker, c2: TypeConstructorMarker): Boolean {
-            if (c1 !is ConeClassifierLookupTag || c2 !is ConeClassifierLookupTag) {
-                return c1 == c2
-            }
-            return isExpectedClassAndActualTypeAlias(c1, c2) ||
-                    isExpectedClassAndActualTypeAlias(c2, c1) ||
-                    c1 == c2
-        }
-
-        // For example, expectedTypeConstructor may be the expected class kotlin.text.StringBuilder, while actualTypeConstructor
-        // is java.lang.StringBuilder. For the purposes of type compatibility checking, we must consider these types equal here.
-        // Note that the case of an "actual class" works as expected though, because the actual class by definition has the same FQ name
-        // as the corresponding expected class, so their type constructors are equal as per AbstractClassTypeConstructor#equals
-        private fun isExpectedClassAndActualTypeAlias(
-            expectLookupTag: ConeClassifierLookupTag,
-            actualLookupTag: ConeClassifierLookupTag
-        ): Boolean {
-            val expectDeclaration = expectLookupTag.toClassLikeDeclaration(expectSession) ?: return false
-            val actualDeclaration = actualLookupTag.toClassLikeDeclaration(actualSession) ?: return false
-
-            if (!expectDeclaration.isExpect) return false
-            val expectClassId = when (expectDeclaration) {
-                is FirRegularClassSymbol -> expectDeclaration.classId
-                is FirTypeAliasSymbol -> expectDeclaration.resolvedExpandedTypeRef.coneType.classId
-                else -> null
-            } ?: return false
-            return expectClassId == actualDeclaration.classId
-        }
-
-        private fun ConeClassifierLookupTag.toClassLikeDeclaration(session: FirSession): FirClassLikeSymbol<*>? {
-            return this.toSymbol(session) as? FirClassLikeSymbol<*>
-        }
-    }
 
     private fun List<FirValueParameterSymbol>.toTypeList(substitutor: ConeSubstitutor): List<ConeKotlinType> {
         return this.map { substitutor.substituteOrSelf(it.resolvedReturnTypeRef.coneType) }
