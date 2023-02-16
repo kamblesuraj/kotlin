@@ -24,13 +24,11 @@ import org.jetbrains.kotlin.ir.util.IrMessageLogger
 import org.jetbrains.kotlin.konan.library.KonanLibrary
 import org.jetbrains.kotlin.library.SerializedIrFile
 import org.jetbrains.kotlin.library.metadata.KlibMetadataProtoBuf
-import org.jetbrains.kotlin.library.metadata.resolver.TopologicalLibraryOrder
 import org.jetbrains.kotlin.metadata.ProtoBuf
 import org.jetbrains.kotlin.utils.toMetadataVersion
 import org.jetbrains.kotlin.metadata.deserialization.BinaryVersion
 import org.jetbrains.kotlin.metadata.serialization.MutableVersionRequirementTable
 import org.jetbrains.kotlin.psi
-import org.jetbrains.kotlin.utils.addIfNotNull
 
 internal fun PhaseContext.firSerializer(
         input: Fir2IrOutput
@@ -50,12 +48,14 @@ internal fun PhaseContext.firSerializer(
             configuration.get(CommonConfigurationKeys.METADATA_VERSION)
                     ?: configuration.languageVersionSettings.languageVersion.toMetadataVersion()
 
-    val resolvedLibraries = config.resolvedLibraries.getFullResolvedList(TopologicalLibraryOrder) // FIXME KT-55603
+    // KT-55603: librariesWithDependencies() are empty in K2, since `isNeededForLink` is never set to true
+    // Serialization/deserialization seem to be ok with empty dependency list though.
+    val dependencies = config.librariesWithDependencies()
     return serializeNativeModule(
             configuration = configuration,
             messageLogger = configuration.get(IrMessageLogger.IR_MESSAGE_LOGGER) ?: IrMessageLogger.None,
             sourceFiles,
-            resolvedLibraries.map { it.library as KonanLibrary },
+            dependencies,
             input.fir2irResult.irModuleFragment,
             expectDescriptorToSymbol = mutableMapOf() // TODO: expect -> actual mapping
     ) { file ->
