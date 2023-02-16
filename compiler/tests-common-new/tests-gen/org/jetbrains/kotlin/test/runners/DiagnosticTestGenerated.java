@@ -35469,6 +35469,12 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
             }
 
             @Test
+            @TestMetadata("TypeParameterError.kt")
+            public void testTypeParameterError() throws Exception {
+                runTest("compiler/testData/diagnostics/tests/when/TypeParameterError.kt");
+            }
+
+            @Test
             @TestMetadata("When.kt")
             public void testWhen() throws Exception {
                 runTest("compiler/testData/diagnostics/tests/when/When.kt");
