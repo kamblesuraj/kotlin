@@ -24,7 +24,10 @@ import org.jetbrains.kotlin.test.services.impl.TestModuleStructureImpl
  * If the test is already multimodule, do nothing.
  */
 @TestInfrastructureInternals
-class SplittingModuleTransformerForBoxTests : ModuleStructureTransformer() {
+class SplittingModuleTransformerForBoxTests(
+    private val dependencyKind: DependencyKind = DependencyKind.Binary,
+    private val dependencyRelation: DependencyRelation = DependencyRelation.FriendDependency
+) : ModuleStructureTransformer() {
     override fun transformModuleStructure(moduleStructure: TestModuleStructure): TestModuleStructure {
         if (moduleStructure.modules.size > 1) {
             // The test is already multimodule, no need to split it into modules further.
@@ -33,7 +36,8 @@ class SplittingModuleTransformerForBoxTests : ModuleStructureTransformer() {
         val module = moduleStructure.modules.single()
         val realFiles = module.files.filterNot { it.isAdditional }
         if (realFiles.size < 2) error("Test should contain at least two files")
-        val additionalFiles = module.files.filter { it.isAdditional }
+        val firstModuleAdditionalFiles = module.files.filter { it.isAdditional }
+        val secondModuleAdditionalFiles = if (dependencyKind == DependencyKind.Source) emptyList() else firstModuleAdditionalFiles
         val firstModuleFiles = realFiles.dropLast(1)
         val secondModuleFile = realFiles.last()
         val firstModule = TestModule(
@@ -43,7 +47,7 @@ class SplittingModuleTransformerForBoxTests : ModuleStructureTransformer() {
             module.frontendKind,
             module.backendKind,
             module.binaryKind,
-            files = firstModuleFiles + additionalFiles,
+            files = firstModuleFiles + firstModuleAdditionalFiles,
             allDependencies = emptyList(),
             module.directives,
             module.languageVersionSettings
@@ -56,8 +60,8 @@ class SplittingModuleTransformerForBoxTests : ModuleStructureTransformer() {
             module.frontendKind,
             module.backendKind,
             module.binaryKind,
-            files = listOf(secondModuleFile) + additionalFiles,
-            allDependencies = listOf(DependencyDescription("lib", DependencyKind.Binary, DependencyRelation.FriendDependency)),
+            files = listOf(secondModuleFile) + secondModuleAdditionalFiles,
+            allDependencies = listOf(DependencyDescription("lib", dependencyKind, dependencyRelation)),
             RegisteredDirectivesBuilder(module.directives).apply {
                 -CodegenTestDirectives.IGNORE_FIR_DIAGNOSTICS
             }.build(),

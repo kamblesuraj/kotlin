@@ -1,13 +1,14 @@
 package org.jetbrains.kotlin.js.test.fir
 
-import org.jetbrains.kotlin.js.test.ir.AbstractJsBlackBoxCodegenTestBase
 import org.jetbrains.kotlin.js.test.converters.FirJsKlibBackendFacade
 import org.jetbrains.kotlin.js.test.converters.JsIrBackendFacade
 import org.jetbrains.kotlin.js.test.converters.incremental.RecompileModuleJsIrBackendFacade
 import org.jetbrains.kotlin.js.test.handlers.JsIrRecompiledArtifactsIdentityHandler
+import org.jetbrains.kotlin.js.test.ir.AbstractJsBlackBoxCodegenTestBase
 import org.jetbrains.kotlin.parsing.parseBoolean
 import org.jetbrains.kotlin.test.Constructor
 import org.jetbrains.kotlin.test.TargetBackend
+import org.jetbrains.kotlin.test.TestInfrastructureInternals
 import org.jetbrains.kotlin.test.backend.ir.IrBackendInput
 import org.jetbrains.kotlin.test.builders.*
 import org.jetbrains.kotlin.test.directives.DiagnosticsDirectives
@@ -20,6 +21,7 @@ import org.jetbrains.kotlin.test.frontend.fir.FirOutputArtifact
 import org.jetbrains.kotlin.test.frontend.fir.handlers.*
 import org.jetbrains.kotlin.test.model.*
 import org.jetbrains.kotlin.test.runners.codegen.commonFirHandlersForCodegenTest
+import org.jetbrains.kotlin.test.services.SplittingModuleTransformerForBoxTests
 import org.jetbrains.kotlin.test.services.configuration.JsEnvironmentConfigurator
 import java.lang.Boolean.getBoolean
 
@@ -47,6 +49,7 @@ open class AbstractFirJsTest(
 
     private fun getBoolean(s: String, default: Boolean) = System.getProperty(s)?.let { parseBoolean(it) } ?: default
 
+    @OptIn(TestInfrastructureInternals::class)
     override fun configure(builder: TestConfigurationBuilder) {
         super.configure(builder)
         with(builder) {
@@ -80,6 +83,12 @@ open class AbstractFirJsTest(
                 defaultDirectives {
                     +JsEnvironmentConfigurationDirectives.GENERATE_INLINE_ANONYMOUS_FUNCTIONS
                 }
+            }
+
+            forTestsMatching("*multiplatform/*") {
+                useModuleStructureTransformers(
+                    SplittingModuleTransformerForBoxTests(DependencyKind.Source, DependencyRelation.DependsOnDependency)
+                )
             }
         }
     }

@@ -7,12 +7,13 @@ package org.jetbrains.kotlin.test.runners.codegen
 
 import org.jetbrains.kotlin.test.Constructor
 import org.jetbrains.kotlin.test.TargetBackend
+import org.jetbrains.kotlin.test.TestInfrastructureInternals
 import org.jetbrains.kotlin.test.backend.ir.IrBackendInput
 import org.jetbrains.kotlin.test.backend.ir.JvmIrBackendFacade
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.builders.configureFirHandlersStep
-import org.jetbrains.kotlin.test.directives.JvmEnvironmentConfigurationDirectives.USE_PSI_CLASS_FILES_READING
 import org.jetbrains.kotlin.test.directives.ConfigurationDirectives.WITH_STDLIB
+import org.jetbrains.kotlin.test.directives.JvmEnvironmentConfigurationDirectives.USE_PSI_CLASS_FILES_READING
 import org.jetbrains.kotlin.test.directives.FirDiagnosticsDirectives.USE_LIGHT_TREE
 import org.jetbrains.kotlin.test.directives.LanguageSettingsDirectives
 import org.jetbrains.kotlin.test.frontend.fir.Fir2IrResultsConverter
@@ -24,6 +25,7 @@ import org.jetbrains.kotlin.test.frontend.fir.handlers.FirDumpHandler
 import org.jetbrains.kotlin.test.frontend.fir.handlers.FirResolvedTypesVerifier
 import org.jetbrains.kotlin.test.frontend.fir.handlers.FirScopeDumpHandler
 import org.jetbrains.kotlin.test.model.*
+import org.jetbrains.kotlin.test.services.SplittingModuleTransformerForBoxTests
 
 abstract class AbstractFirBlackBoxCodegenTestBase(
     val useLightTree: Boolean
@@ -40,6 +42,7 @@ abstract class AbstractFirBlackBoxCodegenTestBase(
     override val backendFacade: Constructor<BackendFacade<IrBackendInput, BinaryArtifacts.Jvm>>
         get() = ::JvmIrBackendFacade
 
+    @OptIn(TestInfrastructureInternals::class)
     override fun configure(builder: TestConfigurationBuilder) {
         super.configure(builder)
         with(builder) {
@@ -79,6 +82,12 @@ abstract class AbstractFirBlackBoxCodegenTestBase(
                 defaultDirectives {
                     LanguageSettingsDirectives.LANGUAGE with "+ExplicitBackingFields"
                 }
+            }
+
+            forTestsMatching("*multiplatform/*") {
+                useModuleStructureTransformers(
+                    SplittingModuleTransformerForBoxTests(DependencyKind.Source, DependencyRelation.DependsOnDependency)
+                )
             }
         }
     }
