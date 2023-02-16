@@ -39543,6 +39543,12 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
             }
 
             @Test
+            @TestMetadata("computeIfAbsentNull.kt")
+            public void testComputeIfAbsentNull() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/computeIfAbsentNull.kt");
+            }
+
+            @Test
             @TestMetadata("explicitNullableLambdaParameter.kt")
             public void testExplicitNullableLambdaParameter() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/explicitNullableLambdaParameter.kt");

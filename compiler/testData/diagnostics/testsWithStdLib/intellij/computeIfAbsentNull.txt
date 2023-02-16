@@ -1,0 +1,30 @@
+package
+
+public final enum class ResourceType : kotlin.Enum<ResourceType!> {
+    enum entry SOME
+
+    public constructor ResourceType()
+    @kotlin.internal.IntrinsicConstEvaluation public final override /*1*/ /*fake_override*/ val name: kotlin.String
+    public final override /*1*/ /*fake_override*/ val ordinal: kotlin.Int
+    protected final override /*1*/ /*fake_override*/ fun clone(): kotlin.Any
+    public final override /*1*/ /*fake_override*/ fun compareTo(/*0*/ other: ResourceType!): kotlin.Int
+    public final override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    protected/*protected and package*/ final override /*1*/ /*fake_override*/ /*isHiddenForResolutionEverywhereBesideSupercalls*/ fun finalize(): kotlin.Unit
+    public/*package*/ open fun foo(): `fun`!
+    public final override /*1*/ /*fake_override*/ /*isHiddenForResolutionEverywhereBesideSupercalls*/ fun getDeclaringClass(): java.lang.Class<ResourceType!>!
+    public final override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+
+    // Static members
+    public final /*synthesized*/ val entries: kotlin.enums.EnumEntries<ResourceType>
+    public final /*synthesized*/ fun valueOf(/*0*/ value: kotlin.String): ResourceType
+    public final /*synthesized*/ fun values(): kotlin.Array<ResourceType>
+}
+
+public interface Table</*0*/ R, /*1*/ K, /*2*/ V> {
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public abstract fun getPackageName(): kotlin.String!
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public abstract fun row(/*0*/ r: R): Map!
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
