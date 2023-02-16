@@ -2607,6 +2607,12 @@ public class LightTreeFir2IrTextTestGenerated extends AbstractLightTreeFir2IrTex
         }
 
         @Test
+        @TestMetadata("ErrorInDefaultValue.kt")
+        public void testErrorInDefaultValue() throws Exception {
+            runTest("compiler/testData/ir/irText/firProblems/ErrorInDefaultValue.kt");
+        }
+
+        @Test
         @TestMetadata("Fir2IrClassifierStorage.kt")
         public void testFir2IrClassifierStorage() throws Exception {
             runTest("compiler/testData/ir/irText/firProblems/Fir2IrClassifierStorage.kt");
