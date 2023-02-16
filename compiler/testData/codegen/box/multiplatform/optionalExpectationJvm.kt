@@ -2,7 +2,6 @@
 // !OPT_IN: kotlin.ExperimentalMultiplatform
 // TARGET_BACKEND: JVM
 // WITH_STDLIB
-// IGNORE_BACKEND_K2: JVM_IR
 
 // FILE: common.kt
 

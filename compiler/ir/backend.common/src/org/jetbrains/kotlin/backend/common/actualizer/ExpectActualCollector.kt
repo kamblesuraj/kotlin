@@ -114,7 +114,7 @@ private class ClassifiersLinkCollector(
         val actualClassifier = actualClassifiers[actualTypeId]
         if (actualClassifier != null) {
             expectActualMap[expectElement.symbol] = actualClassifier
-        } else {
+        } else if (!expectElement.containsOptionalExpectation()) {
             reportMissingActual(expectElement)
         }
     }
@@ -200,7 +200,7 @@ private class CallablesLinkCollector(
                     declaration.setter?.symbol?.let { expectActualMap[it] = actualProperty.setter!!.symbol }
                 }
             }
-        } else {
+        } else if (!declaration.parent.containsOptionalExpectation()) {
             reportMissingActual(declaration)
         }
     }
