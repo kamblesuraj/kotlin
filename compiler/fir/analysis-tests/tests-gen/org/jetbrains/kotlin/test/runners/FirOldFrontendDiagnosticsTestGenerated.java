@@ -39591,6 +39591,12 @@ public class FirOldFrontendDiagnosticsTestGenerated extends AbstractFirDiagnosti
             }
 
             @Test
+            @TestMetadata("misteryousNamedArgument.kt")
+            public void testMisteryousNamedArgument() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/misteryousNamedArgument.kt");
+            }
+
+            @Test
             @TestMetadata("nullabilityInSamConstructor.kt")
             public void testNullabilityInSamConstructor() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/nullabilityInSamConstructor.kt");
