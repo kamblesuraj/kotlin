@@ -14,7 +14,7 @@ interface JsonObject
 class SomeJsonObject() : JsonObject
 
 fun String.put(value: JsonObject?, node: ObjectNode) {
-    <!INFERRED_TYPE_VARIABLE_INTO_EMPTY_INTERSECTION_ERROR!>when (value) {
+    <!INFERRED_TYPE_VARIABLE_INTO_EMPTY_INTERSECTION_WARNING!>when (value) {
         null -> node.set(this, null)
         is SomeJsonObject -> Unit
         else -> TODO()

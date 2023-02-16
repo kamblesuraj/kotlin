@@ -265,7 +265,6 @@ enum class LanguageFeature(
     StopPropagatingDeprecationThroughOverrides(KOTLIN_1_9, kind = BUG_FIX), // KT-47902
     ReportTypeVarianceConflictOnQualifierArguments(KOTLIN_1_9, kind = BUG_FIX), // KT-50947
     ReportErrorsOnRecursiveTypeInsidePlusAssignment(KOTLIN_1_9, kind = BUG_FIX), // KT-48546
-    ForbidInferringTypeVariablesIntoEmptyIntersection(KOTLIN_1_9, kind = BUG_FIX), // KT-51221
     ForbidExtensionCallsOnInlineFunctionalParameters(KOTLIN_1_9, kind = BUG_FIX), // KT-52502
     ForbidInferringPostponedTypeVariableIntoDeclaredUpperBound(KOTLIN_1_9, kind = BUG_FIX), // KT-47986
     KeepNullabilityWhenApproximatingLocalType(KOTLIN_1_9, kind = BUG_FIX), // KT-53982
@@ -285,6 +284,7 @@ enum class LanguageFeature(
     // 2.0
 
     EnhanceNullabilityOfPrimitiveArrays(KOTLIN_2_0, kind = BUG_FIX), // KT-54521
+    ForbidInferringTypeVariablesIntoEmptyIntersection(KOTLIN_2_0, kind = BUG_FIX), // KT-51221
 
     // End of 2.* language features --------------------------------------------------
 
