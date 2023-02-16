@@ -1,0 +1,12 @@
+package
+
+public fun bar(/*0*/ w: Wrapper?): kotlin.Unit
+public fun foo(/*0*/ f: () -> kotlin.Unit): kotlin.Unit
+
+public final class Wrapper {
+    public constructor Wrapper(/*0*/ s: kotlin.String)
+    public final var s: kotlin.String
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}

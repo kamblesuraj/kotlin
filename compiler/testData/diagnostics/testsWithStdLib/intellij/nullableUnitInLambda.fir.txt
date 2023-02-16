@@ -1,0 +1,21 @@
+FILE: nullableUnitInLambda.fir.kt
+    public final fun foo(f: R|() -> kotlin/Unit|): R|kotlin/Unit| {
+        R|<local>/f|.R|SubstitutionOverride<kotlin/Function0.invoke: R|kotlin/Unit|>|()
+    }
+    public final class Wrapper : R|kotlin/Any| {
+        public constructor(s: R|kotlin/String|): R|Wrapper| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final var s: R|kotlin/String| = R|<local>/s|
+            public get(): R|kotlin/String|
+            public set(value: R|kotlin/String|): R|kotlin/Unit|
+
+    }
+    public final fun bar(w: R|Wrapper?|): R|kotlin/Unit| {
+        lval lambda: R|() -> kotlin/Unit?| = fun <anonymous>(): R|kotlin/Unit?| <inline=Unknown>  {
+            ^ R|<local>/w|?.{ $subj$.R|/Wrapper.s| = String(X) }
+        }
+
+        R|/foo<Inapplicable(INAPPLICABLE): /foo>#|(R|<local>/lambda|)
+    }

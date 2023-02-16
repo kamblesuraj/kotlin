@@ -39597,6 +39597,12 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
             }
 
             @Test
+            @TestMetadata("nullableUnitInLambda.kt")
+            public void testNullableUnitInLambda() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/nullableUnitInLambda.kt");
+            }
+
+            @Test
             @TestMetadata("openMapSet.kt")
             public void testOpenMapSet() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/openMapSet.kt");
