@@ -70,8 +70,10 @@ public open class RangeIterationTestBase {
             else -> throw IllegalArgumentException("Unsupported sequence type: $sequence")
         }
 
-        assertEquals(expectedFirst, first)
-        assertEquals(expectedLast, last)
+        @Suppress("UNCHECKED_CAST") // TODO: drop cast and suppress after fixing KT-56717
+        assertEquals(expectedFirst, first as N)
+        @Suppress("UNCHECKED_CAST") // TODO: drop cast and suppress after fixing KT-56717
+        assertEquals(expectedLast, last as N)
         assertEquals(expectedIncrement, increment)
 
         assertEquals(expectedElements.isEmpty(), sequence.none())
