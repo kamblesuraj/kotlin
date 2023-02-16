@@ -39561,6 +39561,12 @@ public class FirOldFrontendDiagnosticsTestGenerated extends AbstractFirDiagnosti
             }
 
             @Test
+            @TestMetadata("falseArrayListAddCall.kt")
+            public void testFalseArrayListAddCall() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/falseArrayListAddCall.kt");
+            }
+
+            @Test
             @TestMetadata("hashMap.kt")
             public void testHashMap() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/intellij/hashMap.kt");
