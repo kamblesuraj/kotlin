@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors
 import org.jetbrains.kotlin.fir.declarations.FirTypeAlias
 import org.jetbrains.kotlin.fir.declarations.utils.isActual
 import org.jetbrains.kotlin.fir.symbols.impl.FirTypeAliasSymbol
+import org.jetbrains.kotlin.fir.types.ConeTypeParameterType
 import org.jetbrains.kotlin.fir.types.ProjectionKind
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.types.Variance
@@ -38,6 +39,16 @@ object FirActualTypeAliasChecker : FirTypeAliasChecker() {
         for (typeArgument in expandedTypeRef.coneType.typeArguments) {
             if (typeArgument.kind != ProjectionKind.INVARIANT) {
                 reporter.reportOn(declaration.source, FirErrors.ACTUAL_TYPE_ALIAS_WITH_USE_SITE_VARIANCE, context)
+                break
+            }
+        }
+
+        for (i in 0 until minOf(declaration.typeParameters.size, expandedTypeRef.coneType.typeArguments.size)) {
+            val typeParameterSymbol = declaration.typeParameters[i].symbol
+            val typeArgumentSymbol =
+                (expandedTypeRef.coneType.typeArguments[i] as? ConeTypeParameterType)?.lookupTag?.typeParameterSymbol ?: continue
+            if (typeParameterSymbol != typeArgumentSymbol) {
+                reporter.reportOn(declaration.source, FirErrors.ACTUAL_TYPE_ALIAS_WITH_COMPLEX_SUBSTITUTION, context)
                 break
             }
         }
