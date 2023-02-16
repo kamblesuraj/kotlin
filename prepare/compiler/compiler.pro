@@ -297,7 +297,3 @@
 
 # This class is needed for test framework
 -keep class com.intellij.openapi.util.text.StringUtil { *; }
-
--keep class com.fasterxml.aalto.stax.InputFactoryImpl { *; }
--keep class com.fasterxml.aalto.stax.OutputFactoryImpl { *; }
--keep class com.fasterxml.aalto.stax.EventFactoryImpl { *; }
