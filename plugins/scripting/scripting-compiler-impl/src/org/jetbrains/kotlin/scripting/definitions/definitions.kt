@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.scripting.definitions
 
 import com.intellij.ide.highlighter.JavaClassFileType
 import com.intellij.ide.highlighter.JavaFileType
+import com.intellij.injected.editor.VirtualFileWindow
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileTypes.FileTypeRegistry
 import com.intellij.openapi.project.Project
@@ -68,12 +69,16 @@ fun findScriptDefinition(project: Project, script: SourceCode): ScriptDefinition
     return scriptDefinitionProvider.findDefinition(script) ?: scriptDefinitionProvider.getDefaultDefinition()
 }
 
-fun VirtualFile.isNonScript(): Boolean =
-    isDirectory ||
-            extension == KotlinFileType.EXTENSION ||
-            extension == JavaFileType.INSTANCE.defaultExtension ||
-            extension == JavaClassFileType.INSTANCE.defaultExtension ||
-            !this.isKotlinFileType()
+fun VirtualFile.isNonScript(): Boolean = when (this) {
+    is VirtualFileWindow -> !this.isKotlinFileType()
+    else -> {
+        isDirectory ||
+                extension == KotlinFileType.EXTENSION ||
+                extension == JavaFileType.INSTANCE.defaultExtension ||
+                extension == JavaClassFileType.INSTANCE.defaultExtension ||
+                !this.isKotlinFileType()
+    }
+}
 
 private fun VirtualFile.isKotlinFileType(): Boolean {
     if (extension == KotlinParserDefinition.STD_SCRIPT_SUFFIX) return true
