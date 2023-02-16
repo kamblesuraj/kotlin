@@ -7,14 +7,10 @@ package org.jetbrains.kotlin.fir.resolve
 
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSessionComponent
-import org.jetbrains.kotlin.fir.declarations.FirFunction
-import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
-import org.jetbrains.kotlin.fir.declarations.FirValueParameter
-import org.jetbrains.kotlin.fir.declarations.singleExpectForActualOrNull
+import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.scopes.*
 import org.jetbrains.kotlin.fir.scopes.impl.FirAbstractImportingScope
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 
 class FirDefaultParametersResolver : FirSessionComponent {
     fun declaresDefaultValue(
@@ -25,7 +21,7 @@ class FirDefaultParametersResolver : FirSessionComponent {
         originScope: FirScope?,
         index: Int,
     ): Boolean {
-        if (valueParameter.defaultValue != null || containsDefaultValue(function.symbol.singleExpectForActualOrNull, index)) {
+        if (valueParameter.defaultValue != null || function.symbol.singleExpectForActualOrNull.containsDefaultValue(index)) {
             return true
         }
         if (function !is FirSimpleFunction) return false
@@ -47,7 +43,7 @@ class FirDefaultParametersResolver : FirSessionComponent {
         var result = false
 
         typeScope.processOverriddenFunctions(symbol) { overridden ->
-            if (containsDefaultValue(overridden, index) || containsDefaultValue(overridden.singleExpectForActualOrNull, index)) {
+            if (overridden.containsDefaultValue(index) || overridden.singleExpectForActualOrNull.containsDefaultValue(index)) {
                 result = true
                 return@processOverriddenFunctions ProcessorAction.STOP
             }
@@ -56,11 +52,6 @@ class FirDefaultParametersResolver : FirSessionComponent {
         }
 
         return result
-    }
-
-    private fun containsDefaultValue(functionSymbol: FirFunctionSymbol<*>?, index: Int): Boolean {
-        if (functionSymbol == null) return false
-        return functionSymbol.fir.valueParameters[index].defaultValue != null
     }
 }
 
