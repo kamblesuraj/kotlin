@@ -116,5 +116,5 @@ class DefaultInMemoryStorageWrapper<K, V>(private val origin: LazyStorage<K, V>)
     private fun <K, V> Map<K, V>.getValue(key: K) =
         this[key] ?: error("$key was unexpectedly removed from in-memory storage. Seems to be a multithreading issue")
 
-    class ValueWrapper<V>(val value: V, val isAppend: Boolean = false)
+    private class ValueWrapper<V>(val value: V, val isAppend: Boolean = false)
 }
