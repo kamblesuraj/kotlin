@@ -8,7 +8,6 @@ package org.jetbrains.kotlin.fir.lazy
 import org.jetbrains.kotlin.descriptors.DescriptorVisibility
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
-import org.jetbrains.kotlin.fir.FirAnnotationContainer
 import org.jetbrains.kotlin.fir.backend.Fir2IrComponents
 import org.jetbrains.kotlin.fir.backend.declareThisReceiverParameter
 import org.jetbrains.kotlin.fir.declarations.FirCallableDeclaration
@@ -116,16 +115,8 @@ abstract class AbstractFir2IrLazyFunction<F : FirCallableDeclaration>(
     private fun tryLoadIr(): Boolean {
         if (!isInline || isFakeOverride) return false
         if (!extensions.irNeedsDeserialization) return false
-        val toplevel = getToplevel()
+        val toplevel = getTopLevelDeclaration()
         return (toplevel as? DeserializableClass)?.loadIr() ?: false
-    }
-
-    private fun getToplevel(): IrDeclaration {
-        var current: IrDeclaration = this
-        while (current.parent !is IrPackageFragment) {
-            current = current.parent as IrDeclaration
-        }
-        return current
     }
 
     companion object {
