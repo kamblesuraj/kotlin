@@ -106,10 +106,14 @@ TEST(GlobalRootSetTest, Basic) {
     stableRefsProducer.Insert(stableRef2);
     stableRefsProducer.Insert(stableRef3);
 
+    mm::ForeignRefRegistry foreignRefs;
+    mm::ForeignRefRegistry::ThreadQueue foreignRefsProducer(foreignRefs);
+
     globalsProducer.Publish();
     stableRefsProducer.Publish();
+    foreignRefsProducer.publish();
 
-    mm::GlobalRootSet iter(globals, stableRefs);
+    mm::GlobalRootSet iter(globals, stableRefs, foreignRefs);
 
     std_support::vector<mm::GlobalRootSet::Value> actual;
     for (auto object : iter) {
@@ -127,8 +131,9 @@ TEST(GlobalRootSetTest, Basic) {
 TEST(GlobalRootSetTest, Empty) {
     mm::GlobalsRegistry globals;
     mm::StableRefRegistry stableRefs;
+    mm::ForeignRefRegistry foreignRefs;
 
-    mm::GlobalRootSet iter(globals, stableRefs);
+    mm::GlobalRootSet iter(globals, stableRefs, foreignRefs);
 
     std_support::vector<mm::GlobalRootSet::Value> actual;
     for (auto object : iter) {
