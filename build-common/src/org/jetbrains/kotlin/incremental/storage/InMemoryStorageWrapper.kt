@@ -40,9 +40,10 @@ class DefaultInMemoryStorageWrapper<K, V>(private val origin: LazyStorage<K, V>)
     override fun flush(memoryCachesOnly: Boolean) {
         if (isCleanRequested) {
             origin.clean()
-        }
-        for (key in removedKeys) {
-            origin.remove(key)
+        } else {
+            for (key in removedKeys) {
+                origin.remove(key)
+            }
         }
         for ((key, valueWrapper) in inMemoryStorage) {
             if (valueWrapper.isAppend) {
