@@ -498,30 +498,31 @@ fun FirSafeCallExpression.propagateTypeFromQualifiedAccessAfterNullCheck(
     file: FirFile,
 ) {
     val receiverType = nullableReceiverExpression.typeRef.coneTypeSafe<ConeKotlinType>()
-    val typeAfterNullCheck = selector.expressionTypeOrUnitForAssignment() ?: return
-    val isReceiverActuallyNullable = if (session.languageVersionSettings.supportsFeature(LanguageFeature.SafeCallsAreAlwaysNullable)) {
-        true
-    } else {
-        receiverType != null && session.typeContext.run { receiverType.isNullableType() }
+
+    val resultingType = when (val it = selector) {
+        is FirExpression -> {
+            val type = it.typeRef.coneTypeSafe<ConeKotlinType>() ?: return
+
+            val isReceiverActuallyNullable = session.languageVersionSettings.supportsFeature(LanguageFeature.SafeCallsAreAlwaysNullable)
+                    || receiverType != null && session.typeContext.run { receiverType.isNullableType() }
+
+            if (isReceiverActuallyNullable) {
+                type.withNullability(ConeNullability.NULLABLE, session.typeContext)
+            } else {
+                type
+            }
+        }
+        else -> {
+            require(it is FirVariableAssignment) {
+                "The only non-expression FirQualifiedAccess is FirVariableAssignment, but ${this::class} was found"
+            }
+            StandardClassIds.Unit.constructClassLikeType(emptyArray(), isNullable = false)
+        }
     }
-    val resultingType =
-        if (isReceiverActuallyNullable)
-            typeAfterNullCheck.withNullability(ConeNullability.NULLABLE, session.typeContext)
-        else
-            typeAfterNullCheck
 
     val resolvedTypeRef = typeRef.resolvedTypeFromPrototype(resultingType)
     replaceTypeRef(resolvedTypeRef)
     session.lookupTracker?.recordTypeResolveAsLookup(resolvedTypeRef, source, file.source)
-}
-
-private fun FirStatement.expressionTypeOrUnitForAssignment(): ConeKotlinType? {
-    if (this is FirExpression) return typeRef.coneTypeSafe()
-
-    require(this is FirVariableAssignment) {
-        "The only non-expression FirQualifiedAccess is FirVariableAssignment, but ${this::class} was found"
-    }
-    return StandardClassIds.Unit.constructClassLikeType(emptyArray(), isNullable = false)
 }
 
 fun FirAnnotation.getCorrespondingClassSymbolOrNull(session: FirSession): FirRegularClassSymbol? {
