@@ -12,26 +12,18 @@ import org.gradle.work.DisableCachingByDefault
 import org.gradle.work.InputChanges
 import org.gradle.work.NormalizeLineEndings
 import org.jetbrains.kotlin.gradle.targets.js.internal.RewriteSourceMapFilterReader
+import org.jetbrains.kotlin.gradle.tasks.LinkSyncTask
 import java.io.File
 import javax.inject.Inject
 
 @DisableCachingByDefault
-abstract class LinkSyncTask : DefaultTask() {
+abstract class DefaultLinkSyncTask : DefaultTask(), LinkSyncTask {
 
     @get:Inject
     abstract val fs: FileSystemOperations
 
     @get:Inject
     abstract val objectFactory: ObjectFactory
-
-    @get:InputFiles
-    @get:NormalizeLineEndings
-    @get:IgnoreEmptyDirectories
-    @get:SkipWhenEmpty
-    abstract val from: ConfigurableFileCollection
-
-    @get:OutputDirectory
-    abstract val destinationDir: Property<File>
 
     @TaskAction
     fun doCopy(inputChanges: InputChanges) {

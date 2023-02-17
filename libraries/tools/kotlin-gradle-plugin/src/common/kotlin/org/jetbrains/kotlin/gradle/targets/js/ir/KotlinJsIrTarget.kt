@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenExec
 import org.jetbrains.kotlin.gradle.targets.js.dsl.*
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 import org.jetbrains.kotlin.gradle.targets.js.typescript.TypeScriptValidationTask
+import org.jetbrains.kotlin.gradle.tasks.LinkSyncTask
 import org.jetbrains.kotlin.gradle.tasks.locateOrRegisterTask
 import org.jetbrains.kotlin.gradle.tasks.registerTask
 import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
@@ -129,11 +130,11 @@ constructor(
         }
     }
 
-    private fun registerCompileSync(binary: JsIrBinary): TaskProvider<LinkSyncTask> {
+    private fun registerCompileSync(binary: JsIrBinary): TaskProvider<DefaultLinkSyncTask> {
         val compilation = binary.compilation
         val npmProject = compilation.npmProject
 
-        return project.registerTask<LinkSyncTask>(
+        return project.registerTask<DefaultLinkSyncTask>(
             binary.linkSyncTaskName
         ) { task ->
             task.from.from(
