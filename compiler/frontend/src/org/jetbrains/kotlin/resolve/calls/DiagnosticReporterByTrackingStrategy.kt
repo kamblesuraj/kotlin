@@ -538,7 +538,6 @@ class DiagnosticReporterByTrackingStrategy(
             BuilderInferencePosition -> {
                 // some error reported later?
             }
-            is CallableReferenceConstraintPosition<*> -> TODO()
             is DeclaredUpperBoundConstraintPosition<*> -> {
                 val typeParameterDescriptor = position.typeParameter as TypeParameterDescriptor
                 val ownerDescriptor = typeParameterDescriptor.containingDeclaration
@@ -555,13 +554,16 @@ class DiagnosticReporterByTrackingStrategy(
             is DelegatedPropertyConstraintPosition<*> -> {
                 // DELEGATE_SPECIAL_FUNCTION_NONE_APPLICABLE, reported later
             }
-            is IncorporationConstraintPosition -> TODO()
-            is InjectedAnotherStubTypeConstraintPosition<*> -> TODO()
             is KnownTypeParameterConstraintPosition<*> -> {
                 // UPPER_BOUND_VIOLATED, reported later?
             }
-            is LHSArgumentConstraintPosition<*, *> -> TODO()
-            SimpleConstraintSystemConstraintPosition -> TODO()
+            is CallableReferenceConstraintPosition<*>,
+            is IncorporationConstraintPosition,
+            is InjectedAnotherStubTypeConstraintPosition<*>,
+            is LHSArgumentConstraintPosition<*, *>,
+            SimpleConstraintSystemConstraintPosition -> {
+                throw AssertionError("Constraint error in unexpected position: $position")
+            }
             // Never reachable
             is ArgumentConstraintPosition<*>,
             is LambdaArgumentConstraintPosition<*>,
