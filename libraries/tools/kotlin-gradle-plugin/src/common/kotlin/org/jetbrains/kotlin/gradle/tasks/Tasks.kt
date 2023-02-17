@@ -167,6 +167,10 @@ abstract class AbstractKotlinCompileTool<T : CommonToolArguments> @Inject constr
     internal val defaultCompilerClasspath: ConfigurableFileCollection =
         project.objects.fileCollection()
 
+    @get:Classpath
+    internal val compilerFacadeClasspath: ConfigurableFileCollection =
+        project.objects.fileCollection()
+
     protected fun validateCompilerClasspath() {
         // Note that the check triggers configuration resolution
         require(!defaultCompilerClasspath.isEmpty) {
@@ -327,6 +331,9 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments> @Inject constr
     internal open val defaultKotlinJavaToolchain: Provider<DefaultKotlinJavaToolchain> = objectFactory
         .propertyWithNewInstance({ null })
 
+    @get:Input
+    internal abstract val useEmbeddedCompiler: Property<Boolean>
+
     @get:Internal
     internal val compilerRunner: Provider<GradleCompilerRunner> =
         objectFactory.propertyWithConvention(
@@ -339,7 +346,7 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments> @Inject constr
                         defaultKotlinJavaToolchain
                             .map {
                                 val toolsJar = it.currentJvmJdkToolsJar.orNull
-                                GradleCompilerRunnerWithWorkers(
+                                createGradleCompilerRunner(
                                     taskProvider,
                                     toolsJar,
                                     CompilerExecutionSettings(
@@ -348,7 +355,8 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments> @Inject constr
                                         useDaemonFallbackStrategy.get()
                                     ),
                                     params.first,
-                                    workerExecutor
+                                    workerExecutor,
+                                    useEmbeddedCompiler.get(),
                                 )
                             }
                     }
@@ -730,7 +738,7 @@ abstract class KotlinCompile @Inject constructor(
 
         @Suppress("ConvertArgumentToSet")
         val environment = GradleCompilerEnvironment(
-            defaultCompilerClasspath, gradleMessageCollector, outputItemCollector,
+            defaultCompilerClasspath, compilerFacadeClasspath, gradleMessageCollector, outputItemCollector,
             // In the incremental compiler, outputFiles will be cleaned on rebuild. However, because classpathSnapshotDir is not included in
             // TaskOutputsBackup, we don't want classpathSnapshotDir to be cleaned immediately on rebuild, and therefore we exclude it from
             // outputFiles here. (See TaskOutputsBackup's kdoc for more info.)
@@ -1142,7 +1150,7 @@ abstract class Kotlin2JsCompile @Inject constructor(
         } else null
 
         val environment = GradleCompilerEnvironment(
-            defaultCompilerClasspath, gradleMessageCollector, outputItemCollector,
+            defaultCompilerClasspath, compilerFacadeClasspath, gradleMessageCollector, outputItemCollector,
             outputFiles = allOutputFiles(),
             reportingSettings = reportingSettings(),
             incrementalCompilationEnvironment = icEnv
