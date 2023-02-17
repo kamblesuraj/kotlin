@@ -97,6 +97,22 @@ abstract class BaseCompilationTransaction : CompilationTransaction {
         inMemoryStorageWrappers.add(inMemoryStorageWrapper)
     }
 
+    override var cachesManager: Closeable? = null
+        set(value) {
+            check(field == null) {
+                "cachesManager is already set"
+            }
+            field = value
+        }
+
+    override var executionThrowable: Throwable? = null
+        set(value) {
+            check(field == null) {
+                "executionThrowable is already set"
+            }
+            field = value
+        }
+
     protected fun closeCachesManager() = runCatching {
         if (!isSuccessful) {
             for (wrapper in inMemoryStorageWrappers) {
@@ -131,10 +147,6 @@ class NonRecoverableCompilationTransaction : CompilationTransaction, BaseCompila
             Files.delete(outputFile)
         }
     }
-
-    override var cachesManager: Closeable? = null
-
-    override var executionThrowable: Throwable? = null
 
     override fun close() {
         checkForExecutionException()
@@ -232,10 +244,6 @@ class RecoverableCompilationTransaction(
             }
         }
     }
-
-    override var cachesManager: Closeable? = null
-
-    override var executionThrowable: Throwable? = null
 
     override fun close() {
         checkForExecutionException()
