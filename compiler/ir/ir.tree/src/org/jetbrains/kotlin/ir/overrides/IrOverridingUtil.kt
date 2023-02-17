@@ -647,6 +647,8 @@ class IrOverridingUtil(
                 subMember !is IrSimpleFunction -> return incompatible("Member kind mismatch")
                 superMember.hasExtensionReceiver != subMember.hasExtensionReceiver -> return incompatible("Receiver presence mismatch")
                 superMember.isSuspend != subMember.isSuspend -> return incompatible("Incompatible suspendability")
+                superMember.isInline -> return incompatible("Inline function can't be overridden")
+                subMember.isInline -> return incompatible("Function can't be overridden with inline function")
 
                 else -> {
                     superTypeParameters = superMember.typeParameters
