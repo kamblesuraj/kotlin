@@ -13,7 +13,7 @@
 namespace kotlin {
 namespace mm {
 
-// Registry for all objects that have references outside of Kotlin.
+// Registry for all objects that have stable reference created for them.
 class StableRefRegistry : Pinned {
     using Mutex = SpinLock<MutexThreadStateHandling::kIgnore>;
 

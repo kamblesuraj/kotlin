@@ -81,7 +81,7 @@ id allocWithZoneImp(Class self, SEL _cmd, void* zone) {
   ObjHolder holder;
   auto kotlinObj = AllocInstanceWithAssociatedObject(typeInfo, result, holder.slot());
 
-  getBackRef(result, classData)->initAndAddRef(kotlinObj);
+  getBackRef(result, classData)->initAndAddRef(kotlinObj, true);
 
   return result;
 }

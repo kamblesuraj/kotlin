@@ -38,6 +38,7 @@ public:
         explicit Node(Producer* owner, Args&& ...args) noexcept : value_(std::forward<Args>(args)...), owner_(owner) {}
 
         T& operator*() noexcept { return value_; }
+        T* operator->() noexcept { return &value_; }
 
         static Node& fromValue(T& t) noexcept {
             static_assert(std::is_base_of_v<Pinned, T>, "fromValue function only makes sense for non-movable object");
@@ -121,18 +122,23 @@ public:
 
         bool operator!=(const Iterator& rhs) const noexcept { return position_ != rhs.position_; }
 
+        void EraseAndAdvance() noexcept {
+            owner_->EraseAndAdvance(*this);
+        }
+
     private:
         friend class MultiSourceQueue;
 
-        explicit Iterator(const typename List<Node>::iterator& position) noexcept : position_(position) {}
+        Iterator(MultiSourceQueue* owner, const typename List<Node>::iterator& position) noexcept : owner_(owner), position_(position) {}
 
+        MultiSourceQueue* owner_ = nullptr;
         typename List<Node>::iterator position_;
     };
 
     class Iterable : MoveOnly {
     public:
-        Iterator begin() noexcept { return Iterator(owner_.queue_.begin()); }
-        Iterator end() noexcept { return Iterator(owner_.queue_.end()); }
+        Iterator begin() noexcept { return Iterator(&owner_, owner_.queue_.begin()); }
+        Iterator end() noexcept { return Iterator(&owner_, owner_.queue_.end()); }
 
     private:
         friend class MultiSourceQueue;

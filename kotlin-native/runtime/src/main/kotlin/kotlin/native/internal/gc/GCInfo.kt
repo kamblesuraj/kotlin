@@ -46,7 +46,8 @@ public class RootSetStatistics(
         val threadLocalReferences: Long,
         val stackReferences: Long,
         val globalReferences: Long,
-        val stableReferences: Long
+        val stableReferences: Long,
+        val foreignReferences: Long,
 )
 
 /**
@@ -133,8 +134,8 @@ private class GCInfoBuilder() {
     }
 
     @ExportForCppRuntime("Kotlin_Internal_GC_GCInfoBuilder_setRootSet")
-    private fun setRootSet(threadLocalReferences: Long, stackReferences: Long, globalReferences: Long, stableReferences: Long) {
-        rootSet = RootSetStatistics(threadLocalReferences, stackReferences, globalReferences, stableReferences)
+    private fun setRootSet(threadLocalReferences: Long, stackReferences: Long, globalReferences: Long, stableReferences: Long, foreignReferences: Long) {
+        rootSet = RootSetStatistics(threadLocalReferences, stackReferences, globalReferences, stableReferences, foreignReferences)
     }
 
     @ExportForCppRuntime("Kotlin_Internal_GC_GCInfoBuilder_setMemoryUsageBefore")

@@ -52,12 +52,14 @@ public:
         GCHandle& handle_;
         uint64_t globalRoots_ = 0;
         uint64_t stableRoots_ = 0;
+        uint64_t foreignRoots_ = 0;
 
     public:
         explicit GCGlobalRootSetScope(GCHandle& handle);
         ~GCGlobalRootSetScope();
         void addGlobalRoot() { globalRoots_++; }
         void addStableRoot() { stableRoots_++; }
+        void addForeignRoot() { foreignRoots_++; }
     };
 
     class GCThreadRootSetScope : GCStageScopeUsTimer, Pinned {
@@ -87,12 +89,25 @@ public:
         }
     };
 
+    class GCSweepForeignRefsScope : GCStageScopeUsTimer, Pinned {
+        GCHandle& handle_;
+        uint64_t swept_ = 0;
+        uint64_t kept_ = 0;
+
+    public:
+        explicit GCSweepForeignRefsScope(GCHandle& handle) noexcept : handle_(handle) {}
+        ~GCSweepForeignRefsScope();
+
+        void addSwept() noexcept { ++swept_; }
+        void addKept() noexcept { ++kept_; }
+    };
+
 private:
     uint64_t epoch_;
     explicit GCHandle(uint64_t epoch) : epoch_(epoch) {}
 
     void threadRootSetCollected(mm::ThreadData& threadData, uint64_t threadLocalReferences, uint64_t stackReferences);
-    void globalRootSetCollected(uint64_t globalReferences, uint64_t stableReferences);
+    void globalRootSetCollected(uint64_t globalReferences, uint64_t stableReferences, uint64_t foreignReferences);
     void heapUsageBefore(MemoryUsage usage);
     void heapUsageAfter(MemoryUsage usage);
     void extraObjectsUsageBefore(MemoryUsage usage);
@@ -117,6 +132,7 @@ public:
     GCGlobalRootSetScope collectGlobalRoots() { return GCGlobalRootSetScope(*this); }
     GCThreadRootSetScope collectThreadRoots(mm::ThreadData& threadData) { return GCThreadRootSetScope(*this, threadData); }
     GCMarkScope mark() { return GCMarkScope(*this); }
+    GCSweepForeignRefsScope sweepForeignRefs() noexcept { return GCSweepForeignRefsScope(*this); }
 
     MemoryUsage getMarked();
 };

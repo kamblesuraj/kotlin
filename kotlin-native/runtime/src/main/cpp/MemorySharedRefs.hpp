@@ -39,14 +39,18 @@ class KRefSharedHolder {
 
  private:
   ObjHeader* obj_;
-  ForeignRefContext context_;
+  union {
+    ForeignRefContext context_; // Legacy MM
+    void* stablePointer_; // New MM
+  };
 };
 
 static_assert(std::is_trivially_destructible_v<KRefSharedHolder>, "KRefSharedHolder destructor is not guaranteed to be called.");
 
 class BackRefFromAssociatedObject {
  public:
-  void initAndAddRef(ObjHeader* obj);
+  void initAndAddRef(ObjHeader* obj, bool commit);
+  void commit();
 
   // Error if refCount is zero and it's called from the wrong worker with non-frozen obj_.
   template <ErrorPolicy errorPolicy>
@@ -64,6 +68,10 @@ class BackRefFromAssociatedObject {
   // Error if called from the wrong worker with non-frozen obj_.
   template <ErrorPolicy errorPolicy>
   ObjHeader* ref() const;
+
+  ObjHeader*& objUnsafe() { return obj_; }
+
+  bool isReferenced() const;
 
  private:
   ObjHeader* obj_; // May be null before [initAndAddRef] or after [detach].

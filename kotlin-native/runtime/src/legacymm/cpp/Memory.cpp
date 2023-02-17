@@ -3250,16 +3250,28 @@ ForeignRefContext InitLocalForeignRef(ObjHeader* object) {
   return initLocalForeignRef(object);
 }
 
-ForeignRefContext InitForeignRef(ObjHeader* object) {
+ForeignRefContext InitForeignRefLegacyMM(ObjHeader* object) {
   return initForeignRef(object);
 }
 
-void DeinitForeignRef(ObjHeader* object, ForeignRefContext context) {
+void DeinitForeignRefLegacyMM(ObjHeader* object, ForeignRefContext context) {
   deinitForeignRef(object, context);
+}
+
+ForeignRefContext RUNTIME_NOTHROW InitForeignRef(BackRefFromAssociatedObject* backRef, bool commit) {
+  RuntimeFail("Only for experimental MM");
+}
+
+void RUNTIME_NOTHROW DeinitForeignRef(ForeignRefContext context) {
+  RuntimeFail("Only for experimental MM");
 }
 
 bool IsForeignRefAccessible(ObjHeader* object, ForeignRefContext context) {
   return isForeignRefAccessible(object, context);
+}
+
+void RUNTIME_NOTHROW ForeignRefPromote(ForeignRefContext context) {
+  RuntimeFail("Only for experimental MM");
 }
 
 void AdoptReferenceFromSharedVariable(ObjHeader* object) {

@@ -90,6 +90,8 @@ mm::GlobalRootSet::Value mm::GlobalRootSet::Iterator::operator*() noexcept {
             return {**globalsIterator_, Source::kGlobal};
         case Phase::kStableRefs:
             return {*stableRefsIterator_, Source::kStableRef};
+        case Phase::kForeignRefs:
+            return {*foreignRefsIterator_, Source::kForeignRef};
         case Phase::kDone:
             RuntimeFail("Cannot dereference");
     }
@@ -103,6 +105,10 @@ mm::GlobalRootSet::Iterator& mm::GlobalRootSet::Iterator::operator++() noexcept 
             return *this;
         case Phase::kStableRefs:
             ++stableRefsIterator_;
+            Init();
+            return *this;
+        case Phase::kForeignRefs:
+            ++foreignRefsIterator_;
             Init();
             return *this;
         case Phase::kDone:
@@ -122,6 +128,8 @@ bool mm::GlobalRootSet::Iterator::operator==(const Iterator& rhs) const noexcept
             return globalsIterator_ == rhs.globalsIterator_;
         case Phase::kStableRefs:
             return stableRefsIterator_ == rhs.stableRefsIterator_;
+        case Phase::kForeignRefs:
+            return foreignRefsIterator_ == rhs.foreignRefsIterator_;
     }
 }
 
@@ -135,6 +143,11 @@ void mm::GlobalRootSet::Iterator::Init() noexcept {
                 break;
             case Phase::kStableRefs:
                 if (stableRefsIterator_ != owner_.stableRefsIterable_.end()) return;
+                phase_ = Phase::kForeignRefs;
+                foreignRefsIterator_ = owner_.foreignRefsIterable_.begin();
+                break;
+            case Phase::kForeignRefs:
+                if (foreignRefsIterator_ != owner_.foreignRefsIterable_.end()) return;
                 phase_ = Phase::kDone;
                 break;
             case Phase::kDone:
@@ -146,4 +159,4 @@ void mm::GlobalRootSet::Iterator::Init() noexcept {
 mm::ThreadRootSet::ThreadRootSet(ThreadData& threadData) noexcept : ThreadRootSet(threadData.shadowStack(), threadData.tls()) {}
 
 mm::GlobalRootSet::GlobalRootSet() noexcept :
-    GlobalRootSet(mm::GlobalData::Instance().globalsRegistry(), mm::GlobalData::Instance().stableRefRegistry()) {}
+    GlobalRootSet(mm::GlobalData::Instance().globalsRegistry(), mm::GlobalData::Instance().stableRefRegistry(), mm::GlobalData::Instance().foreignRefRegistry()) {}

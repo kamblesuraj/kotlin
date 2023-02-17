@@ -132,6 +132,7 @@ bool gc::SameThreadMarkAndSweep::PerformFullGC() noexcept {
         scheduler.gcData().UpdateAliveSetBytes(markStats.totalObjectsSize);
         gc::SweepExtraObjects<SweepTraits>(gcHandle, extraObjectsDataFactory);
         finalizerQueue = gc::Sweep<SweepTraits>(gcHandle, objectFactory_);
+        sweepForeignRefs(gcHandle, mm::GlobalData::Instance().foreignRefRegistry());
 
         kotlin::compactObjectPoolInMainThread();
 

@@ -195,6 +195,7 @@ bool gc::ConcurrentMarkAndSweep::PerformFullGC(int64_t epoch) noexcept {
     gcHandle.threadsAreResumed();
     heap_.Sweep();
 #endif
+    sweepForeignRefs(gcHandle, mm::GlobalData::Instance().foreignRefRegistry());
     state_.finish(epoch);
     gcHandle.finalizersScheduled(finalizerQueue.size());
     gcHandle.finished();

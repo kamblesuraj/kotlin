@@ -7,6 +7,7 @@
 #define RUNTIME_GC_COMMON_MARK_AND_SWEEP_UTILS_H
 
 #include "ExtraObjectData.hpp"
+#include "ForeignRefRegistry.hpp"
 #include "FinalizerHooks.hpp"
 #include "GlobalData.hpp"
 #include "GCStatistics.hpp"
@@ -190,6 +191,9 @@ void collectRootSetGlobals(GCHandle gcHandle, typename Traits::MarkQueue& markQu
                 case mm::GlobalRootSet::Source::kStableRef:
                     handle.addStableRoot();
                     break;
+                case mm::GlobalRootSet::Source::kForeignRef:
+                    handle.addForeignRoot();
+                    break;
             }
         }
     }
@@ -206,6 +210,20 @@ void collectRootSet(GCHandle handle, typename Traits::MarkQueue& markQueue, F&& 
         collectRootSetForThread<Traits>(handle, markQueue, thread);
     }
     collectRootSetGlobals<Traits>(handle, markQueue);
+}
+
+inline void sweepForeignRefs(GCHandle gcHandle, mm::ForeignRefRegistry& registry) noexcept {
+    auto handle = gcHandle.sweepForeignRefs();
+    auto iterable = registry.lockForIter();
+    for (auto it = iterable.begin(); it != iterable.end();) {
+        if ((*it).canBeSwept()) {
+            it.EraseAndAdvance();
+            handle.addSwept();
+        } else {
+            ++it;
+            handle.addKept();
+        }
+    }
 }
 
 } // namespace gc

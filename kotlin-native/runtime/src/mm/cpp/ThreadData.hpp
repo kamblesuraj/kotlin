@@ -8,17 +8,18 @@
 
 #include <atomic>
 
-#include "GlobalData.hpp"
-#include "GlobalsRegistry.hpp"
+#include "ExtraObjectDataFactory.hpp"
+#include "ForeignRefRegistry.hpp"
 #include "GC.hpp"
 #include "GCScheduler.hpp"
+#include "GlobalData.hpp"
+#include "GlobalsRegistry.hpp"
 #include "ObjectFactory.hpp"
-#include "ExtraObjectDataFactory.hpp"
 #include "ShadowStack.hpp"
 #include "StableRefRegistry.hpp"
 #include "ThreadLocalStorage.hpp"
-#include "Utils.hpp"
 #include "ThreadSuspension.hpp"
+#include "Utils.hpp"
 #include "std_support/Vector.hpp"
 
 struct ObjHeader;
@@ -34,6 +35,7 @@ public:
         threadId_(threadId),
         globalsThreadQueue_(GlobalsRegistry::Instance()),
         stableRefThreadQueue_(StableRefRegistry::Instance()),
+        foreignRefThreadQueue_(GlobalData::Instance().foreignRefRegistry()),
         extraObjectDataThreadQueue_(ExtraObjectDataFactory::Instance()),
         gc_(GlobalData::Instance().gc(), *this),
         suspensionData_(ThreadState::kNative, *this) {}
@@ -47,6 +49,8 @@ public:
     ThreadLocalStorage& tls() noexcept { return tls_; }
 
     StableRefRegistry::ThreadQueue& stableRefThreadQueue() noexcept { return stableRefThreadQueue_; }
+
+    ForeignRefRegistry::ThreadQueue& foreignRefThreadQueue() noexcept { return foreignRefThreadQueue_; }
 
     ExtraObjectDataFactory::ThreadQueue& extraObjectDataThreadQueue() noexcept { return extraObjectDataThreadQueue_; }
 
@@ -66,6 +70,7 @@ public:
         // TODO: These use separate locks, which is inefficient.
         globalsThreadQueue_.Publish();
         stableRefThreadQueue_.Publish();
+        foreignRefThreadQueue_.publish();
         extraObjectDataThreadQueue_.Publish();
         gc_.Publish();
     }
@@ -73,6 +78,7 @@ public:
     void ClearForTests() noexcept {
         globalsThreadQueue_.ClearForTests();
         stableRefThreadQueue_.ClearForTests();
+        foreignRefThreadQueue_.clearForTests();
         extraObjectDataThreadQueue_.ClearForTests();
         gc_.ClearForTests();
     }
@@ -82,6 +88,7 @@ private:
     GlobalsRegistry::ThreadQueue globalsThreadQueue_;
     ThreadLocalStorage tls_;
     StableRefRegistry::ThreadQueue stableRefThreadQueue_;
+    ForeignRefRegistry::ThreadQueue foreignRefThreadQueue_;
     ExtraObjectDataFactory::ThreadQueue extraObjectDataThreadQueue_;
     ShadowStack shadowStack_;
     gc::GC::ThreadData gc_;

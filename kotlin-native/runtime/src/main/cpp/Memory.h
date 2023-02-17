@@ -152,6 +152,7 @@ ALWAYS_INLINE inline bool isNullOrMarker(const ObjHeader* obj) noexcept {
 class ForeignRefManager;
 struct FrameOverlay;
 typedef ForeignRefManager* ForeignRefContext;
+class BackRefFromAssociatedObject;
 
 #ifdef __cplusplus
 extern "C" {
@@ -346,10 +347,15 @@ OBJ_GETTER(TryRef, ObjHeader* object) RUNTIME_NOTHROW;
 
 ForeignRefContext InitLocalForeignRef(ObjHeader* object);
 
-ForeignRefContext InitForeignRef(ObjHeader* object);
-void DeinitForeignRef(ObjHeader* object, ForeignRefContext context);
+ForeignRefContext InitForeignRefLegacyMM(ObjHeader* object);
+void DeinitForeignRefLegacyMM(ObjHeader* object, ForeignRefContext context);
+
+ForeignRefContext InitForeignRef(BackRefFromAssociatedObject* backRef, bool commit) RUNTIME_NOTHROW;
+void DeinitForeignRef(ForeignRefContext context) RUNTIME_NOTHROW;
 
 bool IsForeignRefAccessible(ObjHeader* object, ForeignRefContext context);
+
+void ForeignRefPromote(ForeignRefContext context) RUNTIME_NOTHROW;
 
 // Should be used when reference is read from a possibly shared variable,
 // and there's nothing else keeping the object alive.

@@ -73,19 +73,35 @@ bool ensureRefAccessible<ErrorPolicy::kIgnore>(ObjHeader* object, ForeignRefCont
 
 void KRefSharedHolder::initLocal(ObjHeader* obj) {
   RuntimeAssert(obj != nullptr, "must not be null");
+  if (CurrentMemoryModel == MemoryModel::kExperimental) {
+    stablePointer_ = nullptr;
+    obj_ = obj;
+    return;
+  }
+
   context_ = InitLocalForeignRef(obj);
   obj_ = obj;
 }
 
 void KRefSharedHolder::init(ObjHeader* obj) {
   RuntimeAssert(obj != nullptr, "must not be null");
-  context_ = InitForeignRef(obj);
+  if (CurrentMemoryModel == MemoryModel::kExperimental) {
+    stablePointer_ = CreateStablePointer(obj);
+    obj_ = obj;
+    return;
+  }
+
+  context_ = InitForeignRefLegacyMM(obj);
   obj_ = obj;
 }
 
 template <ErrorPolicy errorPolicy>
 ObjHeader* KRefSharedHolder::ref() const {
-  kotlin::AssertThreadState(kotlin::ThreadState::kRunnable);
+  if (CurrentMemoryModel == MemoryModel::kExperimental) {
+    kotlin::AssertThreadState(kotlin::ThreadState::kRunnable);
+    return obj_;
+  }
+
   if (!ensureRefAccessible<errorPolicy>(obj_, context_)) {
     return nullptr;
   }
@@ -103,8 +119,12 @@ void KRefSharedHolder::dispose() const {
     // To handle the case when it is not initialized. See [KotlinMutableSet/Dictionary dealloc].
     return;
   }
+  if (CurrentMemoryModel == MemoryModel::kExperimental) {
+    DisposeStablePointer(stablePointer_);
+    return;
+  }
 
-  DeinitForeignRef(obj_, context_);
+  DeinitForeignRefLegacyMM(obj_, context_);
 }
 
 OBJ_GETTER0(KRefSharedHolder::describe) const {
@@ -112,13 +132,24 @@ OBJ_GETTER0(KRefSharedHolder::describe) const {
   RETURN_RESULT_OF(DescribeObjectForDebugging, obj_->type_info(), obj_);
 }
 
-void BackRefFromAssociatedObject::initAndAddRef(ObjHeader* obj) {
+void BackRefFromAssociatedObject::initAndAddRef(ObjHeader* obj, bool commit) {
   RuntimeAssert(obj != nullptr, "must not be null");
   obj_ = obj;
+  if (CurrentMemoryModel == MemoryModel::kExperimental) {
+    refCount = 1;
+    context_ = InitForeignRef(this, commit);
+    return;
+  }
 
   // Generally a specialized addRef below:
-  context_ = InitForeignRef(obj);
+  context_ = InitForeignRefLegacyMM(obj);
   refCount = 1;
+}
+
+void BackRefFromAssociatedObject::commit() {
+  if (CurrentMemoryModel == MemoryModel::kExperimental) {
+    ForeignRefPromote(context_);
+  }
 }
 
 template <ErrorPolicy errorPolicy>
@@ -131,7 +162,12 @@ void BackRefFromAssociatedObject::addRef() {
   if (atomicAdd(&refCount, 1) == 1) {
     if (obj_ == nullptr) return; // E.g. after [detach].
 
-    kotlin::CalledFromNativeGuard guard(/* reentrant */ true);
+    if (CurrentMemoryModel == MemoryModel::kExperimental) {
+      kotlin::CalledFromNativeGuard guard(/* reentrant */ true);
+      // Important for the changes to refCount to be visible inside this call.
+      ForeignRefPromote(context_);
+      return;
+    }
 
     // There are no references to the associated object itself, so Kotlin object is being passed from Kotlin,
     // and it is owned therefore.
@@ -139,7 +175,7 @@ void BackRefFromAssociatedObject::addRef() {
 
     // Foreign reference has already been deinitialized (see [releaseRef]).
     // Create a new one:
-    context_ = InitForeignRef(obj_);
+    context_ = InitForeignRefLegacyMM(obj_);
   }
 }
 
@@ -183,6 +219,11 @@ template bool BackRefFromAssociatedObject::tryAddRef<ErrorPolicy::kThrow>();
 template bool BackRefFromAssociatedObject::tryAddRef<ErrorPolicy::kTerminate>();
 
 void BackRefFromAssociatedObject::releaseRef() {
+  if (CurrentMemoryModel == MemoryModel::kExperimental) {
+    atomicAdd(&refCount, -1);
+    return;
+  }
+
   ForeignRefContext context = context_;
   if (atomicAdd(&refCount, -1) == 0) {
     if (obj_ == nullptr) return; // E.g. after [detach].
@@ -191,7 +232,7 @@ void BackRefFromAssociatedObject::releaseRef() {
 
     // Note: by this moment "subsequent" addRef may have already happened and patched context_.
     // So use the value loaded before refCount update:
-    DeinitForeignRef(obj_, context);
+    DeinitForeignRefLegacyMM(obj_, context);
     // From this moment [context] is generally a dangling pointer.
     // This is handled in [IsForeignRefAccessible] and [addRef].
     // TODO: This probably isn't fine in new MM. Make sure it works.
@@ -200,17 +241,30 @@ void BackRefFromAssociatedObject::releaseRef() {
 
 void BackRefFromAssociatedObject::detach() {
   RuntimeAssert(atomicGet(&refCount) == 0, "unexpected refCount");
+  // TODO: Racy with concurrent extra objects sweep.
   obj_ = nullptr; // Handled in addRef/tryAddRef/releaseRef/ref.
+  if (CurrentMemoryModel == MemoryModel::kExperimental) {
+    auto* context = context_;
+    context_ = nullptr;
+    DeinitForeignRef(context);
+  }
 }
 
 ALWAYS_INLINE void BackRefFromAssociatedObject::assertDetached() {
+  if (CurrentMemoryModel == MemoryModel::kExperimental) {
+    RuntimeAssert(obj_ == nullptr && context_ == nullptr, "Expecting this=%p to be detached, but found obj_=%p context_=%p", this, obj_, context_);
+  } else {
     RuntimeAssert(obj_ == nullptr, "Expecting this=%p to be detached, but found obj_=%p", this, obj_);
+  }
 }
 
 template <ErrorPolicy errorPolicy>
 ObjHeader* BackRefFromAssociatedObject::ref() const {
   kotlin::AssertThreadState(kotlin::ThreadState::kRunnable);
   RuntimeAssert(obj_ != nullptr, "no valid Kotlin object found");
+  if (CurrentMemoryModel == MemoryModel::kExperimental) {
+    return obj_;
+  }
 
   if (!ensureRefAccessible<errorPolicy>(obj_, context_)) {
     return nullptr;
@@ -223,6 +277,10 @@ ObjHeader* BackRefFromAssociatedObject::ref() const {
 template ObjHeader* BackRefFromAssociatedObject::ref<ErrorPolicy::kDefaultValue>() const;
 template ObjHeader* BackRefFromAssociatedObject::ref<ErrorPolicy::kThrow>() const;
 template ObjHeader* BackRefFromAssociatedObject::ref<ErrorPolicy::kTerminate>() const;
+
+bool BackRefFromAssociatedObject::isReferenced() const {
+  return atomicGetAcquire(&refCount) > 0;
+}
 
 extern "C" {
 RUNTIME_NOTHROW void KRefSharedHolder_initLocal(KRefSharedHolder* holder, ObjHeader* obj) {

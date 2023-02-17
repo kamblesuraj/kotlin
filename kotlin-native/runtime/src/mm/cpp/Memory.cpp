@@ -8,6 +8,7 @@
 
 #include "Exceptions.h"
 #include "ExtraObjectData.hpp"
+#include "ForeignRefRegistry.hpp"
 #include "Freezing.hpp"
 #include "GC.hpp"
 #include "GlobalsRegistry.hpp"
@@ -26,7 +27,7 @@ using namespace kotlin;
 
 // TODO: This name does not make sense anymore.
 // Delete all means of creating this type directly as it only serves
-// as a typedef for `mm::StableRefRegistry::Node`.
+// as a typedef for `mm::ForeignRefRegistry::Node`.
 class ForeignRefManager : Pinned {
 public:
     ForeignRefManager() = delete;
@@ -37,12 +38,12 @@ namespace {
 
 // `reinterpret_cast` to it and back to the same type
 // will yield precisely the same pointer, so it's safe.
-ALWAYS_INLINE ForeignRefManager* ToForeignRefManager(mm::StableRefRegistry::Node* data) {
+ALWAYS_INLINE ForeignRefManager* ToForeignRefManager(mm::ForeignRefRegistry::Node* data) {
     return reinterpret_cast<ForeignRefManager*>(data);
 }
 
-ALWAYS_INLINE mm::StableRefRegistry::Node* FromForeignRefManager(ForeignRefManager* manager) {
-    return reinterpret_cast<mm::StableRefRegistry::Node*>(manager);
+ALWAYS_INLINE mm::ForeignRefRegistry::Node* FromForeignRefManager(ForeignRefManager* manager) {
+    return reinterpret_cast<mm::ForeignRefRegistry::Node*>(manager);
 }
 
 } // namespace
@@ -563,31 +564,43 @@ extern "C" void EnsureNeverFrozen(ObjHeader* obj) {
 }
 
 extern "C" ForeignRefContext InitLocalForeignRef(ObjHeader* object) {
-    AssertThreadState(ThreadState::kRunnable);
     // TODO: Remove when legacy MM is gone.
     // Nothing to do.
     return nullptr;
 }
 
-extern "C" ForeignRefContext InitForeignRef(ObjHeader* object) {
-    AssertThreadState(ThreadState::kRunnable);
-    auto* threadData = mm::ThreadRegistry::Instance().CurrentThreadData();
-    auto* node = mm::StableRefRegistry::Instance().RegisterStableRef(threadData, object);
-    return ToForeignRefManager(node);
+extern "C" ForeignRefContext InitForeignRefLegacyMM(ObjHeader* object) {
+    // TODO: Remove when legacy MM is gone.
+    // Nothing to do.
+    return nullptr;
 }
 
-extern "C" void DeinitForeignRef(ObjHeader* object, ForeignRefContext context) {
-    AssertThreadState(ThreadState::kRunnable);
-    RuntimeAssert(context != nullptr, "DeinitForeignRef must not be called for InitLocalForeignRef");
+extern "C" void DeinitForeignRefLegacyMM(ObjHeader* object, ForeignRefContext context) {
+    // TODO: Remove when legacy MM is gone.
+    // Nothing to do.
+}
+
+extern "C" ForeignRefContext RUNTIME_NOTHROW InitForeignRef(BackRefFromAssociatedObject* backRef, bool commit) {
     auto* threadData = mm::ThreadRegistry::Instance().CurrentThreadData();
-    auto* node = FromForeignRefManager(context);
-    RuntimeAssert(object == **node, "Must correspond to the same object");
-    mm::StableRefRegistry::Instance().UnregisterStableRef(threadData, node);
+    AssertThreadState(threadData, ThreadState::kRunnable);
+    return ToForeignRefManager(threadData->foreignRefThreadQueue().initForeignRef(backRef, commit));
+}
+
+extern "C" void RUNTIME_NOTHROW DeinitForeignRef(ForeignRefContext context) {
+    // Any thread state is allowed here.
+    RuntimeAssert(context != nullptr, "DeinitForeignRef with null context");
+    (*FromForeignRefManager(context))->deinit();
 }
 
 extern "C" bool IsForeignRefAccessible(ObjHeader* object, ForeignRefContext context) {
     // TODO: Remove when legacy MM is gone.
     return true;
+}
+
+extern "C" void RUNTIME_NOTHROW ForeignRefPromote(ForeignRefContext context) {
+    // Any thread state is allowed here.
+    RuntimeAssert(context != nullptr, "ForeignRefPromote with null context");
+    (*FromForeignRefManager(context))->promote();
 }
 
 extern "C" void AdoptReferenceFromSharedVariable(ObjHeader* object) {
