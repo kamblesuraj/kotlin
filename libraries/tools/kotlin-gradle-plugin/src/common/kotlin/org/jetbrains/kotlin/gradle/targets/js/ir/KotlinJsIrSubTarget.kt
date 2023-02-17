@@ -126,8 +126,8 @@ abstract class KotlinJsIrSubTarget(
             testJs.inputFileProperty.fileProvider(
                 binary.linkSyncTask.flatMap { linkSyncTask ->
                     binary.linkTask.flatMap { linkTask ->
-                        linkTask.outputFileProperty.map {
-                            linkSyncTask.destinationDir.resolve(it.name)
+                        linkTask.outputFileProperty.flatMap { file ->
+                            linkSyncTask.destinationDir.map { it.resolve(file.name) }
                         }
                     }
                 }
