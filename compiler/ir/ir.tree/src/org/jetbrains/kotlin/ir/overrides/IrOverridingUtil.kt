@@ -660,6 +660,8 @@ class IrOverridingUtil(
             is IrProperty -> when {
                 subMember !is IrProperty -> return incompatible("Member kind mismatch")
                 superMember.getter.hasExtensionReceiver != subMember.getter.hasExtensionReceiver -> return incompatible("Receiver presence mismatch")
+                superMember.isInline -> return incompatible("Inline property can't be overridden")
+                subMember.isInline -> return incompatible("Property can't be overridden with inline property")
 
                 else -> {
                     superTypeParameters = superMember.typeParameters
@@ -739,6 +741,9 @@ private inline val IrProperty.compiledValueParameters: List<IrValueParameter>
 
 private inline val IrProperty.typeParameters: List<IrTypeParameter>
     get() = getter?.typeParameters.orEmpty()
+
+private inline val IrProperty.isInline: Boolean
+    get() = getter?.isInline == true || setter?.isInline == true
 
 private inline val IrOverridableMember.typeParameters: List<IrTypeParameter>
     get() = when (this) {
