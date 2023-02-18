@@ -66,6 +66,7 @@ internal fun PhaseContext.fir2Ir(
             linkViaSignatures = false,
             signatureComposerCreator = null,
             irMangler = KonanManglerIr,
+            firMangler = FirKonanMangler(),
             visibilityConverter = Fir2IrVisibilityConverter.Default,
             kotlinBuiltIns = builtInsModule ?: DefaultBuiltIns.Instance,
     ).also {

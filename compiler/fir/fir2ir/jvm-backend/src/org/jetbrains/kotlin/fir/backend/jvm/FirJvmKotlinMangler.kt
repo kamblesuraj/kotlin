@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.signaturer.FirMangler
 
 @NoMutableState
-class FirJvmKotlinMangler : AbstractKotlinMangler<FirDeclaration>(), FirMangler {
+open class FirJvmKotlinMangler : AbstractKotlinMangler<FirDeclaration>(), FirMangler {
 
     override fun FirDeclaration.mangleString(compatibleMode: Boolean): String = getMangleComputer(MangleMode.FULL, compatibleMode).computeMangle(this)
 

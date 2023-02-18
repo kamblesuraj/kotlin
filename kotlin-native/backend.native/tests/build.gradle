@@ -5271,8 +5271,7 @@ if (PlatformInfo.isAppleTarget(project)) {
 
     standaloneTest("interop_kt55653") {
         // Test depends on macOS-specific AppKit
-        enabled = (project.testTarget == 'macos_x64' || project.testTarget == 'macos_arm64' || project.testTarget == null) &&
-                !isK2(project) // KT-56030
+        enabled = (project.testTarget == 'macos_x64' || project.testTarget == 'macos_arm64' || project.testTarget == null)
         source = "interop/objc/kt55653/main.kt"
         useGoldenData = true
         UtilsKt.dependsOnPlatformLibs(it)

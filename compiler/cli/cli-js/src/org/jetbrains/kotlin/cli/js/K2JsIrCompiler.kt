@@ -44,6 +44,7 @@ import org.jetbrains.kotlin.fir.DependencyListForCliModule
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.backend.Fir2IrExtensions
 import org.jetbrains.kotlin.fir.backend.Fir2IrVisibilityConverter
+import org.jetbrains.kotlin.fir.backend.jvm.FirJvmKotlinMangler
 import org.jetbrains.kotlin.fir.declarations.FirFile
 import org.jetbrains.kotlin.fir.descriptors.FirModuleDescriptor
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
@@ -552,6 +553,7 @@ class K2JsIrCompiler : CLICompiler<K2JSCompilerArguments>() {
             linkViaSignatures = false,
             signatureComposerCreator = null,
             irMangler = JsManglerIr,
+            firMangler = FirJvmKotlinMangler(),
             visibilityConverter = Fir2IrVisibilityConverter.Default,
             kotlinBuiltIns = builtInsModule ?: DefaultBuiltIns.Instance,
             fir2IrResultPostCompute = {

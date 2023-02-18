@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.fir.backend.jvm.FirJvmVisibilityConverter
 import org.jetbrains.kotlin.fir.declarations.FirFile
 import org.jetbrains.kotlin.fir.languageVersionSettings
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
+import org.jetbrains.kotlin.fir.signaturer.FirMangler
 import org.jetbrains.kotlin.ir.backend.jvm.serialization.JvmDescriptorMangler
 import org.jetbrains.kotlin.ir.backend.jvm.serialization.JvmIrMangler
 import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
@@ -42,6 +43,7 @@ fun FirResult.convertToIrAndActualizeForJvm(
     linkViaSignatures = linkViaSignatures,
     signatureComposerCreator = { JvmIdSignatureDescriptor(JvmDescriptorMangler(null)) },
     irMangler = JvmIrMangler,
+    firMangler = FirJvmKotlinMangler(),
     visibilityConverter = FirJvmVisibilityConverter,
     kotlinBuiltIns = DefaultBuiltIns.Instance,
 )
@@ -52,6 +54,7 @@ fun FirResult.convertToIrAndActualize(
     linkViaSignatures: Boolean,
     signatureComposerCreator: (() -> IdSignatureComposer)?,
     irMangler: KotlinMangler.IrMangler,
+    firMangler: FirMangler,
     visibilityConverter: Fir2IrVisibilityConverter,
     kotlinBuiltIns: KotlinBuiltIns,
     fir2IrResultPostCompute: Fir2IrResult.() -> Unit = {},
@@ -61,7 +64,7 @@ fun FirResult.convertToIrAndActualize(
     val commonMemberStorage = Fir2IrCommonMemberStorage(
         generateSignatures = linkViaSignatures,
         signatureComposerCreator = signatureComposerCreator,
-        manglerCreator = { FirJvmKotlinMangler() } // TODO: replace with potentially simpler version for other backends.
+        manglerCreator = { firMangler }
     )
 
     when (outputs.size) {
