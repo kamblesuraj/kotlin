@@ -18,12 +18,9 @@ fun main(args: Array<String>) {
 }
 
 fun run() {
-    /*
     // TODO: migrate remaining tests to interop/objc/tests/
     testTypeOps()
-    */
     testCustomRetain()
-    /*
     testExportObjCClass()
     testLocalizedStrings()
 
@@ -105,7 +102,7 @@ fun run() {
     createObjectWithFactory(object : NSObject(), ObjectFactoryProtocol {
         override fun create() = autoreleasepool { NSObject() }
     })
-    */
+
 }
 
 fun MutablePairProtocol.swap() {
