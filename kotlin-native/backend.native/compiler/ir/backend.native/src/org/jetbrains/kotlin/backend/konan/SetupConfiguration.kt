@@ -179,6 +179,12 @@ fun CompilerConfiguration.setupFromArguments(arguments: K2NativeCompilerArgument
     arguments.autoCacheDir?.let { put(AUTO_CACHE_DIR, it) }
     arguments.filesToCache?.let { put(FILES_TO_CACHE, it.toList()) }
     put(MAKE_PER_FILE_CACHE, arguments.makePerFileCache)
+    val nThreadsRaw = parseBackendThreads(arguments.backendThreads)
+    val nThreads = if (nThreadsRaw == 0) Runtime.getRuntime().availableProcessors() else nThreadsRaw
+    if (nThreads > 1) {
+        report(LOGGING, "Running backend in parallel with $nThreads threads")
+    }
+    put(CommonConfigurationKeys.PARALLEL_BACKEND_THREADS, nThreads)
 
     parseShortModuleName(arguments, this@setupFromArguments, outputKind)?.let {
         put(SHORT_MODULE_NAME, it)
@@ -399,6 +405,14 @@ private fun parseLibraryToAddToCache(
     } else {
         input
     }
+}
+
+private fun parseBackendThreads(stringValue: String): Int {
+    val value = stringValue.toIntOrNull()
+            ?: throw KonanCompilationException("Cannot parse -Xbackend-threads value: \"$stringValue\". Please use an integer number")
+    if (value < 0)
+        throw KonanCompilationException("-Xbackend-threads value cannot be negative")
+    return value
 }
 
 // TODO: Support short names for current module in ObjC export and lift this limitation.
