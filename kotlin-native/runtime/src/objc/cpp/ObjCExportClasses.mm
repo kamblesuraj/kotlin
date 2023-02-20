@@ -105,9 +105,9 @@ static void injectToRuntime();
         return objc_retain(old);
       }
     }
+    candidate->refHolder.commit();
   }
 
-  candidate->refHolder.commit();
   return candidate;
 }
 
