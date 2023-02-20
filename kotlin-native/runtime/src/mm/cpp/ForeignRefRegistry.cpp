@@ -33,17 +33,22 @@ void mm::ForeignRefRegistry::promoteToRoots(Record& record) noexcept {
 }
 
 mm::ForeignRefRegistry::Record* mm::ForeignRefRegistry::nextRoot(Record* current, int maxIterations) noexcept {
+    konan::consoleErrorf("nextRoot head=%p tail=%p\n", &rootsHead_, &rootsTail_);
     for (int i = 0; i < maxIterations; ++i) {
+        konan::consoleErrorf("nextRoot current=%p i=%d\n", current, i);
         RuntimeAssert(current != &rootsTail_, "Trying to increment past the end");
         auto candidate = current->next_.load(std::memory_order_acquire);
+        konan::consoleErrorf("nextRoot candidadate=%p\n", candidate);
         if (candidate == &rootsTail_ || candidate->needsToBeRoot()) {
             // Perfectly good node. Stop right there.
             // It's fine if anyone inserted something between prev and current:
             // * promoteToRoots will make sure to mark that record.
             // * And on the next GC iteration it'll be properly processed, because
             //   deletion only happens at this stage.
+            konan::consoleErrorf("nextRoot candidadate good\n");
             return candidate;
         }
+        konan::consoleErrorf("nextRoot candidadate bad\n");
         // Okay, let's delete the candidate
         while (true) {
             RuntimeAssert(current != &rootsTail_, "Deleting candidate has moved us to the end");
@@ -61,8 +66,10 @@ mm::ForeignRefRegistry::Record* mm::ForeignRefRegistry::nextRoot(Record* current
             // Move current forward, and try deleting again.
             current = actualNext;
         }
+        konan::consoleErrorf("nextRoot candidadate purged\n");
         // Candidate is deleted. But should it have been?
         if (candidate->needsToBeRoot()) {
+            konan::consoleErrorf("nextRoot candidadate good actually\n");
             // Oops. Let's put it back. In the head of the list is okay.
             promoteToRoots(*candidate);
         }
