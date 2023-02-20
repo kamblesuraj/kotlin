@@ -136,7 +136,6 @@ void BackRefFromAssociatedObject::initAndAddRef(ObjHeader* obj, bool commit) {
   RuntimeAssert(obj != nullptr, "must not be null");
   obj_ = obj;
   if (CurrentMemoryModel == MemoryModel::kExperimental) {
-    konan::consoleErrorf("initAndAddRef@%p obj=%p commit=%d\n", this, obj, commit);
     refCount = 1;
     context_ = InitForeignRef(this, commit);
     return;
@@ -149,14 +148,12 @@ void BackRefFromAssociatedObject::initAndAddRef(ObjHeader* obj, bool commit) {
 
 void BackRefFromAssociatedObject::commit() {
   if (CurrentMemoryModel == MemoryModel::kExperimental) {
-    konan::consoleErrorf("commit@%p \n", this);
     ForeignRefPromote(context_);
   }
 }
 
 template <ErrorPolicy errorPolicy>
 void BackRefFromAssociatedObject::addRef() {
-    konan::consoleErrorf("addRef@%p \n", this);
   static_assert(errorPolicy != ErrorPolicy::kDefaultValue, "Cannot use default return value here");
 
   // Can be called both from Native state (if ObjC or Swift code adds RC)
@@ -187,7 +184,6 @@ template void BackRefFromAssociatedObject::addRef<ErrorPolicy::kTerminate>();
 
 template <ErrorPolicy errorPolicy>
 bool BackRefFromAssociatedObject::tryAddRef() {
-    konan::consoleErrorf("tryAddRef@%p \n", this);
   static_assert(errorPolicy != ErrorPolicy::kDefaultValue, "Cannot use default return value here");
   kotlin::CalledFromNativeGuard guard;
 
@@ -223,7 +219,6 @@ template bool BackRefFromAssociatedObject::tryAddRef<ErrorPolicy::kThrow>();
 template bool BackRefFromAssociatedObject::tryAddRef<ErrorPolicy::kTerminate>();
 
 void BackRefFromAssociatedObject::releaseRef() {
-    konan::consoleErrorf("releaseRef@%p \n", this);
   if (CurrentMemoryModel == MemoryModel::kExperimental) {
     atomicAdd(&refCount, -1);
     return;
@@ -245,7 +240,6 @@ void BackRefFromAssociatedObject::releaseRef() {
 }
 
 void BackRefFromAssociatedObject::detach() {
-    konan::consoleErrorf("detach@%p \n", this);
   RuntimeAssert(atomicGet(&refCount) == 0, "unexpected refCount");
   // TODO: Racy with concurrent extra objects sweep.
   obj_ = nullptr; // Handled in addRef/tryAddRef/releaseRef/ref.
@@ -266,7 +260,6 @@ ALWAYS_INLINE void BackRefFromAssociatedObject::assertDetached() {
 
 template <ErrorPolicy errorPolicy>
 ObjHeader* BackRefFromAssociatedObject::ref() const {
-    konan::consoleErrorf("ref@%p \n", this);
   kotlin::AssertThreadState(kotlin::ThreadState::kRunnable);
   RuntimeAssert(obj_ != nullptr, "no valid Kotlin object found");
   if (CurrentMemoryModel == MemoryModel::kExperimental) {

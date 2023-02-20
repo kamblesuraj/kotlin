@@ -9,7 +9,6 @@
 #include <type_traits>
 
 #include "Memory.h"
-#include "Porting.h"
 
 // TODO: Generalize for uses outside this file.
 enum class ErrorPolicy {
@@ -70,10 +69,7 @@ class BackRefFromAssociatedObject {
   template <ErrorPolicy errorPolicy>
   ObjHeader* ref() const;
 
-  ObjHeader*& objUnsafe() {
-    konan::consoleErrorf("objUnsafe@%p: %p\n", this, obj_);
-    return obj_;
-  }
+  ObjHeader*& objUnsafe() { return obj_; }
 
   bool isReferenced() const;
 
