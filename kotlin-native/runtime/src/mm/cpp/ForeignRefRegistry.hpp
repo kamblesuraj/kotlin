@@ -116,7 +116,7 @@ public:
     private:
         friend class ForeignRefRegistry;
 
-        RootsIterator(ForeignRefRegistry* owner, Record* node) noexcept : node_(node) {}
+        RootsIterator(ForeignRefRegistry& owner, Record* node) noexcept : owner_(&owner), node_(node) {}
 
         ForeignRefRegistry* owner_;
         Record* node_;
@@ -126,11 +126,11 @@ public:
     public:
         RootsIterator begin() noexcept {
             auto* node = owner_.nextRoot(&owner_.rootsHead_, 1000);
-            return RootsIterator(&owner_, node);
+            return RootsIterator(owner_, node);
         }
 
         RootsIterator end() noexcept {
-            return RootsIterator(&owner_, &owner_.rootsTail_);
+            return RootsIterator(owner_, &owner_.rootsTail_);
         }
 
     private:
