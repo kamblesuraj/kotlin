@@ -171,7 +171,14 @@ class IrCompileTimeChecker(
         // we want to avoid recursion in cases like "enum class E(val srt: String) { OK(OK.name) }"
         if (visitedStack.contains(expression)) return true
         return expression.asVisited {
-            expression.symbol.owner.initializerExpression?.accept(this, data) == true
+            val owner = expression.symbol.owner
+            if (owner.initializerExpression == null && contextExpression?.symbol?.owner?.name?.asString() == "<get-name>") {
+                // This check is needed in case of JS recompilation. In this case we don't construct full IR tree.
+                // On interpreter side this is going to work because we treat <get-name> for enums in a special way.
+                // see "js/js.translator/testData/box/incremental/enumUsage.kt" for details
+                return@asVisited true
+            }
+            owner.initializerExpression?.accept(this, data) == true
         }
     }
 
