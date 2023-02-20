@@ -504,6 +504,8 @@ private fun PhaseEngine<NativeGenerationState>.getAllLowerings() = listOfNotNull
         rangeContainsLoweringPhase,
         forLoopsPhase,
         flattenStringConcatenationPhase,
+        foldConstantLoweringPhase,
+        computeStringTrimPhase,
         stringConcatenationPhase,
         stringConcatenationTypeNarrowingPhase.takeIf { context.config.optimizationsEnabled },
         enumConstructorsPhase,

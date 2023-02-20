@@ -923,6 +923,8 @@ val loweringList = listOf<Lowering>(
     propertyAccessorInlinerLoweringPhase,
     copyPropertyAccessorBodiesLoweringPass,
     booleanPropertyInExternalLowering,
+    foldConstantLoweringPhase,
+    computeStringTrimPhase,
     privateMembersLoweringPhase,
     privateMemberUsagesLoweringPhase,
     defaultArgumentStubGeneratorPhase,
