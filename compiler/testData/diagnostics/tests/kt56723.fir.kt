@@ -31,12 +31,12 @@ class IndexibleRefRef(val ref: IndexibleRef?)
 
 fun ban(refRef: IndexibleRefRef?, ref: IndexibleRef?) {
     val lambda = {
-        <!UNSAFE_CALL!>ref?.ind[1]<!> = "X"
+        ref?.ind[1] = "X"
     }
     foo(lambda)
 
     val lambda2 = {
-        <!UNSAFE_CALL!>refRef?.ref?.ind[1]<!> = "X"
+        refRef?.ref?.ind[1] = "X"
     }
     foo(lambda2)
 }

@@ -49,8 +49,8 @@ import org.jetbrains.kotlin.resolve.calls.tower.CandidateApplicability
 import org.jetbrains.kotlin.types.ConstantValueKind
 import org.jetbrains.kotlin.types.SmartcastStability
 import org.jetbrains.kotlin.types.model.safeSubstitute
+import org.jetbrains.kotlin.util.OperatorNameConventions
 import org.jetbrains.kotlin.utils.addIfNotNull
-import org.jetbrains.kotlin.utils.addToStdlib.runIf
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -498,10 +498,11 @@ fun FirSafeCallExpression.propagateTypeFromQualifiedAccessAfterNullCheck(
     file: FirFile,
 ) {
     val receiverType = nullableReceiverExpression.typeRef.coneTypeSafe<ConeKotlinType>()
+    val selector = selector
 
-    val resultingType = when (val it = selector) {
-        is FirExpression -> {
-            val type = it.typeRef.coneTypeSafe<ConeKotlinType>() ?: return
+    val resultingType = when {
+        selector is FirExpression && !selector.isCallToStatementLikeFunction -> {
+            val type = selector.typeRef.coneTypeSafe<ConeKotlinType>() ?: return
 
             val isReceiverActuallyNullable = session.languageVersionSettings.supportsFeature(LanguageFeature.SafeCallsAreAlwaysNullable)
                     || receiverType != null && session.typeContext.run { receiverType.isNullableType() }
@@ -512,10 +513,9 @@ fun FirSafeCallExpression.propagateTypeFromQualifiedAccessAfterNullCheck(
                 type
             }
         }
+        // Branch for things that shouldn't be used as expressions.
+        // They are forced to return not-null `Unit`, regardless of the receiver.
         else -> {
-            require(it is FirVariableAssignment) {
-                "The only non-expression FirQualifiedAccess is FirVariableAssignment, but ${this::class} was found"
-            }
             StandardClassIds.Unit.constructClassLikeType(emptyArray(), isNullable = false)
         }
     }
@@ -524,6 +524,12 @@ fun FirSafeCallExpression.propagateTypeFromQualifiedAccessAfterNullCheck(
     replaceTypeRef(resolvedTypeRef)
     session.lookupTracker?.recordTypeResolveAsLookup(resolvedTypeRef, source, file.source)
 }
+
+private val FirExpression.isCallToStatementLikeFunction: Boolean
+    get() {
+        val symbol = (this as? FirFunctionCall)?.calleeReference?.toResolvedFunctionSymbol() ?: return false
+        return symbol.isOperator && symbol.name in OperatorNameConventions.STATEMENT_LIKE_OPERATORS
+    }
 
 fun FirAnnotation.getCorrespondingClassSymbolOrNull(session: FirSession): FirRegularClassSymbol? {
     return annotationTypeRef.coneType.fullyExpandedType(session).classId?.let {
