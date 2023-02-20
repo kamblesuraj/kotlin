@@ -50,10 +50,13 @@ mm::ForeignRefRegistry::Record* mm::ForeignRefRegistry::nextRoot(Record* current
             // Racy if someone concurrently inserts in the middle. Or iterates.
             // But we don't have that here. Inserts are only in the beginning.
             // Iteration also happens only here.
-            auto next = candidate->next_.exchange(nullptr, std::memory_order_acq_rel);
+            auto next = candidate->next_.load(std::memory_order_acquire);
             auto actualNext = candidate;
             bool deleted = current->next_.compare_exchange_strong(actualNext, next, std::memory_order_acq_rel);
-            if (deleted) break;
+            if (deleted) {
+                candidate->next_.store(nullptr, std::memory_order_release);
+                break;
+            }
             // Someone inserted between current and candidate.
             // Move current forward, and try deleting again.
             current = actualNext;
