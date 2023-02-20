@@ -36,6 +36,7 @@ void processFieldInMark(void* state, ObjHeader* field) noexcept {
 
 template <typename Traits>
 void processObjectInMark(void* state, ObjHeader* object) noexcept {
+    // konan::consoleErrorf("processObjectInMark %p\n", object);
     auto* typeInfo = object->type_info();
     RuntimeAssert(typeInfo != theArrayTypeInfo, "Must not be an array of objects");
     for (int i = 0; i < typeInfo->objOffsetsCount_; ++i) {
@@ -43,10 +44,12 @@ void processObjectInMark(void* state, ObjHeader* object) noexcept {
         if (!field) continue;
         processFieldInMark<Traits>(state, field);
     }
+    // konan::consoleErrorf("processObjectInMark %p done\n", object);
 }
 
 template <typename Traits>
 void processArrayInMark(void* state, ArrayHeader* array) noexcept {
+    // konan::consoleErrorf("processArrayInMark %p\n", array);
     RuntimeAssert(array->type_info() == theArrayTypeInfo, "Must be an array of objects");
     auto* begin = ArrayAddressOfElementAt(array, 0);
     auto* end = ArrayAddressOfElementAt(array, array->count_);
@@ -55,19 +58,26 @@ void processArrayInMark(void* state, ArrayHeader* array) noexcept {
         if (!field) continue;
         processFieldInMark<Traits>(state, field);
     }
+    // konan::consoleErrorf("processArrayInMark %p done\n", array);
 }
 
 template <typename Traits>
 bool collectRoot(typename Traits::MarkQueue& markQueue, ObjHeader* object) noexcept {
+    // konan::consoleErrorf("collectRoot %p\n", object);
     if (isNullOrMarker(object))
         return false;
 
     if (object->heap()) {
+        // konan::consoleErrorf("collectRoot %p heap\n", object);
         Traits::tryEnqueue(markQueue, object);
+        // konan::consoleErrorf("collectRoot %p heap done\n", object);
     } else {
+        // konan::consoleErrorf("collectRoot %p !heap\n", object);
         // Each permanent and stack object has own entry in the root set, so it's okay to only process objects in heap.
         Traits::processInMark(markQueue, object);
+        // konan::consoleErrorf("collectRoot %p !heap processed\n", object);
         RuntimeAssert(!object->has_meta_object(), "Non-heap object %p may not have an extra object data", object);
+        // konan::consoleErrorf("collectRoot %p !heap done\n", object);
     }
     return true;
 }

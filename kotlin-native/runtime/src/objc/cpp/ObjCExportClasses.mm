@@ -3,6 +3,7 @@
  * that can be found in the LICENSE file.
  */
 
+#include "StackTrace.hpp"
 #import "Types.h"
 #import "Memory.h"
 #import "MemorySharedRefs.hpp"
@@ -87,6 +88,7 @@ static void injectToRuntime();
   kotlin::AssertThreadState(kotlin::ThreadState::kRunnable);
 
   KotlinBase* candidate = [super allocWithZone:nil];
+  konan::consoleErrorf("createRetainedWrapper@%p refHolder=%p obj=%p permanent=%d\n", candidate, &candidate->refHolder, obj, obj->permanent());
   // TODO: should we call NSObject.init ?
   candidate->refHolder.initAndAddRef(obj, false);
   candidate->permanent = obj->permanent();
@@ -109,6 +111,12 @@ static void injectToRuntime();
 
   candidate->refHolder.commit();
   return candidate;
+}
+
+-(void)dealloc {
+  konan::consoleErrorf("dealloc@%p refHolder=%p\n", self, &self->refHolder);
+  kotlin::PrintStackTraceStderr();
+  [super dealloc];
 }
 
 -(instancetype)retain {

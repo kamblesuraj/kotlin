@@ -10,6 +10,7 @@
 #include "Memory.h"
 #include "MemorySharedRefs.hpp"
 #include "MultiSourceQueue.hpp"
+#include "Porting.h"
 #include "ThreadRegistry.hpp"
 
 namespace kotlin {
@@ -22,9 +23,12 @@ class ForeignRefRegistry : Pinned {
 public:
     class Record {
     public:
-        explicit Record(BackRefFromAssociatedObject* owner) noexcept : owner_(owner) {}
+        explicit Record(BackRefFromAssociatedObject* owner) noexcept : owner_(owner) {
+            // konan::consoleErrorf("Record@%p owner=%p\n", this, owner);
+        }
 
         ~Record() {
+            // konan::consoleErrorf("~Record@%p\n", this);
             auto* owner = owner_.load(std::memory_order_relaxed);
             RuntimeAssert(owner == nullptr, "Record@%p is attached to owner %p during destruction", this, owner);
             auto* next = next_.load(std::memory_order_relaxed);
@@ -32,6 +36,7 @@ public:
         }
 
         void deinit() noexcept {
+            // konan::consoleErrorf("Record::deinit@%p\n", this);
             // This happens during weak references invalidation.
             // Conservatively considering that Record might still be in the roots list. It'll be removed from there
             // during the next GC.
@@ -39,6 +44,7 @@ public:
         }
 
         void promote() noexcept {
+            // konan::consoleErrorf("Record::promote@%p\n", this);
             ForeignRefRegistry::instance().promoteToRoots(*this);
         }
 
@@ -97,6 +103,7 @@ public:
         ObjHeader*& operator*() noexcept {
             // Cleaning up owner can only happen during weak refs processing later.
             auto* owner = node_->owner_.load(std::memory_order_relaxed);
+            // konan::consoleErrorf("RootsIterator@%p: owner=%p obj=%p objAddr=%p\n", node_, owner, owner->objUnsafe(), &owner->objUnsafe());
             return owner ? owner->objUnsafe() : nullObject;
         }
 
