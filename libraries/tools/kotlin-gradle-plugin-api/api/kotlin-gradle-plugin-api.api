@@ -1569,6 +1569,16 @@ public final class org/jetbrains/kotlin/gradle/tasks/KotlinToolTask$DefaultImpls
 	public static fun toolOptions (Lorg/jetbrains/kotlin/gradle/tasks/KotlinToolTask;Lorg/gradle/api/Action;)V
 }
 
+public abstract interface class org/jetbrains/kotlin/gradle/tasks/LinkSyncTask : org/gradle/api/Task {
+	public abstract fun getDestinationDir ()Ljava/io/File;
+	public abstract fun getDestinationDirProperty ()Lorg/gradle/api/provider/Property;
+	public abstract fun getFrom ()Lorg/gradle/api/file/ConfigurableFileCollection;
+}
+
+public final class org/jetbrains/kotlin/gradle/tasks/LinkSyncTask$DefaultImpls {
+	public static fun getDestinationDir (Lorg/jetbrains/kotlin/gradle/tasks/LinkSyncTask;)Ljava/io/File;
+}
+
 public abstract interface class org/jetbrains/kotlin/gradle/tasks/UsesKotlinJavaToolchain : org/gradle/api/Task {
 	public abstract fun getKotlinJavaToolchain ()Lorg/jetbrains/kotlin/gradle/tasks/KotlinJavaToolchain;
 	public abstract fun getKotlinJavaToolchainProvider ()Lorg/gradle/api/provider/Provider;
