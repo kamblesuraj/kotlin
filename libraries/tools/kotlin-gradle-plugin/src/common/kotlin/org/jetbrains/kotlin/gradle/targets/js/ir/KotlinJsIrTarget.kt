@@ -145,7 +145,7 @@ constructor(
 
             task.from.from(project.tasks.named(compilation.processResourcesTaskName))
 
-            task.destinationDir.set(npmProject.dist)
+            task.destinationDirProperty.set(npmProject.dist)
         }
     }
 

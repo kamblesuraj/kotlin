@@ -38,7 +38,7 @@ abstract class KotlinD8Ir @Inject constructor(target: KotlinJsIrTarget) :
                 binary.linkSyncTask.flatMap { linkSyncTask ->
                     binary.linkTask.flatMap { linkTask ->
                         linkTask.outputFileProperty.map { file ->
-                            linkSyncTask.destinationDir.get().resolve(file.name)
+                            linkSyncTask.destinationDirProperty.get().resolve(file.name)
                         }
                     }
                 }

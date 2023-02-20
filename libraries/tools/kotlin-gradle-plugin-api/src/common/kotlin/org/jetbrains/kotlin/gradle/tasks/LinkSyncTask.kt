@@ -3,10 +3,7 @@ package org.jetbrains.kotlin.gradle.tasks
 import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.IgnoreEmptyDirectories
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.SkipWhenEmpty
+import org.gradle.api.tasks.*
 import org.gradle.work.NormalizeLineEndings
 import java.io.File
 
@@ -18,5 +15,10 @@ interface LinkSyncTask : Task {
     val from: ConfigurableFileCollection
 
     @get:OutputDirectory
-    val destinationDir: Property<File>
+    val destinationDirProperty: Property<File>
+
+    @get:Internal
+    @Deprecated("Use destinationDirProperty with Provider API", ReplaceWith("destinationDirProperty.get()"))
+    val destinationDir: File
+        get() = destinationDirProperty.get()
 }

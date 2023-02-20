@@ -27,7 +27,7 @@ abstract class DefaultLinkSyncTask : DefaultTask(), LinkSyncTask {
 
     @TaskAction
     fun doCopy(inputChanges: InputChanges) {
-        val destinationDir = destinationDir.get()
+        val destinationDir = destinationDirProperty.get()
         val commonAction: CopySpec.() -> Unit = {
             into(destinationDir)
             // Rewrite relative paths in sourcemaps in the target directory
