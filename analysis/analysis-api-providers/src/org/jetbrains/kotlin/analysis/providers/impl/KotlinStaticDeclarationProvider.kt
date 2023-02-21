@@ -28,6 +28,8 @@ import org.jetbrains.kotlin.fileClasses.javaFileFacadeFqName
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.name.*
 import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.stubs.KotlinClassOrObjectStub
+import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 import org.jetbrains.kotlin.psi.stubs.impl.*
 import org.jetbrains.kotlin.serialization.deserialization.builtins.BuiltInSerializerProtocol
 
@@ -253,6 +255,11 @@ public class KotlinStaticDeclarationProviderFactory(
                 is KotlinTypeAliasStubImpl -> addToTypeAliasMap(stub.psi)
                 is KotlinFunctionStubImpl -> addToFunctionMap(stub.psi)
                 is KotlinPropertyStubImpl -> addToPropertyMap(stub.psi)
+                is KotlinPlaceHolderStubImpl -> {
+                    if (stub.stubType == KtStubElementTypes.CLASS_BODY) {
+                        stub.getChildrenStubs().filterIsInstance<KotlinClassOrObjectStub<*>>().forEach(::indexStub)
+                    }
+                }
             }
         }
 
