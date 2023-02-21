@@ -68,6 +68,7 @@ internal constructor(private val value: Int) : Comparable<Char> {
     @DeprecatedSinceKotlin(warningSince = "1.5")
     public fun toByte(): Byte = value.toByte()
     /** Returns the value of this character as a `Char`. */
+    @kotlin.Suppress("OVERRIDE_DEPRECATION")
     public fun toChar(): Char = this
     /** Returns the value of this character as a `Short`. */
     @Deprecated("Conversion of Char to Number is deprecated. Use Char.code property instead.", ReplaceWith("this.code.toShort()"))

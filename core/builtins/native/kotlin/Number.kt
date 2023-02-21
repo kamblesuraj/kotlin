@@ -43,8 +43,10 @@ public abstract class Number {
     /**
      * Returns the [Char] with the numeric value equal to this number, truncated to 16 bits if appropriate.
      */
-//    @Deprecated("Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", ReplaceWith("this.toInt().toChar()"))
-    public abstract fun toChar(): Char
+    @Deprecated("Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", ReplaceWith("this.toInt().toChar()"))
+    public open fun toChar(): Char {
+        return toInt().toChar()
+    }
 
     /**
      * Returns the value of this number as a [Short], which may involve rounding or truncation.

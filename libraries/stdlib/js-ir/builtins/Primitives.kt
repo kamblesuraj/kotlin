@@ -861,6 +861,7 @@ public class Int private constructor() : Number(), Comparable<Int> {
      *
      * The resulting `Char` code is represented by the least significant 16 bits of this `Int` value.
      */
+    @Suppress("OVERRIDE_DEPRECATION")
     public override fun toChar(): Char
     /**
      * Converts this [Int] value to [Short].

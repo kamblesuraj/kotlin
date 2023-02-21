@@ -1001,6 +1001,7 @@ public class Int private constructor() : Number(), Comparable<Int> {
      *
      * The resulting `Char` code is represented by the least significant 16 bits of this `Int` value.
      */
+    @Suppress("OVERRIDE_DEPRECATION")
     @kotlin.internal.IntrinsicConstEvaluation
     public override fun toChar(): Char
     /**
