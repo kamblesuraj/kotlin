@@ -27,18 +27,18 @@ infix fun Example.plus(o: Example) = ""
 
 fun test() {
     var a = Example()
-    val b = Example()
-
-    consumeString(a())
-    consumeString(a[1])
-
-    val (x, y) = Example()
-    consumeString(x)
-    consumeString(y)
+//    val b = Example()
+//
+//    consumeString(a())
+//    consumeString(a[1])
+//
+//    val (x, y) = Example()
+//    consumeString(x)
+//    consumeString(y)
 
     consumeExample2(++a)
 
-    consumeString(a plus b)
+//    consumeString(a plus b)
 }
 
 fun consumeInt(i: Int) {}

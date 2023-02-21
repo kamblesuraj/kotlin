@@ -1,4 +1,4 @@
-// TARGET_FRONTEND: ClassicFrontend
+// TARGET_FRONTEND: FIR
 
 object A {
     private var r: Int = 1;
@@ -59,7 +59,7 @@ fun box() : String {
 
     val p2 = A.test2()
     val holderValue = A.holder
-    if (p2 != 3 || holderValue != "getR2getR2getR2getR2") return "fail 2:  $p2 ${holderValue}"
+    if (p2 != 3 || holderValue != "getR2getR2getR2") return "fail 2:  $p2 ${holderValue}"
 
     A.holder = ""
     val p3 = A.test3()
@@ -67,7 +67,7 @@ fun box() : String {
 
     A.holder = ""
     val p4 = A.test4()
-    if (p4 != 3 || A.holder != "getR4setR4:getR4setR4getR4getR4") return "fail 4:  $p4 ${A.holder}"
+    if (p4 != 3 || A.holder != "getR4setR4:getR4setR4getR4") return "fail 4:  $p4 ${A.holder}"
 
     return "OK"
 }

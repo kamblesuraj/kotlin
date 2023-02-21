@@ -22,10 +22,10 @@ class WrongIncDec() {
 
 fun testWrongIncDec() {
   var x = WrongIncDec()
-  <!RESULT_TYPE_MISMATCH!>x++<!>
-  <!RESULT_TYPE_MISMATCH!>++x<!>
-  <!RESULT_TYPE_MISMATCH!>x--<!>
-  <!RESULT_TYPE_MISMATCH!>--x<!>
+  x<!ASSIGNMENT_TYPE_MISMATCH!>++<!>
+  <!ASSIGNMENT_TYPE_MISMATCH!>++x<!>
+  x<!ASSIGNMENT_TYPE_MISMATCH!>--<!>
+  <!ASSIGNMENT_TYPE_MISMATCH!>--x<!>
 }
 
 class UnitIncDec() {
@@ -35,12 +35,12 @@ class UnitIncDec() {
 
 fun testUnitIncDec() {
   var x = UnitIncDec()
-  x<!INC_DEC_SHOULD_NOT_RETURN_UNIT!>++<!>
-  <!INC_DEC_SHOULD_NOT_RETURN_UNIT!>++<!>x
-  x<!INC_DEC_SHOULD_NOT_RETURN_UNIT!>--<!>
-  <!INC_DEC_SHOULD_NOT_RETURN_UNIT!>--<!>x
-  x = x<!INC_DEC_SHOULD_NOT_RETURN_UNIT!>++<!>
-  x = x<!INC_DEC_SHOULD_NOT_RETURN_UNIT!>--<!>
-  x = <!INC_DEC_SHOULD_NOT_RETURN_UNIT!>++<!>x
-  x = <!INC_DEC_SHOULD_NOT_RETURN_UNIT!>--<!>x
+  x<!ASSIGNMENT_TYPE_MISMATCH!>++<!>
+  <!ASSIGNMENT_TYPE_MISMATCH!>++x<!>
+  x<!ASSIGNMENT_TYPE_MISMATCH!>--<!>
+  <!ASSIGNMENT_TYPE_MISMATCH!>--x<!>
+  x = x<!ASSIGNMENT_TYPE_MISMATCH!>++<!>
+  x = x<!ASSIGNMENT_TYPE_MISMATCH!>--<!>
+  x = <!ASSIGNMENT_TYPE_MISMATCH!><!INC_DEC_SHOULD_NOT_RETURN_UNIT!>++<!>x<!>
+  x = <!ASSIGNMENT_TYPE_MISMATCH!><!INC_DEC_SHOULD_NOT_RETURN_UNIT!>--<!>x<!>
 }

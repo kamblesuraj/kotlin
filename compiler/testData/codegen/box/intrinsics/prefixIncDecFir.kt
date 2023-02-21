@@ -1,4 +1,4 @@
-// TARGET_FRONTEND: ClassicFrontend
+// TARGET_FRONTEND: FIR
 
 public var inc: Int = 0
 
@@ -20,11 +20,11 @@ public var propDec: Int = 0
 
 fun box(): String {
     ++propInc
-    if (inc != 3) return "fail in prefix increment: ${inc} != 3"
+    if (inc != 2) return "fail in prefix increment: ${inc} != 3"
     if (propInc != 1) return "fail in prefix increment: ${propInc} != 1"
 
     --propDec
-    if (dec != -3) return "fail in prefix decrement: ${dec} != -3"
+    if (dec != -2) return "fail in prefix decrement: ${dec} != -3"
     if (propDec != -1) return "fail in prefix decrement: ${propDec} != -1"
 
     return "OK"

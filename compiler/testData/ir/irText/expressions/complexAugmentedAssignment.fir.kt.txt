@@ -54,18 +54,24 @@ fun test1(a: IntArray) {
 }
 
 fun test2() {
-  val <receiver>: X1 = X1
-  val <unary>: Int = <receiver>.<get-x1>()
-  <receiver>.<set-x1>(<set-?> = <unary>.inc())
-  <unary> /*~> Unit */
-  val <receiver>: X2 = X2
-  val <unary>: Int = <receiver>.<get-x2>()
-  <receiver>.<set-x2>(<set-?> = <unary>.inc())
-  <unary> /*~> Unit */
-  val <receiver>: X3 = X3
-  val <unary>: Int = <receiver>.<get-x3>()
-  <receiver>.<set-x3>(<set-?> = <unary>.inc())
-  <unary> /*~> Unit */
+  { // BLOCK
+    val <receiver>: X1 = X1
+    val <unary>: Int = <receiver>.<get-x1>()
+    <receiver>.<set-x1>(<set-?> = <unary>.inc())
+    <unary>
+  } /*~> Unit */
+  { // BLOCK
+    val <receiver>: X2 = X2
+    val <unary>: Int = <receiver>.<get-x2>()
+    <receiver>.<set-x2>(<set-?> = <unary>.inc())
+    <unary>
+  } /*~> Unit */
+  { // BLOCK
+    val <receiver>: X3 = X3
+    val <unary>: Int = <receiver>.<get-x3>()
+    <receiver>.<set-x3>(<set-?> = <unary>.inc())
+    <unary>
+  } /*~> Unit */
 }
 
 class B {
