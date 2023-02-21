@@ -377,7 +377,7 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments> @Inject constr
                 """
                 
                 The build has experimental Kotlin incremental compilation optimizations enabled.
-                If you notice incorrect compilation results after enabling it, please file a bug report at https://kotl.in/issue
+                If you notice incorrect compilation results after enabling it, please file a bug report at https://kotl.in/issue/experimental-ic-optimizations
                 """.trimIndent()
             )
         }
