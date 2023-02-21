@@ -20,7 +20,8 @@ val KtElement.containingDeclarationForPseudocode: KtDeclaration?
 
 // Should return KtDeclarationWithBody, KtClassOrObject, or KtClassInitializer
 fun KtElement.getElementParentDeclaration(): KtDeclaration? =
-    getParentOfType(this, KtDeclarationWithBody::class.java, KtClassOrObject::class.java, KtClassInitializer::class.java)
+    getParentOfType(this, KtDeclarationWithBody::class.java, KtClassOrObject::class.java, KtClassInitializer::class.java,
+                    KtScriptInitializer::class.java)
 
 fun KtDeclaration?.getDeclarationDescriptorIncludingConstructors(context: BindingContext): DeclarationDescriptor? {
     val descriptor = context.get(DECLARATION_TO_DESCRIPTOR, (this as? KtClassInitializer)?.containingDeclaration ?: this)
