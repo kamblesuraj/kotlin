@@ -92,7 +92,8 @@ abstract class AbstractIrTextTestBase<R : ResultingArtifact.FrontendOutput<R>> :
             useHandlers(
                 ::IrTextDumpHandler,
                 ::IrTreeVerifierHandler,
-                ::IrPrettyKotlinDumpHandler
+                ::IrPrettyKotlinDumpHandler,
+                ::IrNewStyleDumpHandler,
             )
         }
     }
