@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.PropertyNames.KOTLI
 import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.PropertyNames.KOTLIN_MPP_HIERARCHICAL_STRUCTURE_BY_DEFAULT
 import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.PropertyNames.KOTLIN_MPP_HIERARCHICAL_STRUCTURE_SUPPORT
 import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.PropertyNames.KOTLIN_NATIVE_DEPENDENCY_PROPAGATION
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.sources.internal
 import org.jetbrains.kotlin.gradle.utils.SingleWarningPerBuild
@@ -69,14 +70,18 @@ private fun reportTargetsWithNonUniqueConsumableConfigurations(project: Project)
         }
 
         val nonDistinguishableTargets = allTargets
-            .groupBy { target -> project.configurations.getByName(target.apiElementsConfigurationName).attributes.toMap() }
+            .mapNotNull { target ->
+                val attributes = project.configurations.findByName(target.apiElementsConfigurationName) ?: return@mapNotNull null
+                target.name to attributes
+            }
+            .groupBy { (_, consumableConfiguration) -> consumableConfiguration.attributes.toMap() }
             .values
             .filter { targetGroup -> targetGroup.size > 1 }
 
         if (nonDistinguishableTargets.isEmpty()) return@afterEvaluate
 
         val nonUniqueTargetsString = nonDistinguishableTargets.joinToString(separator = "\n") { targets ->
-            val targetsListString = targets.joinToString { "'${it.name}'" }
+            val targetsListString = targets.joinToString { targetName -> "'$targetName'" }
             "  * $targetsListString"
         }
 
