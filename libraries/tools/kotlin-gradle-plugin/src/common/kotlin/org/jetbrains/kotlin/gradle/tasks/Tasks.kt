@@ -49,6 +49,7 @@ import org.jetbrains.kotlin.gradle.logging.GradleKotlinLogger
 import org.jetbrains.kotlin.gradle.logging.GradlePrintingMessageCollector
 import org.jetbrains.kotlin.gradle.logging.kotlinDebug
 import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.PropertyNames.KOTLIN_SUPPRESS_EXPERIMENTAL_IC_OPTIMIZATIONS_WARNING
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
 import org.jetbrains.kotlin.gradle.plugin.statistics.KotlinBuildStatsService
 import org.jetbrains.kotlin.gradle.report.*
@@ -363,11 +364,17 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments> @Inject constr
     @get:Internal
     internal abstract val keepIncrementalCompilationCachesInMemory: Property<Boolean>
 
+    @get:Internal
+    internal abstract val suppressExperimentalIcOptimizationsWarning: Property<Boolean>
+
     /** Task outputs that we don't want to include in [TaskOutputsBackup] (see [TaskOutputsBackup.outputsToRestore] for more info). */
     @get:Internal
     internal abstract val taskOutputsBackupExcludes: SetProperty<File>
 
     private fun notifyUserAboutExperimentalICOptimizations() {
+        if (suppressExperimentalIcOptimizationsWarning.get()) {
+            return
+        }
         if (!preciseCompilationResultsBackup.get() && !keepIncrementalCompilationCachesInMemory.get()) {
             return
         }
@@ -378,6 +385,8 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments> @Inject constr
                 
                 The build has experimental Kotlin incremental compilation optimizations enabled.
                 If you notice incorrect compilation results after enabling it, please file a bug report at https://kotl.in/issue/experimental-ic-optimizations
+                
+                You can suppress this warning by adding `$KOTLIN_SUPPRESS_EXPERIMENTAL_IC_OPTIMIZATIONS_WARNING=true` to the gradle.properties
                 """.trimIndent()
             )
         }
