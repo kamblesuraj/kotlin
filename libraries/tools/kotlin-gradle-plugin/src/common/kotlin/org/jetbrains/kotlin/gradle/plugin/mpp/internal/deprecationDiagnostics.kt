@@ -53,6 +53,21 @@ private fun reportTargetsWithNonUniqueConsumableConfigurations(project: Project)
     project.afterEvaluate {
         val allTargets = project.multiplatformExtension.targets
 
+        val duplicatedConsumableConfigurations = project.configurations
+            .filter { it.isCanBeConsumed }
+            .filterNot { it.attributes.isEmpty }
+            .groupBy { it.attributes.toMap() }
+            .values
+            .filter { it.size > 1 }
+
+        if (duplicatedConsumableConfigurations.isNotEmpty()) {
+            val msg = duplicatedConsumableConfigurations.joinToString(separator = "\n") { configs ->
+                val list = configs.joinToString { it.name }
+                " * $list"
+            }
+            error("Following configurations have the same attributes:\n$msg")
+        }
+
         val nonDistinguishableTargets = allTargets
             .groupBy { target -> project.configurations.getByName(target.apiElementsConfigurationName).attributes.toMap() }
             .values
