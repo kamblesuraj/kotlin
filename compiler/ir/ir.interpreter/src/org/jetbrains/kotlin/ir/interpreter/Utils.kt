@@ -342,3 +342,8 @@ internal fun IrEnumEntry.toState(irBuiltIns: IrBuiltIns): Common {
 
     return enumClassObject
 }
+
+fun IrFunction?.isConstPropertyAccessor(): Boolean {
+    if (this !is IrSimpleFunction) return false
+    return this.correspondingPropertySymbol?.owner?.isConst == true
+}

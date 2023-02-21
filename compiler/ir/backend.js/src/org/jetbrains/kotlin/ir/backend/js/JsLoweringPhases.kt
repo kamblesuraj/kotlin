@@ -710,7 +710,14 @@ private val constLoweringPhase = makeBodyLoweringPhase(
 )
 
 private val constEvaluationPhase = makeJsModulePhase(
-    { ConstEvaluationLowering(it, configuration = IrInterpreterConfiguration(printOnlyExceptionMessage = true, treatFloatInSpecialWay = true)) },
+    {
+        val interpreterConfiguration = IrInterpreterConfiguration(
+            printOnlyExceptionMessage = true,
+            treatFloatInSpecialWay = true,
+            inlineConstProperty = false,
+        )
+        ConstEvaluationLowering(it, configuration = interpreterConfiguration)
+    },
     name = "ConstEvaluationLowering",
     description = "Evaluate functions that are marked as `IntrinsicConstEvaluation`"
 ).toModuleLowering()

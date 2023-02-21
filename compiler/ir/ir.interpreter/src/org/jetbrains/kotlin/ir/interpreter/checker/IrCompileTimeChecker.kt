@@ -9,10 +9,9 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.interpreter.IrInterpreterConfiguration
+import org.jetbrains.kotlin.ir.interpreter.*
 import org.jetbrains.kotlin.ir.interpreter.accessesTopLevelOrObjectField
 import org.jetbrains.kotlin.ir.interpreter.fqName
-import org.jetbrains.kotlin.ir.interpreter.isAccessToNotNullableObject
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.statements
@@ -68,6 +67,7 @@ class IrCompileTimeChecker(
 
     override fun visitCall(expression: IrCall, data: Nothing?): Boolean {
         val owner = expression.symbol.owner
+        if (!interpreterConfiguration.inlineConstProperty && owner.isConstPropertyAccessor()) return false
         if (!mode.canEvaluateFunction(owner, expression)) return false
 
         // We disable `toFloat` folding on K/JS till `toFloat` is fixed (KT-35422)

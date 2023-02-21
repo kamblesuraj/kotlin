@@ -34,8 +34,10 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
         }
 
         private fun IrFunction?.isCompileTimePropertyAccessor(): Boolean {
-            val property = (this as? IrSimpleFunction)?.correspondingPropertySymbol?.owner ?: return false
-            if (property.isConst) return true
+            if (this !is IrSimpleFunction) return false
+            if (this.isConstPropertyAccessor()) return true
+
+            val property = this.correspondingPropertySymbol?.owner ?: return false
             if (property.isMarkedAsCompileTime() || property.isCompileTimeTypeAlias()) return true
 
             val backingField = property.backingField
@@ -53,7 +55,7 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
         private val allowedExtensionFunctions = setOf("kotlin.floorDiv", "kotlin.mod", "kotlin.NumbersKt.floorDiv", "kotlin.NumbersKt.mod")
 
         override fun canEvaluateFunction(function: IrFunction, context: IrCall?): Boolean {
-            if ((function as? IrSimpleFunction)?.correspondingPropertySymbol?.owner?.isConst == true) return true
+            if (function.isConstPropertyAccessor()) return true
 
             val fqName = function.fqNameWhenAvailable?.asString()
             val parent = function.parentClassOrNull
@@ -79,8 +81,11 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
         }
 
         private fun IrFunction?.isCompileTimePropertyAccessor(): Boolean {
-            val property = (this as? IrSimpleFunction)?.correspondingPropertySymbol?.owner ?: return false
-            return property.isConst || (property.resolveFakeOverride() ?: property).isMarkedAsIntrinsicConstEvaluation()
+            if (this !is IrSimpleFunction) return false
+            if (this.isConstPropertyAccessor()) return true
+
+            val property = this.correspondingPropertySymbol?.owner ?: return false
+            return (property.resolveFakeOverride() ?: property).isMarkedAsIntrinsicConstEvaluation()
         }
 
         override fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall?): Boolean {
