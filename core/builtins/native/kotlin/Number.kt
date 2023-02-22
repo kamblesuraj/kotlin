@@ -44,6 +44,7 @@ public abstract class Number {
      * Returns the [Char] with the numeric value equal to this number, truncated to 16 bits if appropriate.
      */
     @Deprecated("Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", ReplaceWith("this.toInt().toChar()"))
+    @DeprecatedSinceKotlin(warningSince = "1.9", errorSince = "2.1")
     public open fun toChar(): Char {
         return toInt().toChar()
     }

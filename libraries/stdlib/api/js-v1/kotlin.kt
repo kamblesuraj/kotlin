@@ -2444,6 +2444,7 @@ public abstract class Number {
     public abstract fun toByte(): kotlin.Byte
 
     @kotlin.Deprecated(message = "Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", replaceWith = kotlin.ReplaceWith(expression = "this.toInt().toChar()", imports = {}))
+    @kotlin.DeprecatedSinceKotlin(errorSince = "2.1", warningSince = "1.9")
     public open fun toChar(): kotlin.Char
 
     public abstract fun toDouble(): kotlin.Double

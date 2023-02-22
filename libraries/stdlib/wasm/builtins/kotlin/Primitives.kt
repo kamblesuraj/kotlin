@@ -314,6 +314,7 @@ public class Byte private constructor(private val value: Byte) : Number(), Compa
      * whereas the most significant 8 bits are filled with the sign bit of this value.
      */
     @Deprecated("Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", ReplaceWith("this.toInt().toChar()"))
+    @DeprecatedSinceKotlin(warningSince = "1.9", errorSince = "2.1")
     public override fun toChar(): Char = reinterpretAsInt().reinterpretAsChar()
 
     /**
@@ -698,6 +699,7 @@ public class Short private constructor(private val value: Short) : Number(), Com
      * i.e. it has the same binary representation as this `Short`.
      */
     @Deprecated("Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", ReplaceWith("this.toInt().toChar()"))
+    @DeprecatedSinceKotlin(warningSince = "1.9", errorSince = "2.1")
     public override fun toChar(): Char = reinterpretAsInt().reinterpretAsChar()
 
     /** Returns this value. */
@@ -1580,6 +1582,7 @@ public class Long private constructor(private val value: Long) : Number(), Compa
      * The resulting `Char` code is represented by the least significant 16 bits of this `Long` value.
      */
     @Deprecated("Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", ReplaceWith("this.toInt().toChar()"))
+    @DeprecatedSinceKotlin(warningSince = "1.9", errorSince = "2.1")
     public override inline fun toChar(): Char =
         this.toInt().toChar()
 
@@ -1928,6 +1931,7 @@ public class Float private constructor(private val value: Float) : Number(), Com
      * The resulting `Char` value is equal to `this.toInt().toChar()`.
      */
     @Deprecated("Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", ReplaceWith("this.toInt().toChar()"))
+    @DeprecatedSinceKotlin(warningSince = "1.9", errorSince = "2.1")
     public override inline fun toChar(): Char = this.toInt().toChar()
 
     /**
@@ -2270,6 +2274,7 @@ public class Double private constructor(private val value: Double) : Number(), C
      * The resulting `Char` value is equal to `this.toInt().toChar()`.
      */
     @Deprecated("Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", ReplaceWith("this.toInt().toChar()"))
+    @DeprecatedSinceKotlin(warningSince = "1.9", errorSince = "2.1")
     public override inline fun toChar(): Char = this.toInt().toChar()
 
     /**

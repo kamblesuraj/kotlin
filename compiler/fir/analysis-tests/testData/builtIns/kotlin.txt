@@ -1101,7 +1101,7 @@ public final class Nothing {
 public abstract class Number : R|kotlin/Any|, R|java/io/Serializable| {
     public abstract fun toByte(): R|kotlin/Byte|
 
-    @R|kotlin/Deprecated|(message = String(Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.), replaceWith = @R|kotlin/ReplaceWith|(imports = <implicitArrayOf>(), expression = String(this.toInt().toChar())) ) public open fun toChar(): R|kotlin/Char|
+    @R|kotlin/Deprecated|(message = String(Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.), replaceWith = @R|kotlin/ReplaceWith|(imports = <implicitArrayOf>(), expression = String(this.toInt().toChar())) ) @R|kotlin/DeprecatedSinceKotlin|(warningSince = String(1.9), errorSince = String(2.1)) public open fun toChar(): R|kotlin/Char|
 
     public abstract fun toDouble(): R|kotlin/Double|
 

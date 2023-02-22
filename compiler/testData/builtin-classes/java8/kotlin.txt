@@ -638,7 +638,7 @@ public final class Nothing {
 public abstract class Number : kotlin.Any, java.io.Serializable {
     /*primary*/ public constructor Number()
     public abstract fun toByte(): kotlin.Byte
-    @kotlin.Deprecated(message = "Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", replaceWith = kotlin.ReplaceWith(expression = "this.toInt().toChar()", imports = {})) public open fun toChar(): kotlin.Char
+    @kotlin.Deprecated(message = "Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", replaceWith = kotlin.ReplaceWith(expression = "this.toInt().toChar()", imports = {})) @kotlin.DeprecatedSinceKotlin(errorSince = "2.1", warningSince = "1.9") public open fun toChar(): kotlin.Char
     public abstract fun toDouble(): kotlin.Double
     public abstract fun toFloat(): kotlin.Float
     public abstract fun toInt(): kotlin.Int
