@@ -10,8 +10,11 @@ import org.gradle.api.file.FileTree
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerToolOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinNativeCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.usesK2
 import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode
-import org.jetbrains.kotlin.gradle.tasks.CompilerPluginOptions
+import org.jetbrains.kotlin.gradle.tasks.*
+import org.jetbrains.kotlin.gradle.tasks.fragmentSourcesCompilerArgs
+import org.jetbrains.kotlin.gradle.tasks.fragmentsCompilerArgs
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.project.model.LanguageSettings
@@ -46,7 +49,8 @@ internal fun buildKotlinNativeKlibCompilerArgs(
     libraryVersion: String,
     sharedCompilationData: SharedCompilationData?,
     source: FileTree,
-    commonSourcesTree: FileTree
+    commonSourcesTree: FileTree,
+    k2MultiplatformCompilationData: K2MultiplatformStructure
 ): List<String> = mutableListOf<String>().apply {
     addAll(buildKotlinNativeMainArgs(outFile, optimized, debuggable, target, CompilerOutputKind.LIBRARY, libraries))
 
@@ -79,8 +83,15 @@ internal fun buildKotlinNativeKlibCompilerArgs(
     addAll(buildKotlinNativeCompileCommonArgs(languageSettings, compilerOptions, compilerPlugins))
 
     addAll(source.map { it.absolutePath })
-    if (!commonSourcesTree.isEmpty) {
-        add("-Xcommon-sources=${commonSourcesTree.joinToString(separator = ",") { it.absolutePath }}")
+
+    if (compilerOptions.usesK2.get()) {
+        add("-Xfragments=${k2MultiplatformCompilationData.fragmentsCompilerArgs.joinToString(",")}")
+        add("-Xfragment-sources=${k2MultiplatformCompilationData.fragmentSourcesCompilerArgs.joinToString(",")}")
+        add("-Xdepends-on=${k2MultiplatformCompilationData.dependsOnCompilerArgs.joinToString(",")}")
+    } else {
+        if (!commonSourcesTree.isEmpty) {
+            add("-Xcommon-sources=${commonSourcesTree.joinToString(separator = ",") { it.absolutePath }}")
+        }
     }
 }
 
