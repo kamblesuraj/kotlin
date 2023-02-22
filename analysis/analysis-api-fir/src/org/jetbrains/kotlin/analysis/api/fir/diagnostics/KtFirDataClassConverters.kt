@@ -3837,6 +3837,22 @@ internal val KT_DIAGNOSTIC_CONVERTER = KtDiagnosticConverterBuilder.buildConvert
             token,
         )
     }
+    add(FirErrors.DEPRECATED_IDENTITY_EQUALS) { firDiagnostic ->
+        DeprecatedIdentityEqualsImpl(
+            firSymbolBuilder.typeBuilder.buildKtType(firDiagnostic.a),
+            firSymbolBuilder.typeBuilder.buildKtType(firDiagnostic.b),
+            firDiagnostic as KtPsiDiagnostic,
+            token,
+        )
+    }
+    add(FirErrors.IMPLICIT_BOXING_IN_IDENTITY_EQUALS) { firDiagnostic ->
+        ImplicitBoxingInIdentityEqualsImpl(
+            firSymbolBuilder.typeBuilder.buildKtType(firDiagnostic.a),
+            firSymbolBuilder.typeBuilder.buildKtType(firDiagnostic.b),
+            firDiagnostic as KtPsiDiagnostic,
+            token,
+        )
+    }
     add(FirErrors.INC_DEC_SHOULD_NOT_RETURN_UNIT) { firDiagnostic ->
         IncDecShouldNotReturnUnitImpl(
             firDiagnostic as KtPsiDiagnostic,

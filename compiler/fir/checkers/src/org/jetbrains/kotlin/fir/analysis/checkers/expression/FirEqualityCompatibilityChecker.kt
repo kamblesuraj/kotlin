@@ -250,22 +250,28 @@ object FirEqualityCompatibilityChecker : FirEqualityOperatorCallChecker() {
         isWarning: Boolean,
         context: CheckerContext,
     ): KtDiagnosticFactory2<ConeKotlinType, ConeKotlinType> {
-        val areBothPrimitives = lType.isPrimitiveOrNullablePrimitive && rType.isPrimitiveOrNullablePrimitive
-        val isAnyPrimitive = lType.isPrimitiveOrNullablePrimitive || rType.isPrimitiveOrNullablePrimitive
-        val onlyOneIsPrimitive = isAnyPrimitive && !areBothPrimitives
+        val areBothPrimitives = lType.isPrimitive && rType.isPrimitive
         val areSameTypes = lType.classId == rType.classId
         val shouldProperlyReportError = context.languageVersionSettings.supportsFeature(LanguageFeature.ReportErrorsForComparisonOperators)
 
-        // K1 reports DEPRECATED_IDENTITY_EQUALS for pairs of primitives,
-        // and IMPLICIT_BOXING_IN_IDENTITY_EQUALS when only one type
-        // is a primitive.
-        val shouldRelaxDiagnostic = (areSameTypes && isAnyPrimitive || onlyOneIsPrimitive) && !shouldProperlyReportError
+        // In this case K1 reports nothing
+        val shouldRelaxDiagnostic = (lType.isNullableNothing || rType.isNullableNothing) && !shouldProperlyReportError
 
         return when {
+            // See: KT-28252
+            areSameTypes && areBothPrimitives -> FirErrors.DEPRECATED_IDENTITY_EQUALS
+            // The same reason as above
+            isIdentityComparedWithImplicitBoxing(lType, rType, context.session) -> FirErrors.IMPLICIT_BOXING_IN_IDENTITY_EQUALS
             isWarning || shouldRelaxDiagnostic -> FirErrors.FORBIDDEN_IDENTITY_EQUALS_WARNING
             else -> FirErrors.FORBIDDEN_IDENTITY_EQUALS
         }
     }
+
+    private fun isIdentityComparedWithImplicitBoxing(lType: ConeKotlinType, rType: ConeKotlinType, session: FirSession) =
+        isPrimitiveWithNonPrimitiveSupertype(lType, rType, session) || isPrimitiveWithNonPrimitiveSupertype(rType, lType, session)
+
+    private fun isPrimitiveWithNonPrimitiveSupertype(lType: ConeKotlinType, rType: ConeKotlinType, session: FirSession) =
+        lType.isPrimitive && !rType.isPrimitive && lType.isSubtypeOf(rType, session)
 
     private fun getSourceLessInapplicabilityDiagnostic(isWarning: Boolean) = when {
         isWarning -> FirErrors.INCOMPATIBLE_TYPES_WARNING

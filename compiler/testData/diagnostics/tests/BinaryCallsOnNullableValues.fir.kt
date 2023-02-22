@@ -18,8 +18,8 @@ fun f(): Unit {
     <!EQUALITY_NOT_APPLICABLE!>x === "1"<!>
     <!EQUALITY_NOT_APPLICABLE!>x !== "1"<!>
 
-    <!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x === 1<!>
-    <!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x !== 1<!>
+    <!IMPLICIT_BOXING_IN_IDENTITY_EQUALS!>x === 1<!>
+    <!IMPLICIT_BOXING_IN_IDENTITY_EQUALS!>x !== 1<!>
 
     x..2
     x in 1..2

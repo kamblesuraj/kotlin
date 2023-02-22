@@ -55,7 +55,7 @@ fun case_4(x: Char?) {
 fun case_5() {
     val x: Unit? = null
 
-    if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x !== <!USELESS_IS_CHECK!>null is Boolean?<!><!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>
+    if (<!FORBIDDEN_IDENTITY_EQUALS!>x !== <!USELESS_IS_CHECK!>null is Boolean?<!><!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>
     if (<!SENSELESS_COMPARISON!>x !== null == null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!><!UNSAFE_CALL!>.<!>equals(null)
     if (<!SENSELESS_COMPARISON!>x !== null == null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!>.propT
     if (<!SENSELESS_COMPARISON!>x !== null == null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Unit?")!>x<!><!UNSAFE_CALL!>.<!>propAny
@@ -165,7 +165,7 @@ fun case_11(x: TypealiasNullableStringIndirect<!REDUNDANT_NULLABLE!>?<!>, y: Typ
 
 // TESTCASE NUMBER: 12
 fun case_12(x: TypealiasNullableStringIndirect, y: TypealiasNullableStringIndirect) =
-    if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!><!USELESS_IS_CHECK!>(x == null) !is Boolean<!> === false<!>) "1"
+    if (<!DEPRECATED_IDENTITY_EQUALS!><!USELESS_IS_CHECK!>(x == null) !is Boolean<!> === false<!>) "1"
     else if (<!USELESS_IS_CHECK!>(<!FORBIDDEN_IDENTITY_EQUALS_WARNING, SENSELESS_COMPARISON!>y === null !== null<!>) is Boolean<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>
     else if (<!SENSELESS_COMPARISON!>y === null != null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.equals(null)
     else if (<!SENSELESS_COMPARISON!>y === null != null<!>) <!DEBUG_INFO_EXPRESSION_TYPE("TypealiasNullableStringIndirect")!>x<!>.propT
@@ -180,7 +180,7 @@ fun case_12(x: TypealiasNullableStringIndirect, y: TypealiasNullableStringIndire
 
 // TESTCASE NUMBER: 13
 fun case_13(x: <!UNRESOLVED_REFERENCE!>otherpackage.Case13<!>?) =
-    <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Boolean")!>if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>(x == null !is Boolean) !== true<!>) {
+    <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Boolean")!>if (<!DEPRECATED_IDENTITY_EQUALS!>(x == null !is Boolean) !== true<!>) {
         throw Exception()
     } else {
         <!DEBUG_INFO_EXPRESSION_TYPE("ERROR CLASS: Symbol not found for otherpackage.Case13? & kotlin.Boolean")!>x<!>
@@ -204,17 +204,17 @@ fun case_14() {
             if (<!SENSELESS_COMPARISON!>a.x !== null<!> == false) {
                 if (<!SENSELESS_COMPARISON!><!SENSELESS_COMPARISON!>a.x != null<!> == null<!>) {
                     if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING, SENSELESS_COMPARISON!><!SENSELESS_COMPARISON!>a.x != null<!> !== null<!>) {
-                        if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!><!SENSELESS_COMPARISON!>a.x != null<!> === true<!>) {
-                            if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!><!SENSELESS_COMPARISON!>a.x !== null<!> === <!USELESS_IS_CHECK!>true !is Boolean<!><!> == true) {
-                                if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!><!SENSELESS_COMPARISON!>a.x != null<!> !== false<!>) {
-                                    if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!><!SENSELESS_COMPARISON!>a.x != null<!> === false<!>) {
-                                        if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!><!SENSELESS_COMPARISON!>a.x !== null<!> === true<!>) {
+                        if (<!DEPRECATED_IDENTITY_EQUALS!><!SENSELESS_COMPARISON!>a.x != null<!> === true<!>) {
+                            if (<!DEPRECATED_IDENTITY_EQUALS!><!SENSELESS_COMPARISON!>a.x !== null<!> === <!USELESS_IS_CHECK!>true !is Boolean<!><!> == true) {
+                                if (<!DEPRECATED_IDENTITY_EQUALS!><!SENSELESS_COMPARISON!>a.x != null<!> !== false<!>) {
+                                    if (<!DEPRECATED_IDENTITY_EQUALS!><!SENSELESS_COMPARISON!>a.x != null<!> === false<!>) {
+                                        if (<!DEPRECATED_IDENTITY_EQUALS!><!SENSELESS_COMPARISON!>a.x !== null<!> === true<!>) {
                                             if (<!USELESS_IS_CHECK!>(<!SENSELESS_COMPARISON!>a.x != null<!> != true) !is Boolean<!>) {
                                                 if (a.x != null is Boolean) {
                                                     if (a.x != <!USELESS_IS_CHECK!>null is Boolean is Boolean<!>) {
-                                                        if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>a.x !== null is Boolean<!>) {
+                                                        if (<!IMPLICIT_BOXING_IN_IDENTITY_EQUALS!>a.x !== null is Boolean<!>) {
                                                             if (a.x != null is Boolean) {
-                                                                if ((<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>a.x !== null !is Boolean<!>) == false) {
+                                                                if ((<!IMPLICIT_BOXING_IN_IDENTITY_EQUALS!>a.x !== null !is Boolean<!>) == false) {
                                                                     a.x
                                                                     a.x.equals(a.x)
                                                                 }
@@ -237,7 +237,7 @@ fun case_14() {
 
 // TESTCASE NUMBER: 15
 fun case_15(x: EmptyObject) {
-    val t = if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x === <!USELESS_IS_CHECK!><!USELESS_IS_CHECK!>null is Boolean is Boolean<!> is Boolean<!><!>) "" else {
+    val t = if (<!FORBIDDEN_IDENTITY_EQUALS!>x === <!USELESS_IS_CHECK!><!USELESS_IS_CHECK!>null is Boolean is Boolean<!> is Boolean<!><!>) "" else {
         <!DEBUG_INFO_EXPRESSION_TYPE("EmptyObject")!>x<!>
         <!DEBUG_INFO_EXPRESSION_TYPE("EmptyObject")!>x<!>.equals(null)
         <!DEBUG_INFO_EXPRESSION_TYPE("EmptyObject")!>x<!>.propT
@@ -329,7 +329,7 @@ fun case_20(b: Boolean) {
         }
     }
 
-    if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>a.B19.C19.D19 !== null !is Boolean<!>) {
+    if (<!FORBIDDEN_IDENTITY_EQUALS!>a.B19.C19.D19 !== null !is Boolean<!>) {
         a.B19.C19.D19
         a.B19.C19.D19<!UNSAFE_CALL!>.<!>equals(null)
         a.B19.C19.D19.propT
@@ -396,7 +396,7 @@ fun case_23(a: ((Float) -> Int?)?, b: Float?) {
 
 // TESTCASE NUMBER: 24
 fun case_24(a: ((() -> Unit) -> Unit)?, b: (() -> Unit)?) =
-    if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>a !== null is Boolean<!> && <!FORBIDDEN_IDENTITY_EQUALS_WARNING!>b !== null !is Boolean<!>) {
+    if (<!FORBIDDEN_IDENTITY_EQUALS!>a !== null is Boolean<!> && <!FORBIDDEN_IDENTITY_EQUALS!>b !== null !is Boolean<!>) {
         <!UNSAFE_IMPLICIT_INVOKE_CALL!>a<!>(<!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Function0<kotlin.Unit>?")!>b<!>)
         <!UNSAFE_IMPLICIT_INVOKE_CALL!>a<!>(b)
         <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Function0<kotlin.Unit>?")!>b<!><!UNSAFE_CALL!>.<!>equals(null)
@@ -420,10 +420,10 @@ fun case_25(b: Boolean) {
 
     val y = if (b) x else null
 
-    if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>y !== null === true<!>) {
+    if (<!DEPRECATED_IDENTITY_EQUALS!>y !== null === true<!>) {
         val z = <!DEBUG_INFO_EXPRESSION_TYPE("<anonymous>?")!>y()<!>
 
-        if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>z != null !== false<!>) {
+        if (<!DEPRECATED_IDENTITY_EQUALS!>z != null !== false<!>) {
             <!DEBUG_INFO_EXPRESSION_TYPE("<anonymous>? & <anonymous>")!>z<!>.a
             <!DEBUG_INFO_EXPRESSION_TYPE("<anonymous>? & <anonymous>")!>z<!>.a.equals(null)
             <!DEBUG_INFO_EXPRESSION_TYPE("<anonymous>? & <anonymous>")!>z<!>.a.propT
@@ -442,7 +442,7 @@ fun case_25(b: Boolean) {
 fun case_26(a: ((Float) -> Int?)?, b: Float?) {
     if (a != null == true == false && b != null == true == false) {
         val x = <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int?")!><!UNSAFE_IMPLICIT_INVOKE_CALL!>a<!>(<!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Float? & kotlin.Nothing?")!>b<!>)<!>
-        if (<!FORBIDDEN_IDENTITY_EQUALS_WARNING!>x != null == true === false<!>) {
+        if (<!DEPRECATED_IDENTITY_EQUALS!>x != null == true === false<!>) {
             <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int? & kotlin.Nothing?")!>x<!>
             <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int? & kotlin.Nothing?")!>x<!>.equals(null)
             <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int? & kotlin.Nothing?")!>x<!>.propT

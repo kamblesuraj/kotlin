@@ -2678,6 +2678,18 @@ sealed class KtFirDiagnostic<PSI : PsiElement> : KtDiagnosticWithPsi<PSI> {
         abstract val rightType: KtType
     }
 
+    abstract class DeprecatedIdentityEquals : KtFirDiagnostic<KtElement>() {
+        override val diagnosticClass get() = DeprecatedIdentityEquals::class
+        abstract val leftType: KtType
+        abstract val rightType: KtType
+    }
+
+    abstract class ImplicitBoxingInIdentityEquals : KtFirDiagnostic<KtElement>() {
+        override val diagnosticClass get() = ImplicitBoxingInIdentityEquals::class
+        abstract val leftType: KtType
+        abstract val rightType: KtType
+    }
+
     abstract class IncDecShouldNotReturnUnit : KtFirDiagnostic<KtExpression>() {
         override val diagnosticClass get() = IncDecShouldNotReturnUnit::class
     }

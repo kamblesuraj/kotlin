@@ -217,6 +217,7 @@ import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.FINAL_SUPERTYPE
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.FINAL_UPPER_BOUND
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.FLOAT_LITERAL_OUT_OF_RANGE
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.DEPRECATED_BINARY_MOD
+import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.DEPRECATED_IDENTITY_EQUALS
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.FORBIDDEN_BINARY_MOD
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.FORBIDDEN_IDENTITY_EQUALS
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.FORBIDDEN_IDENTITY_EQUALS_WARNING
@@ -247,6 +248,7 @@ import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.ILLEGAL_SUSPEND_F
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.ILLEGAL_SUSPEND_PROPERTY_ACCESS
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.ILLEGAL_UNDERSCORE
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.IMPLEMENTATION_BY_DELEGATION_IN_EXPECT_CLASS
+import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.IMPLICIT_BOXING_IN_IDENTITY_EQUALS
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.IMPLICIT_NOTHING_PROPERTY_TYPE
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.IMPLICIT_NOTHING_RETURN_TYPE
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors.INAPPLICABLE_CANDIDATE
@@ -1258,7 +1260,7 @@ object FirErrorsDefaultMessages : BaseDiagnosticRendererFactory() {
         )
 
         map.put(IMPLICIT_NOTHING_RETURN_TYPE, "'Nothing' return type needs to be specified explicitly")
-        map.put(IMPLICIT_NOTHING_PROPERTY_TYPE, "'Nothing' property type needs to be specified explicitly");
+        map.put(IMPLICIT_NOTHING_PROPERTY_TYPE, "'Nothing' property type needs to be specified explicitly")
 
         map.put(CYCLIC_GENERIC_UPPER_BOUND, "Type parameter has cyclic upper bounds")
 
@@ -1993,6 +1995,18 @@ object FirErrorsDefaultMessages : BaseDiagnosticRendererFactory() {
         map.put(
             FORBIDDEN_IDENTITY_EQUALS_WARNING,
             "Identity equality for arguments of types {0} and {1} is forbidden",
+            RENDER_TYPE,
+            RENDER_TYPE
+        )
+        map.put(
+            DEPRECATED_IDENTITY_EQUALS,
+            "Identity equality for arguments of types {0} and {1} is deprecated",
+            RENDER_TYPE,
+            RENDER_TYPE
+        )
+        map.put(
+            IMPLICIT_BOXING_IN_IDENTITY_EQUALS,
+            "Identity equality for arguments of types {0} and {1} can be unstable because of implicit boxing",
             RENDER_TYPE,
             RENDER_TYPE
         )

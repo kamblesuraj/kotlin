@@ -3228,6 +3228,20 @@ internal class ForbiddenIdentityEqualsWarningImpl(
     override val token: KtLifetimeToken,
 ) : KtFirDiagnostic.ForbiddenIdentityEqualsWarning(), KtAbstractFirDiagnostic<KtElement>
 
+internal class DeprecatedIdentityEqualsImpl(
+    override val leftType: KtType,
+    override val rightType: KtType,
+    override val firDiagnostic: KtPsiDiagnostic,
+    override val token: KtLifetimeToken,
+) : KtFirDiagnostic.DeprecatedIdentityEquals(), KtAbstractFirDiagnostic<KtElement>
+
+internal class ImplicitBoxingInIdentityEqualsImpl(
+    override val leftType: KtType,
+    override val rightType: KtType,
+    override val firDiagnostic: KtPsiDiagnostic,
+    override val token: KtLifetimeToken,
+) : KtFirDiagnostic.ImplicitBoxingInIdentityEquals(), KtAbstractFirDiagnostic<KtElement>
+
 internal class IncDecShouldNotReturnUnitImpl(
     override val firDiagnostic: KtPsiDiagnostic,
     override val token: KtLifetimeToken,
