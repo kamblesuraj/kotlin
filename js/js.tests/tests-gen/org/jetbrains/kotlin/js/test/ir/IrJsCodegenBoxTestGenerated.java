@@ -24404,6 +24404,12 @@ public class IrJsCodegenBoxTestGenerated extends AbstractIrJsCodegenBoxTest {
         }
 
         @Test
+        @TestMetadata("customNumberInheritor.kt")
+        public void testCustomNumberInheritor() throws Exception {
+            runTest("compiler/testData/codegen/box/primitiveTypes/customNumberInheritor.kt");
+        }
+
+        @Test
         @TestMetadata("ea35963.kt")
         public void testEa35963() throws Exception {
             runTest("compiler/testData/codegen/box/primitiveTypes/ea35963.kt");
