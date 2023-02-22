@@ -36,4 +36,5 @@ javadocJar()
 tasks.withType<KotlinCompilationTask<*>>().configureEach {
     compilerOptions.apiVersion.value(KotlinVersion.KOTLIN_1_8).finalizeValueOnRead()
     compilerOptions.languageVersion.value(KotlinVersion.KOTLIN_1_8).finalizeValueOnRead()
+    compilerOptions.freeCompilerArgs.add("-XXLanguage:+StopPropagatingDeprecationThroughOverrides")
 }

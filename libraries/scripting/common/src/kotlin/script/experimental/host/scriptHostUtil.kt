@@ -134,7 +134,7 @@ private val ExternalSourceCode.textSafe: String?
             null
         }
 
-private const val UTF8_BOM = 0xfeff.toInt().toChar().toString()
+private const val UTF8_BOM = 0xfeff.toChar().toString()
 
 private fun File.readTextSkipUtf8Bom(): String = readText().removePrefix(UTF8_BOM)
 
