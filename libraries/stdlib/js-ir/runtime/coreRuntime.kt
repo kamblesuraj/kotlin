@@ -102,8 +102,21 @@ internal fun extendThrowable(this_: dynamic, message: String?, cause: Throwable?
     setPropertiesToThrowableInstance(this_, message, cause)
 }
 
+internal fun hasOverriddenThrowableProperty(this_: dynamic, propName: String): Boolean {
+    var proto = JsObject.getPrototypeOf(this_)
+
+    do {
+        if (proto.hasOwnProperty(propName).unsafeCast<Boolean>()) {
+            return true
+        }
+        proto = JsObject.getPrototypeOf(proto)
+    } while (proto !== js("Error").prototype)
+
+    return false
+}
+
 internal fun setPropertiesToThrowableInstance(this_: dynamic, message: String?, cause: Throwable?) {
-    if (!hasOwnPrototypeProperty(this_, "message")) {
+    if (!hasOverriddenThrowableProperty(this_, "message")) {
         @Suppress("IfThenToElvis")
         this_.message = if (message == null) {
             @Suppress("SENSELESS_COMPARISON")
@@ -116,7 +129,7 @@ internal fun setPropertiesToThrowableInstance(this_: dynamic, message: String?, 
             }
         } else message
     }
-    if (!hasOwnPrototypeProperty(this_, "cause")) {
+    if (!hasOverriddenThrowableProperty(this_, "cause")) {
         this_.cause = cause
     }
     this_.name = JsObject.getPrototypeOf(this_).constructor.name
