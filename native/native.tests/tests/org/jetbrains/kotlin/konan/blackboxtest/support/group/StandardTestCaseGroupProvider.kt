@@ -50,7 +50,9 @@ internal class StandardTestCaseGroupProvider : TestCaseGroupProvider {
 
             val lldbTestCases = testCases.filter { it.kind == TestKind.STANDALONE_LLDB }
             if (lldbTestCases.isNotEmpty()
-                && (settings.get<OptimizationMode>() != OptimizationMode.DEBUG || !settings.get<LLDB>().isAvailable)
+                && (settings.get<OptimizationMode>() != OptimizationMode.DEBUG
+                        || !settings.get<LLDB>().isAvailable
+                        || settings.get<KotlinNativeTargets>().run { testTarget != hostTarget })
             ) {
                 lldbTestCases.mapTo(disabledTestCaseIds) { it.id }
             }
