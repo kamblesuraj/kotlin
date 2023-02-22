@@ -18,6 +18,15 @@ dependencies {
     testImplementation(projectTests(":compiler:tests-common-new"))
     testImplementation(projectTests(":compiler:test-infrastructure"))
     testImplementation(projectTests(":generators:test-generator"))
+
+    // FIXME: Well, this reveals the problem of this New infra being located outside of the kotlin-native.
+    //  This subproject is under the `kotlin.native.enabled` property making impossible to even compile the project
+    //  Probably could be done pluggable and located separately
+    if (kotlinBuildProperties.isKotlinNativeEnabled) {
+        testImplementation(project(":kotlin-native-shared"))
+        testImplementation(project(":native:kotlin-native-utils"))
+        testImplementation(project(":kotlin-native:utilities:executors"))
+    }
     testApiJUnit5()
 
     testRuntimeOnly(commonDependency("org.jetbrains.intellij.deps:trove4j"))
