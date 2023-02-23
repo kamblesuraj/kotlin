@@ -42,12 +42,12 @@ tasks.validatePlugins.configure {
 }
 
 
-sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
-    kotlin.srcDir("../../../performance/buildSrc/src/main/kotlin")
-    kotlin.srcDir("../../../shared/src/library/kotlin")
-    kotlin.srcDir("../../../shared/src/main/kotlin")
-    kotlin.srcDir("../../benchmarks/shared/src/main/kotlin/report")
-    kotlin.srcDir("../../../../native/utils/src")
+sourceSets["main"].kotlin {
+    srcDir("../../../performance/buildSrc/src/main/kotlin")
+    srcDir("../../../shared/src/library/kotlin")
+    srcDir("../../../shared/src/main/kotlin")
+    srcDir("../../benchmarks/shared/src/main/kotlin/report")
+    srcDir("../../../../native/utils/src")
 }
 
 tasks.withType<KotlinCompile>().configureEach {

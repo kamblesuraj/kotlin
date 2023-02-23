@@ -38,12 +38,12 @@ tasks.validatePlugins.configure {
 }
 
 
-sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
-    kotlin.srcDir("src/main/kotlin")
-    kotlin.srcDir("../../shared/src/library/kotlin")
-    kotlin.srcDir("../../shared/src/main/kotlin")
-    kotlin.srcDir("../../tools/benchmarks/shared/src/main/kotlin/report")
-    kotlin.srcDir("../../../native/utils/src")
+sourceSets["main"].kotlin {
+    srcDir("src/main/kotlin")
+    srcDir("../../shared/src/library/kotlin")
+    srcDir("../../shared/src/main/kotlin")
+    srcDir("../../tools/benchmarks/shared/src/main/kotlin/report")
+    srcDir("../../../native/utils/src")
 }
 
 tasks.withType<KotlinCompile>().configureEach {
@@ -72,8 +72,6 @@ dependencies {
     implementation("io.ktor:ktor-client-auth:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
-
-    api("org.jetbrains.kotlin:kotlin-native-utils:$kotlinVersion")
 
     // Located in <repo root>/shared and always provided by the composite build.
     //api("org.jetbrains.kotlin:kotlin-native-shared:$konanVersion")
