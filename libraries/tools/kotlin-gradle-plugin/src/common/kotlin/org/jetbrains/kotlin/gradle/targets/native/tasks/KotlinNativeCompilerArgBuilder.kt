@@ -61,20 +61,6 @@ internal fun buildKotlinNativeKlibCompilerArgs(
         addKey("-no-default-libs", sharedCompilationData.isAllowCommonizer)
     }
 
-    /*
-    For now, we only pass multiplatform structure to K2 for platform compilations
-    Metadata compilations will compile against pre-compiled klibs from their dependsOn
-    */
-    if (compilerOptions.usesK2.get() && sharedCompilationData == null) {
-        add("-Xfragments=${k2MultiplatformCompilationData.fragmentsCompilerArgs.joinToString(",")}")
-        add("-Xfragment-sources=${k2MultiplatformCompilationData.fragmentSourcesCompilerArgs.joinToString(",")}")
-        add("-Xdepends-on=${k2MultiplatformCompilationData.dependsOnCompilerArgs.joinToString(",")}")
-    } else {
-        if (!commonSourcesTree.isEmpty) {
-            add("-Xcommon-sources=${commonSourcesTree.joinToString(separator = ",") { it.absolutePath }}")
-        }
-    }
-
     // Configure FQ module name to avoid cyclic dependencies in klib manifests (see KT-36721).
     addArg("-module-name", compilerOptions.moduleName.get())
     add("-Xshort-module-name=$shortModuleName")
@@ -94,10 +80,25 @@ internal fun buildKotlinNativeKlibCompilerArgs(
         }
     }
 
+    if (compilerOptions.usesK2.get()) {
+        /*
+        For now, we only pass multiplatform structure to K2 for platform compilations
+        Metadata compilations will compile against pre-compiled klibs from their dependsOn
+        */
+        if (sharedCompilationData == null) {
+            add("-Xfragments=${k2MultiplatformCompilationData.fragmentsCompilerArgs.joinToString(",")}")
+            add("-Xfragment-sources=${k2MultiplatformCompilationData.fragmentSourcesCompilerArgs.joinToString(",")}")
+            add("-Xdepends-on=${k2MultiplatformCompilationData.dependsOnCompilerArgs.joinToString(",")}")
+        }
+    }
+
     addAll(buildKotlinNativeCompileCommonArgs(languageSettings, compilerOptions, compilerPlugins))
 
     addAll(source.map { it.absolutePath })
 
+    if (!compilerOptions.usesK2.get() && !commonSourcesTree.isEmpty) {
+        add("-Xcommon-sources=${commonSourcesTree.joinToString(separator = ",") { it.absolutePath }}")
+    }
 }
 
 internal fun buildKotlinNativeBinaryLinkerArgs(
