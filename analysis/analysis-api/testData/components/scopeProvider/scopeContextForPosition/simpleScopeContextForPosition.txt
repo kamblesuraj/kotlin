@@ -19,131 +19,6 @@ implicit receivers:
   owner symbol: KtFirNamedClassOrObjectSymbol
 
 scopes:
-  LocalScope, index = 0
-    classifiers: 0
-    callables: 0
-
-  LocalScope, index = 1
-    classifiers: 0
-    callables: 0
-
-  LocalScope, index = 2
-    classifiers: 0
-    callables: 0
-
-  LocalScope, index = 3
-    classifiers: 0
-    callables: 1
-      KtLocalVariableSymbol:
-        annotationsList: []
-        callableIdIfNonLocal: null
-        contextReceivers: []
-        isExtension: false
-        isVal: true
-        name: localVarA
-        origin: SOURCE
-        receiverParameter: null
-        returnType: KtUsualClassType:
-          annotationsList: []
-          ownTypeArguments: []
-          type: kotlin/Int
-        symbolKind: LOCAL
-        typeParameters: []
-
-  LocalScope, index = 4
-    classifiers: 0
-    callables: 1
-      KtValueParameterSymbol:
-        annotationsList: []
-        callableIdIfNonLocal: null
-        contextReceivers: []
-        generatedPrimaryConstructorProperty: null
-        hasDefaultValue: false
-        isCrossinline: false
-        isExtension: false
-        isImplicitLambdaParameter: false
-        isNoinline: false
-        isVararg: false
-        name: lambdaArg
-        origin: SOURCE
-        receiverParameter: null
-        returnType: KtUsualClassType:
-          annotationsList: []
-          ownTypeArguments: []
-          type: kotlin/String
-        symbolKind: LOCAL
-        typeParameters: []
-
-  LocalScope, index = 5
-    classifiers: 0
-    callables: 2
-      KtLocalVariableSymbol:
-        annotationsList: []
-        callableIdIfNonLocal: null
-        contextReceivers: []
-        isExtension: false
-        isVal: true
-        name: localVarB
-        origin: SOURCE
-        receiverParameter: null
-        returnType: KtUsualClassType:
-          annotationsList: []
-          ownTypeArguments: []
-          type: kotlin/Int
-        symbolKind: LOCAL
-        typeParameters: []
-      KtFunctionSymbol:
-        annotationsList: []
-        callableIdIfNonLocal: null
-        contextReceivers: []
-        contractEffects: []
-        hasStableParameterNames: true
-        isBuiltinFunctionInvoke: false
-        isExtension: false
-        isExternal: false
-        isInfix: false
-        isInline: false
-        isOperator: false
-        isOverride: false
-        isStatic: false
-        isSuspend: false
-        modality: FINAL
-        name: localFunB
-        origin: SOURCE
-        receiverParameter: null
-        returnType: KtUsualClassType:
-          annotationsList: []
-          ownTypeArguments: []
-          type: kotlin/Unit
-        symbolKind: LOCAL
-        typeParameters: []
-        valueParameters: []
-        visibility: Local
-
-  LocalScope, index = 6
-    classifiers: 0
-    callables: 1
-      KtValueParameterSymbol:
-        annotationsList: []
-        callableIdIfNonLocal: null
-        contextReceivers: []
-        generatedPrimaryConstructorProperty: null
-        hasDefaultValue: false
-        isCrossinline: false
-        isExtension: false
-        isImplicitLambdaParameter: false
-        isNoinline: false
-        isVararg: false
-        name: param
-        origin: SOURCE
-        receiverParameter: null
-        returnType: KtUsualClassType:
-          annotationsList: []
-          ownTypeArguments: []
-          type: kotlin/String?
-        symbolKind: LOCAL
-        typeParameters: []
-
   SimpleTypeScope, index = 0
     classifiers: 0
     callables: 4
@@ -277,7 +152,11 @@ scopes:
         valueParameters: []
         visibility: Public
 
-  SimpleTypeScope, index = 1
+  LocalScope, index = 1, empty
+
+  LocalScope, index = 2, empty
+
+  SimpleTypeScope, index = 3
     classifiers: 0
     callables: 4
       KtFunctionSymbol:
@@ -410,7 +289,134 @@ scopes:
         valueParameters: []
         visibility: Public
 
-  SimpleTypeScope, index = 2
+  LocalScope, index = 4, empty
+
+  LocalScope, index = 5
+    classifiers: 0
+    callables: 1
+      KtLocalVariableSymbol:
+        annotationsList: []
+        callableIdIfNonLocal: null
+        contextReceivers: []
+        isExtension: false
+        isVal: true
+        name: localVarA
+        origin: SOURCE
+        receiverParameter: null
+        returnType: KtUsualClassType:
+          annotationsList: []
+          ownTypeArguments: []
+          type: kotlin/Int
+        symbolKind: LOCAL
+        typeParameters: []
+
+  LocalScope, index = 6
+    classifiers: 0
+    callables: 1
+      KtValueParameterSymbol:
+        annotationsList: []
+        callableIdIfNonLocal: null
+        contextReceivers: []
+        generatedPrimaryConstructorProperty: null
+        hasDefaultValue: false
+        isCrossinline: false
+        isExtension: false
+        isImplicitLambdaParameter: false
+        isNoinline: false
+        isVararg: false
+        name: lambdaArg
+        origin: SOURCE
+        receiverParameter: null
+        returnType: KtUsualClassType:
+          annotationsList: []
+          ownTypeArguments: []
+          type: kotlin/String
+        symbolKind: LOCAL
+        typeParameters: []
+
+  LocalScope, index = 7
+    classifiers: 0
+    callables: 2
+      KtLocalVariableSymbol:
+        annotationsList: []
+        callableIdIfNonLocal: null
+        contextReceivers: []
+        isExtension: false
+        isVal: true
+        name: localVarB
+        origin: SOURCE
+        receiverParameter: null
+        returnType: KtUsualClassType:
+          annotationsList: []
+          ownTypeArguments: []
+          type: kotlin/Int
+        symbolKind: LOCAL
+        typeParameters: []
+      KtFunctionSymbol:
+        annotationsList: []
+        callableIdIfNonLocal: null
+        contextReceivers: []
+        contractEffects: []
+        hasStableParameterNames: true
+        isBuiltinFunctionInvoke: false
+        isExtension: false
+        isExternal: false
+        isInfix: false
+        isInline: false
+        isOperator: false
+        isOverride: false
+        isStatic: false
+        isSuspend: false
+        modality: FINAL
+        name: localFunB
+        origin: SOURCE
+        receiverParameter: null
+        returnType: KtUsualClassType:
+          annotationsList: []
+          ownTypeArguments: []
+          type: kotlin/Unit
+        symbolKind: LOCAL
+        typeParameters: []
+        valueParameters: []
+        visibility: Local
+
+  LocalScope, index = 8
+    classifiers: 0
+    callables: 1
+      KtValueParameterSymbol:
+        annotationsList: []
+        callableIdIfNonLocal: null
+        contextReceivers: []
+        generatedPrimaryConstructorProperty: null
+        hasDefaultValue: false
+        isCrossinline: false
+        isExtension: false
+        isImplicitLambdaParameter: false
+        isNoinline: false
+        isVararg: false
+        name: param
+        origin: SOURCE
+        receiverParameter: null
+        returnType: KtUsualClassType:
+          annotationsList: []
+          ownTypeArguments: []
+          type: kotlin/String?
+        symbolKind: LOCAL
+        typeParameters: []
+
+  TypeParameterScope, index = 9
+    classifiers: 1
+      KtTypeParameterSymbol:
+        annotationsList: []
+        isReified: false
+        name: T
+        origin: SOURCE
+        typeParameters: []
+        upperBounds: []
+        variance: INVARIANT
+    callables: 0
+
+  SimpleTypeScope, index = 10
     classifiers: 0
     callables: 4
       KtFunctionSymbol:
@@ -566,23 +572,9 @@ scopes:
         valueParameters: []
         visibility: Public
 
-  TypeParameterScope, index = 0
-    classifiers: 1
-      KtTypeParameterSymbol:
-        annotationsList: []
-        isReified: false
-        name: T
-        origin: SOURCE
-        typeParameters: []
-        upperBounds: []
-        variance: INVARIANT
-    callables: 0
+  ExplicitSimpleImportingScope, index = 11, empty
 
-  ExplicitSimpleImportingScope, index = 1
-    classifiers: 0
-    callables: 0
-
-  PackageMemberScope, index = 2
+  PackageMemberScope, index = 12
     classifiers: 3
       KtNamedClassOrObjectSymbol:
         annotationsList: []
@@ -796,17 +788,15 @@ scopes:
         ]
         visibility: Public
 
-  DefaultSimpleImportingScope, index = 3
+  DefaultSimpleImportingScope, index = 13
 
-  DefaultSimpleImportingScope, index = 4
+  DefaultSimpleImportingScope, index = 14
 
-  ExplicitStarImportingScope, index = 5
-    classifiers: 0
-    callables: 0
+  ExplicitStarImportingScope, index = 15, empty
 
-  DefaultSimpleImportingScope, index = 6
+  DefaultSimpleImportingScope, index = 16
 
-  DefaultStarImportingScope, index = 7
+  DefaultStarImportingScope, index = 17
 
-  DefaultStarImportingScope, index = 8
+  DefaultStarImportingScope, index = 18
 

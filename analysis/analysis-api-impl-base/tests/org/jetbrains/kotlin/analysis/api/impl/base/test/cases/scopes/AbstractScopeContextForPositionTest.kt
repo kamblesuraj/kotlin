@@ -64,23 +64,26 @@ abstract class AbstractScopeContextForPositionTest : AbstractAnalysisApiSingleFi
     }
 
     private fun KtAnalysisSession.renderForTests(scope: KtScope, scopeKind: KtScopeKind, printPretty: Boolean): String = prettyPrint {
-        val index = when (scopeKind) {
-            is KtScopeKind.LocalScope -> scopeKind.indexInTower
-            is KtScopeKind.TypeScope -> scopeKind.receiverIndex
-            is KtScopeKind.NonLocalScope -> scopeKind.indexInTower
-        }
-        appendLine("${scopeKind::class.simpleName}, index = $index")
+        append("${scopeKind::class.simpleName}, index = ${scopeKind.indexInTower}")
 
-        if (scopeKind is KtScopeKind.DefaultSimpleImportingScope || scopeKind is KtScopeKind.DefaultStarImportingScope) return@prettyPrint
+        if (scopeKind is KtScopeKind.DefaultSimpleImportingScope || scopeKind is KtScopeKind.DefaultStarImportingScope) {
+            appendLine()
+            return@prettyPrint
+        }
 
         val callables = scope.getCallableSymbols().toList()
         val classifiers = scope.getClassifierSymbols().toList()
-
-        withIndent {
-            appendLine("classifiers: ${classifiers.size}")
-            withIndent { classifiers.forEach { appendLine(renderSymbol(it, printPretty)) } }
-            appendLine("callables: ${callables.size}")
-            withIndent { callables.forEach { appendLine(renderSymbol(it, printPretty)) } }
+        val isEmpty = callables.isEmpty() && classifiers.isEmpty()
+        if (isEmpty) {
+            appendLine(", empty")
+        } else {
+            appendLine()
+            withIndent {
+                appendLine("classifiers: ${classifiers.size}")
+                withIndent { classifiers.forEach { appendLine(renderSymbol(it, printPretty)) } }
+                appendLine("callables: ${callables.size}")
+                withIndent { callables.forEach { appendLine(renderSymbol(it, printPretty)) } }
+            }
         }
     }
 

@@ -10,39 +10,6 @@ implicit receivers:
   owner symbol: KtFirNamedClassOrObjectSymbol
 
 scopes:
-  LocalScope, index = 0
-    classifiers: 0
-    callables: 0
-
-  LocalScope, index = 1
-    classifiers: 0
-    callables: 0
-
-  LocalScope, index = 2
-    classifiers: 0
-    callables: 0
-
-  LocalScope, index = 3
-    classifiers: 0
-    callables: 1
-      val localVarA: kotlin.Int
-
-  LocalScope, index = 4
-    classifiers: 0
-    callables: 1
-      lambdaArg: kotlin.String
-
-  LocalScope, index = 5
-    classifiers: 0
-    callables: 2
-      val localVarB: kotlin.Int
-      fun localFunB()
-
-  LocalScope, index = 6
-    classifiers: 0
-    callables: 1
-      param: kotlin.String?
-
   SimpleTypeScope, index = 0
     classifiers: 0
     callables: 4
@@ -51,7 +18,11 @@ scopes:
       fun hashCode(): kotlin.Int
       fun toString(): kotlin.String
 
-  SimpleTypeScope, index = 1
+  LocalScope, index = 1, empty
+
+  LocalScope, index = 2, empty
+
+  SimpleTypeScope, index = 3
     classifiers: 0
     callables: 4
       fun memberInB()
@@ -59,7 +30,35 @@ scopes:
       fun hashCode(): kotlin.Int
       fun toString(): kotlin.String
 
-  SimpleTypeScope, index = 2
+  LocalScope, index = 4, empty
+
+  LocalScope, index = 5
+    classifiers: 0
+    callables: 1
+      val localVarA: kotlin.Int
+
+  LocalScope, index = 6
+    classifiers: 0
+    callables: 1
+      lambdaArg: kotlin.String
+
+  LocalScope, index = 7
+    classifiers: 0
+    callables: 2
+      val localVarB: kotlin.Int
+      fun localFunB()
+
+  LocalScope, index = 8
+    classifiers: 0
+    callables: 1
+      param: kotlin.String?
+
+  TypeParameterScope, index = 9
+    classifiers: 1
+      T
+    callables: 0
+
+  SimpleTypeScope, index = 10
     classifiers: 0
     callables: 4
       fun <T> methodInC(param: kotlin.String?)
@@ -67,16 +66,9 @@ scopes:
       fun hashCode(): kotlin.Int
       fun toString(): kotlin.String
 
-  TypeParameterScope, index = 0
-    classifiers: 1
-      T
-    callables: 0
+  ExplicitSimpleImportingScope, index = 11, empty
 
-  ExplicitSimpleImportingScope, index = 1
-    classifiers: 0
-    callables: 0
-
-  PackageMemberScope, index = 2
+  PackageMemberScope, index = 12
     classifiers: 3
       class C
       class B
@@ -86,17 +78,15 @@ scopes:
       fun withB(f: B.() -> kotlin.Unit)
       fun withA(f: A.() -> kotlin.Unit)
 
-  DefaultSimpleImportingScope, index = 3
+  DefaultSimpleImportingScope, index = 13
 
-  DefaultSimpleImportingScope, index = 4
+  DefaultSimpleImportingScope, index = 14
 
-  ExplicitStarImportingScope, index = 5
-    classifiers: 0
-    callables: 0
+  ExplicitStarImportingScope, index = 15, empty
 
-  DefaultSimpleImportingScope, index = 6
+  DefaultSimpleImportingScope, index = 16
 
-  DefaultStarImportingScope, index = 7
+  DefaultStarImportingScope, index = 17
 
-  DefaultStarImportingScope, index = 8
+  DefaultStarImportingScope, index = 18
 

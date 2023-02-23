@@ -47,6 +47,12 @@ public class FirStandaloneNormalAnalysisSourceModuleScopeContextForPositionTestG
     }
 
     @Test
+    @TestMetadata("localTypeScope.kt")
+    public void testLocalTypeScope() throws Exception {
+        runTest("analysis/analysis-api/testData/components/scopeProvider/scopeContextForPosition/localTypeScope.kt");
+    }
+
+    @Test
     @TestMetadata("simpleScopeContextForPosition.kt")
     public void testSimpleScopeContextForPosition() throws Exception {
         runTest("analysis/analysis-api/testData/components/scopeProvider/scopeContextForPosition/simpleScopeContextForPosition.kt");
