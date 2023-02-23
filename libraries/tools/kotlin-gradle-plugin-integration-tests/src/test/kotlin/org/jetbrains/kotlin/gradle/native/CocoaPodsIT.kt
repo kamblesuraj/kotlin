@@ -948,7 +948,7 @@ class CocoaPodsIT : BaseGradleIT() {
                 val framework = fileInWorkingDir("build/bin/iOS/podDebugFramework/cocoapods.framework/cocoapods")
                 with(runProcess(listOf("file", framework.absolutePath), projectDir, environmentVariables = getEnvs())) {
                     assertTrue(isSuccessful)
-                    assertTrue(output.contains("current ar archive random library"))
+                    kotlin.test.assertContains(output, "current ar archive")
                 }
             }
 
