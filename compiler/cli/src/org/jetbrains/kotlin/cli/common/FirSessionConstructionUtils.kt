@@ -219,7 +219,6 @@ fun <F> prepareCommonSessions(
         FirCommonSessionFactory.createModuleBasedSession(
             moduleData,
             sessionProvider,
-            librariesScope,
             projectEnvironment,
             incrementalCompilationContext = createProviderAndScopeForIncrementalCompilation(moduleFiles),
             extensionRegistrars,
