@@ -520,7 +520,7 @@ public inline fun Path.createDirectory(vararg attributes: FileAttribute<*>): Pat
  *
  * @param attributes an optional list of file attributes to set atomically when creating the directory.
  *
- * @throws FileAlreadyExistsException if there is already a file located by this path
+ * @throws FileAlreadyExistsException if there is already a file located by this path or one of its parent paths
  * (optional specific exception, some implementations may throw more general [IOException]).
  * @throws IOException if an I/O error occurs.
  * @throws UnsupportedOperationException if the [attributes] array contains an attribute that cannot be set atomically
@@ -551,7 +551,7 @@ public inline fun Path.createDirectories(vararg attributes: FileAttribute<*>): P
  *
  * @return this path unchanged if all parent directories already exist or have been created successfully.
  *
- * @throws FileAlreadyExistsException if there is already a file located by this path
+ * @throws FileAlreadyExistsException if there is already a file located by the [parent][Path.getParent] path or one of its parent paths
  * (optional specific exception, some implementations may throw more general [IOException]).
  * @throws IOException if an I/O error occurs.
  * @throws UnsupportedOperationException if the [attributes] array contains an attribute that cannot be set atomically
