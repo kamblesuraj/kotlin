@@ -9,7 +9,7 @@ public final class UnsafePropertyInitializersKt /* UnsafePropertyInitializersKt*
   private static final float[] arrayOfFloatPrimitives = {5.0f, -1.23E-7f, 1.4E-45f, 3.4028235E38f, 0.0F / 0.0F, 1.0F / 0.0F, -1.0F / 0.0F, 0.0F / 0.0F, 1.0F / 0.0F, -1.0F / 0.0F} /* initializer type: null */;
 
   @org.jetbrains.annotations.NotNull()
-  private static final int[] arrayOfIntPrimitives = {5, -1L, 2147483647, -2147483648} /* initializer type: null */;
+  private static final int[] arrayOfIntPrimitives = {5, -1, 2147483647, -2147483648} /* initializer type: null */;
 
   @org.jetbrains.annotations.NotNull()
   private static final java.lang.Character[] arrayOfCharObjects;
@@ -21,7 +21,7 @@ public final class UnsafePropertyInitializersKt /* UnsafePropertyInitializersKt*
   private static final java.lang.Float[] arrayOfFloatObjects = {5.0f, -1.23E-7f, 1.4E-45f, 3.4028235E38f, 0.0F / 0.0F, 1.0F / 0.0F, -1.0F / 0.0F, 0.0F / 0.0F, 1.0F / 0.0F, -1.0F / 0.0F} /* initializer type: null */;
 
   @org.jetbrains.annotations.NotNull()
-  private static final java.lang.Integer[] arrayOfIntObjects = {5, -1L, 2147483647, -2147483648} /* initializer type: null */;
+  private static final java.lang.Integer[] arrayOfIntObjects = {5, -1, 2147483647, -2147483648} /* initializer type: null */;
 
   @org.jetbrains.annotations.NotNull()
   private static final java.lang.Long[] arrayOfLongObjects = {5L, -1L, 9223372036854775807L, -9223372036854775808L} /* initializer type: null */;
