@@ -162,6 +162,16 @@ fun createStdLibVersionedDocTask(version: String, isLatest: Boolean) =
                     suppress.set(true)
                 }
             }
+            register("wasm") {
+                platform.set(Platform.wasm)
+                noJdkLink.set(true)
+
+                displayName.set("Wasm")
+                dependsOn("common")
+                sourceRoots.from("$kotlin_stdlib_dir/native-wasm/src")
+                sourceRoots.from("$kotlin_stdlib_dir/wasm/src")
+                sourceRoots.from("$kotlin_stdlib_dir/wasm/builtins")
+            }
             configureEach {
                 documentedVisibilities.set(setOf(DokkaConfiguration.Visibility.PUBLIC, DokkaConfiguration.Visibility.PROTECTED))
                 skipDeprecated.set(false)
@@ -243,7 +253,7 @@ fun createKotlinTestVersionedDocTask(version: String, isLatest: Boolean) =
 
         val moduleDirName = "kotlin-test"
         with(pluginsMapConfiguration) {
-            put("org.jetbrains.dokka.base.DokkaBase", """{ "templatesDir": "$templatesDir" }""")
+            put("org.jetbrains.dokka.base.DokkaBase", """{ "mergeImplicitExpectActualDeclarations": "true", "templatesDir": "$templatesDir" }""")
             put("org.jetbrains.dokka.versioning.VersioningPlugin", """{ "version": "$version" }""")
         }
         if (isLatest) {
@@ -338,6 +348,14 @@ fun createKotlinTestVersionedDocTask(version: String, isLatest: Boolean) =
                 displayName.set("Native")
                 dependsOn("common")
                 sourceRoots.from("$kotlin_native_root/runtime/src/main/kotlin/kotlin/test")
+            }
+            register("wasm") {
+                platform.set(Platform.wasm)
+                noJdkLink.set(true)
+
+                displayName.set("Wasm")
+                dependsOn("common")
+                sourceRoots.from("$kotlin_root/libraries/kotlin.test/wasm/src/main")
             }
             configureEach {
                 skipDeprecated.set(false)
