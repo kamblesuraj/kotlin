@@ -32399,6 +32399,11 @@ public class IrCodegenBoxWasmTestGenerated extends AbstractIrCodegenBoxWasmTest 
             runTest("compiler/testData/codegen/box/unit/kt51036.kt");
         }
 
+        @TestMetadata("kt56723.kt")
+        public void testKt56723() throws Exception {
+            runTest("compiler/testData/codegen/box/unit/kt56723.kt");
+        }
+
         @TestMetadata("nullableUnit.kt")
         public void testNullableUnit() throws Exception {
             runTest("compiler/testData/codegen/box/unit/nullableUnit.kt");

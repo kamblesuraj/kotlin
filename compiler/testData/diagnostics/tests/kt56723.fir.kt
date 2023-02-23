@@ -1,3 +1,5 @@
+import kotlin.reflect.KProperty
+
 fun foo(f: () -> Unit) {
     f()
 }
@@ -39,5 +41,51 @@ fun ban(refRef: IndexibleRefRef?, ref: IndexibleRef?) {
         refRef?.ref?.ind[1] = "X"
     }
     foo(lambda2)
+
+    val lambda3 = {
+        ref?.ind?.set(1, "X")
+    }
+    foo(<!ARGUMENT_TYPE_MISMATCH!>lambda3<!>)
+
+    val lambda4 = {
+        refRef?.ref?.ind?.set(1, "X")
+    }
+    foo(<!ARGUMENT_TYPE_MISMATCH!>lambda4<!>)
 }
 
+object PlusAssignable {
+    operator fun plusAssign(index: Int) {}
+}
+
+object Indexible2 {
+    operator fun get(index: Int) = PlusAssignable
+    operator fun set(index: Int, value: String) {}
+}
+
+class Indexible2Ref(val ind: Indexible2)
+
+fun bam(ref: Indexible2Ref?) {
+    val lambda = {
+        ref?.ind[1] += 1
+    }
+    foo(lambda)
+
+    val lambd2 = {
+        ref?.ind?.get(1)?.plusAssign(1)
+    }
+    foo(lambda)
+}
+
+class DelegatedHolder {
+    var delegated by object {
+        operator fun getValue(thisRef: Any?, desc: KProperty<*>) = "test"
+        operator fun setValue(thisRef: Any?, desc: KProperty<*>, value: String) {}
+    }
+}
+
+fun bap(holder: DelegatedHolder?) {
+    val lambda = {
+        holder?.delegated = "Y"
+    }
+    foo(lambda)
+}

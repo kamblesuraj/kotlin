@@ -528,7 +528,7 @@ fun FirSafeCallExpression.propagateTypeFromQualifiedAccessAfterNullCheck(
 private val FirExpression.isCallToStatementLikeFunction: Boolean
     get() {
         val symbol = (this as? FirFunctionCall)?.calleeReference?.toResolvedFunctionSymbol() ?: return false
-        return symbol.isOperator && symbol.name in OperatorNameConventions.STATEMENT_LIKE_OPERATORS
+        return origin == FirFunctionCallOrigin.Operator && symbol.name in OperatorNameConventions.STATEMENT_LIKE_OPERATORS
     }
 
 fun FirAnnotation.getCorrespondingClassSymbolOrNull(session: FirSession): FirRegularClassSymbol? {
