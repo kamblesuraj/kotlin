@@ -127,8 +127,7 @@ samWithReceiver {
 fun Project.samWithReceiver(configure: org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension.() -> Unit): Unit =
     extensions.configure("samWithReceiver", configure)
 
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.apply {
+tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
         allWarningsAsErrors = true
         freeCompilerArgs += listOf(
