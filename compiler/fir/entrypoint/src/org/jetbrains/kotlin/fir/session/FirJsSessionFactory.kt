@@ -14,8 +14,10 @@ import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
 import org.jetbrains.kotlin.fir.java.FirProjectSessionProvider
 import org.jetbrains.kotlin.fir.resolve.calls.ConeCallConflictResolverFactory
 import org.jetbrains.kotlin.fir.resolve.providers.impl.*
+import org.jetbrains.kotlin.fir.scopes.FirIntersectionScopeOverrideChecker
 import org.jetbrains.kotlin.fir.scopes.FirKotlinScopeProvider
 import org.jetbrains.kotlin.fir.scopes.FirPlatformClassMapper
+import org.jetbrains.kotlin.fir.scopes.impl.FirStandardOverrideChecker
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.library.metadata.resolver.KotlinResolvedLibrary
 import org.jetbrains.kotlin.name.Name
@@ -43,7 +45,12 @@ object FirJsSessionFactory : FirAbstractSessionFactory() {
                 registerExtraComponents(session)
             },
             registerExtraCheckers = { it.registerJsCheckers() },
-            createKotlinScopeProvider = { FirKotlinScopeProvider { _, declaredMemberScope, _, _ -> declaredMemberScope } },
+            createKotlinScopeProvider = {
+                FirKotlinScopeProvider(
+                    FirStandardOverrideChecker(sessionProvider.getSession(moduleData)!!)
+                )
+                { _, declaredMemberScope, _, _ -> declaredMemberScope }
+            },
             createProviders = { _, _, symbolProvider, generatedSymbolsProvider, syntheticFunctionInterfaceProvider, dependencies ->
                 listOfNotNull(
                     symbolProvider,
@@ -71,7 +78,12 @@ object FirJsSessionFactory : FirAbstractSessionFactory() {
             it.registerJsSpecificResolveComponents()
             registerExtraComponents(it)
         },
-        createKotlinScopeProvider = { FirKotlinScopeProvider { _, declaredMemberScope, _, _ -> declaredMemberScope } },
+        createKotlinScopeProvider = {
+            FirKotlinScopeProvider(
+                FirIntersectionScopeOverrideChecker(sessionProvider.getSession(moduleDataProvider.allModuleData.single())!!)
+            )
+            { _, declaredMemberScope, _, _ -> declaredMemberScope }
+        },
         createProviders = { session, builtinsModuleData, kotlinScopeProvider ->
             listOf(
                 KlibBasedSymbolProvider(session, moduleDataProvider, kotlinScopeProvider, resolvedLibraries),
