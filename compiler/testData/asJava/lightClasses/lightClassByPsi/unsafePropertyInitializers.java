@@ -27,7 +27,7 @@ public final class UnsafePropertyInitializersKt /* UnsafePropertyInitializersKt*
   private static final java.lang.Long[] arrayOfLongObjects = {5L, -1L, 9223372036854775807L, -9223372036854775808L} /* initializer type: null */;
 
   @org.jetbrains.annotations.NotNull()
-  private static final java.lang.Object[] arrayOfNAny = {1L, 2L, "abc", kotlin.annotation.AnnotationTarget.CLASS, null} /* initializer type: null */;
+  private static final java.lang.Object[] arrayOfNAny = {1, 2L, "abc", kotlin.annotation.AnnotationTarget.CLASS, null} /* initializer type: null */;
 
   @org.jetbrains.annotations.NotNull()
   private static final java.lang.String[] arrayOfStrings = {"", "quotes \" ''quotes", "\r\n", "\u4F60\u597D\u4E16\u754C"} /* initializer type: null */;
