@@ -1,0 +1,74 @@
+FILE: targetOnPrimaryCtorParameter.kt
+    package a
+
+    public final annotation class NoTarget : R|kotlin/Annotation| {
+        public constructor(): R|a/NoTarget| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    @R|kotlin/annotation/Target|(allowedTargets = vararg(Q|kotlin/annotation/AnnotationTarget|.R|kotlin/annotation/AnnotationTarget.PROPERTY|, R|kotlin/annotation/AnnotationTarget.VALUE_PARAMETER|, Q|kotlin/annotation/AnnotationTarget|.R|kotlin/annotation/AnnotationTarget.FIELD|)) public final annotation class PropValueField : R|kotlin/Annotation| {
+        public constructor(): R|a/PropValueField| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    @R|kotlin/annotation/Target|(allowedTargets = vararg(allowedTargets = <implicitArrayOf>(Q|kotlin/annotation/AnnotationTarget|.R|kotlin/annotation/AnnotationTarget.PROPERTY|))) public final annotation class PropertyOnly : R|kotlin/Annotation| {
+        public constructor(): R|a/PropertyOnly| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    @R|kotlin/annotation/Target|(allowedTargets = vararg(allowedTargets = <implicitArrayOf>(Q|kotlin/annotation/AnnotationTarget|.R|kotlin/annotation/AnnotationTarget.VALUE_PARAMETER|))) public final annotation class ParameterOnly : R|kotlin/Annotation| {
+        public constructor(): R|a/ParameterOnly| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    @R|kotlin/annotation/Target|(allowedTargets = vararg(allowedTargets = *<implicitArrayOf>(Q|kotlin/annotation/AnnotationTarget|.R|kotlin/annotation/AnnotationTarget.FIELD|))) public final annotation class FieldOnly : R|kotlin/Annotation| {
+        public constructor(): R|a/FieldOnly| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    @R|kotlin/annotation/Target|(allowedTargets = vararg(*<implicitArrayOf>(Q|kotlin/annotation/AnnotationTarget|.R|kotlin/annotation/AnnotationTarget.PROPERTY|))) public final annotation class PropertyOnly2 : R|kotlin/Annotation| {
+        public constructor(): R|a/PropertyOnly2| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    public final class Foo : R|kotlin/Any| {
+        public constructor(@R|a/NoTarget|() @R|a/PropValueField|() @R|a/ParameterOnly|() param: R|kotlin/Int|): R|a/Foo| {
+            super<R|kotlin/Any|>()
+        }
+
+        @R|a/PropertyOnly|() @R|a/PropertyOnly2|() @R|a/FieldOnly|() public final var param: R|kotlin/Int| = R|<local>/param|
+            public get(): R|kotlin/Int|
+            public set(value: R|kotlin/Int|): R|kotlin/Unit|
+
+    }
+    public final fun box(): R|kotlin/String| {
+        lval clazz: R|kotlin/reflect/KClass<a/Foo>| = <getClass>(Q|a/Foo|)
+        lval parameterAnnotations: R|kotlin/String| = R|<local>/clazz|.R|SubstitutionOverride<kotlin/reflect/KClass.constructors: R|kotlin/collections/Collection<kotlin/reflect/KFunction<a/Foo>>|>|.R|kotlin/collections/single|<R|kotlin/reflect/KFunction<a/Foo>|>().R|SubstitutionOverride<kotlin/reflect/KFunction.parameters: R|kotlin/collections/List<kotlin/reflect/KParameter>|>|.R|kotlin/collections/single|<R|kotlin/reflect/KParameter|>().R|kotlin/reflect/KAnnotatedElement.annotations|.R|kotlin/collections/joinToString|<R|kotlin/Annotation|>()
+        lval propertyAnnotations: R|kotlin/String| = R|<local>/clazz|.R|kotlin/reflect/full/declaredMemberProperties|<R|a/Foo|>.R|kotlin/collections/single|<R|kotlin/reflect/KProperty1<a/Foo, *>|>().R|kotlin/reflect/KAnnotatedElement.annotations|.R|kotlin/collections/joinToString|<R|kotlin/Annotation|>()
+        lval fieldAnnotations: R|kotlin/String| = <getClass>(Q|a/Foo|).R|kotlin/jvm/java|<R|a/Foo|>.R|SubstitutionOverride<java/lang/Class.getDeclaredField: R|java/lang/reflect/Field!|>|(String(param)).R|java/lang/reflect/AccessibleObject.annotations|.R|kotlin/collections/joinToString|<R|kotlin/Annotation!|>()
+        when () {
+            !=(R|<local>/parameterAnnotations|, String(@a.NoTarget(), @a.PropValueField(), @a.ParameterOnly())) ->  {
+                ^box String(Parameters:).R|kotlin/String.plus|(R|<local>/parameterAnnotations|)
+            }
+        }
+
+        when () {
+            !=(R|<local>/propertyAnnotations|, String(@a.PropertyOnly(), @a.PropertyOnly2())) ->  {
+                ^box String(Property:).R|kotlin/String.plus|(R|<local>/propertyAnnotations|)
+            }
+        }
+
+        when () {
+            !=(R|<local>/fieldAnnotations|, String(@a.FieldOnly())) ->  {
+                ^box String(Field:).R|kotlin/String.plus|(R|<local>/fieldAnnotations|)
+            }
+        }
+
+        ^box String(OK)
+    }
