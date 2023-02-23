@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.analysis.api.symbols.pointers.KtSymbolPointer
 import org.jetbrains.kotlin.analysis.project.structure.KtModule
 import org.jetbrains.kotlin.asJava.classes.lazyPub
 import org.jetbrains.kotlin.asJava.elements.KtLightMethod
+import org.jetbrains.kotlin.light.classes.symbol.cachedValue
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassOrObject
 
@@ -51,7 +52,7 @@ internal open class SymbolLightClassForInterface : SymbolLightClassForInterfaceO
         manager = manager,
     )
 
-    private val _ownMethods: List<KtLightMethod> by lazyPub {
+    override fun getOwnMethods(): List<PsiMethod> = cachedValue {
         withClassOrObjectSymbol { classOrObjectSymbol ->
             val result = mutableListOf<KtLightMethod>()
 
@@ -65,8 +66,6 @@ internal open class SymbolLightClassForInterface : SymbolLightClassForInterfaceO
             result
         }
     }
-
-    override fun getOwnMethods(): List<PsiMethod> = _ownMethods
 
     override fun copy(): SymbolLightClassForInterface =
         SymbolLightClassForInterface(classOrObjectDeclaration, classOrObjectSymbolPointer, ktModule, manager)
