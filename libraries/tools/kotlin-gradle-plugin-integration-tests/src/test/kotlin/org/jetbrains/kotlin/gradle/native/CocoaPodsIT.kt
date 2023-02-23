@@ -1264,6 +1264,8 @@ class CocoaPodsIT : BaseGradleIT() {
         val subprojectPodInstallTask = ":$subProjectName$podInstallTaskName"
         with(project) {
             preparePodfile("ios-app", ImportMode.FRAMEWORKS)
+            gradleBuildScript(subProjectName).appendToCocoapodsBlock("ios.deploymentTarget = \"14.0\"")
+
             build(subprojectPodImportTask, "-Pkotlin.native.cocoapods.generate.wrapper=true") {
                 assertTasksExecuted(listOf(subprojectPodspecTask, subprojectPodInstallTask))
             }
