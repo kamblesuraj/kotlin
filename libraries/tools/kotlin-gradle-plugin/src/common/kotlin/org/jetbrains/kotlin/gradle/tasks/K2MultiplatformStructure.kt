@@ -58,10 +58,10 @@ internal val K2MultiplatformStructure.dependsOnCompilerArgs: Array<String>
         "${edge.fromFragmentName}:${edge.toFragmentName}"
     }.toTypedArray()
 
-internal fun CommonCompilerArguments.configureK2Multiplatform(kotlin2CompileMultiplatformFragments: K2MultiplatformStructure) {
-    fragments = kotlin2CompileMultiplatformFragments.fragmentsCompilerArgs
-    fragmentSources = kotlin2CompileMultiplatformFragments.fragmentSourcesCompilerArgs
-    dependsOnDependencies = kotlin2CompileMultiplatformFragments.dependsOnCompilerArgs
+internal fun CommonCompilerArguments.configureK2Multiplatform(multiplatformStructure: K2MultiplatformStructure) {
+    fragments = multiplatformStructure.fragmentsCompilerArgs
+    fragmentSources = multiplatformStructure.fragmentSourcesCompilerArgs
+    dependsOnDependencies = multiplatformStructure.dependsOnCompilerArgs
 }
 
 internal fun CommonCompilerArguments.configureMultiplatform(
