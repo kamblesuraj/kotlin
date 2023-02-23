@@ -25,7 +25,6 @@ plugins {
     groovy
     kotlin("jvm")
     `kotlin-dsl`
-    id("org.jetbrains.kotlin.plugin.sam.with.receiver")
 }
 
 dependencies {
