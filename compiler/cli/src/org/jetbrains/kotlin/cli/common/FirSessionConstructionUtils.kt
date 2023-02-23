@@ -225,7 +225,6 @@ fun <F> prepareCommonSessions(
             configuration.languageVersionSettings,
             lookupTracker = configuration.get(CommonConfigurationKeys.LOOKUP_TRACKER),
             enumWhenTracker = configuration.get(CommonConfigurationKeys.ENUM_WHEN_TRACKER),
-            needRegisterJavaElementFinder = true,
             registerExtraComponents = {},
             init = sessionConfigurator
         )

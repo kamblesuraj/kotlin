@@ -1579,6 +1579,16 @@ public class CliTestGenerated extends AbstractCliTest {
             runTest("compiler/testData/cli/metadata/anonymousObjectTypeWithFir.args");
         }
 
+        @TestMetadata("classesFromLibraryDependencies.args")
+        public void testClassesFromLibraryDependencies() throws Exception {
+            runTest("compiler/testData/cli/metadata/classesFromLibraryDependencies.args");
+        }
+
+        @TestMetadata("classesFromLibraryDependenciesWithFir.args")
+        public void testClassesFromLibraryDependenciesWithFir() throws Exception {
+            runTest("compiler/testData/cli/metadata/classesFromLibraryDependenciesWithFir.args");
+        }
+
         @TestMetadata("inheritorOfExpectSealedClass.args")
         public void testInheritorOfExpectSealedClass() throws Exception {
             runTest("compiler/testData/cli/metadata/inheritorOfExpectSealedClass.args");

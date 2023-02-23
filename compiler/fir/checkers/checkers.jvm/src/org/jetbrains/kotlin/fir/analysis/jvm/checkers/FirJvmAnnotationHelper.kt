@@ -15,11 +15,11 @@ import org.jetbrains.kotlin.name.StandardClassIds
 
 fun <D> FirBasedSymbol<out D>.isCompiledToJvmDefault(
     session: FirSession,
-    jvmDefaultMode: JvmDefaultMode
+    jvmDefaultMode: JvmDefaultMode?
 ): Boolean where D : FirAnnotationContainer, D : FirDeclaration {
     // TODO: Fix support for all cases
     if (getAnnotationByClassId(StandardClassIds.Annotations.JvmDefault, session) != null) return true
 
-    return jvmDefaultMode.forAllMethodsWithBody
+    return jvmDefaultMode?.forAllMethodsWithBody ?: true
 }
 
