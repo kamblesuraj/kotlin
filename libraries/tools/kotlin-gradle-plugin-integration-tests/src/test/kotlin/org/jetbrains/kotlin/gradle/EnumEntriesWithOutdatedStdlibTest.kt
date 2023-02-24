@@ -17,12 +17,19 @@ class EnumEntriesWithOutdatedStdlibTest : KGPBaseTest() {
     @GradleTest
     fun enumEntriesNotAccessible(gradleVersion: GradleVersion) {
         project("enumEntriesNotAccessible", gradleVersion) {
-            buildAndFail(":k1:compileKotlin") {
-                assertOutputContains("MainK1.kt:9:30 Unresolved reference: entries")
+            buildAndFail(":compileKotlin") {
+                assertOutputContains("Main.kt:13:20 Unresolved reference: entries")
+                assertOutputContains("Main.kt:14:30 Unresolved reference: entries")
             }
 
-            buildAndFail(":k2:compileKotlin") {
-                assertOutputContains("MainK2.kt:9:31 Unresolved reference: entries")
+            buildGradleKts.replaceText(
+                "kotlinOptions.languageVersion = \"1.9\"",
+                "kotlinOptions.languageVersion = \"2.0\"",
+            )
+
+            buildAndFail(":compileKotlin") {
+                assertOutputContains("Main.kt:13:20 Unresolved reference: entries")
+                assertOutputContains("Main.kt:14:30 Unresolved reference: entries")
             }
         }
     }
@@ -31,13 +38,17 @@ class EnumEntriesWithOutdatedStdlibTest : KGPBaseTest() {
     @GradleTest
     fun codeCompilesWithoutReferencingEntries(gradleVersion: GradleVersion) {
         project("enumEntriesNotAccessible", gradleVersion) {
-            projectPath.resolve("k1/src/main/kotlin/MainK1.kt")
-                .replaceText("println(AnnotationTarget.entries)", "println(\"Hello!\")")
-            build(":k1:compileKotlin")
+            projectPath.resolve("src/main/kotlin/Main.kt")
+                .replaceText("entries", "values()")
 
-            projectPath.resolve("k2/src/main/kotlin/MainK2.kt")
-                .replaceText("val it = AnnotationTarget.entries", "println(\"Hello!\")")
-            build(":k2:compileKotlin")
+            build(":compileKotlin")
+
+            buildGradleKts.replaceText(
+                "kotlinOptions.languageVersion = \"1.9\"",
+                "kotlinOptions.languageVersion = \"2.0\"",
+            )
+
+            build(":compileKotlin")
         }
     }
 }

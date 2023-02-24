@@ -5,6 +5,12 @@
 
 package com.example
 
+enum class MyEnum {
+    A, B
+}
+
 fun main() {
-    val it = AnnotationTarget.entries
+    val a = MyEnum.entries
+    val b = AnnotationTarget.entries
+    println("$a :: $b")
 }
