@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.backend.konan
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirConstExpression
+import org.jetbrains.kotlin.fir.isSubstitutionOrIntersectionOverride
 import org.jetbrains.kotlin.fir.resolve.getContainingClass
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
@@ -25,8 +26,7 @@ internal fun FirFunction.unwrapPossibleConstructor(): FirFunction? =
  *  mimics FunctionDescriptor.getObjCMethodInfo()
  */
 internal fun FirFunction.getObjCMethodInfo(onlyExternal: Boolean): ObjCMethodInfo? {
-    val isReal = true  // TODO KT-56030: mimic "this.kind.isReal" as K1 did in `FunctionDescriptor.getObjCMethodInfo()`
-    if (isReal) {
+    if (!isSubstitutionOrIntersectionOverride) {
         this.decodeObjCMethodAnnotation()?.let { return it }
 
         if (onlyExternal) {
@@ -37,6 +37,10 @@ internal fun FirFunction.getObjCMethodInfo(onlyExternal: Boolean): ObjCMethodInf
     // TODO KT-56030: to fix test `interop_objc_smoke` for K2, implement ObjCMethod annotation search among overridden functions,
     //   like K1 did in `FunctionDescriptor.getObjCMethodInfo()`:
     // return overriddenDescriptors.firstNotNullOfOrNull { it.getObjCMethodInfo(onlyExternal) }
+    //   Approx. plan for K2 implementation (to discuss on K2 sync meetings):
+    // get `session: FirSession` and `scopeSession: ScopeSession` from somewhere in space/time
+    // get scope as:  `classSymbol.unsubstitutedScope(session, scopeSession, withForcedTypeCalculator = false)`
+    // from scope, invoke `getDirectOverriddenFunctions()`
     return null
 }
 
@@ -44,12 +48,16 @@ internal fun FirFunction.getObjCMethodInfo(onlyExternal: Boolean): ObjCMethodInf
  * mimics ConstructorDescriptor.getObjCInitMethod()
  */
 private fun FirConstructor.getObjCInitMethod(): FirFunction? {
-    this.annotations.getAnnotationByClassId(ClassId.topLevel(objCConstructorFqName), moduleData.session)?.let {
+    val session = moduleData.session // FIXME KT-56030 wrong session! needed session for currently compiled module
+    this.annotations.getAnnotationByClassId(ClassId.topLevel(objCConstructorFqName), session)?.let {
         val initSelector: String = it.constStringArgument("initSelector")
-        val containingClass = this.getContainingClass(moduleData.session) ?: error("Expected containingClass for constructor $this")
+        val containingClass = this.getContainingClass(session) ?: error("Expected containingClass for constructor $this")
+        // FIXME KT-56030 iteration below does not involve constructors of super classes (btw, do we need them here?)
+        // Approx.plan for K2 implementation (to discuss on K2 sync meetings):
+        // get FirSession and ScopeSession from somewhere in space/time
+        // klass.scopeForClass(ConeSubstitutor.Empty, FirSession, ScopeSession, klass.symbol.toLookupTag()).processAllFunctions {...}
         return containingClass.declarations.mapNotNull { it as? FirFunction }
                 .find { function ->
-                    // TODO KT-56030: how to mimic `memberScope.getContributedFunctions(name, NoLookupLocation.FROM_BACKEND)` ?
                     function.getObjCMethodInfo(onlyExternal = true)?.selector == initSelector
                 } ?: error("Cannot find ObjInitMethod for $this")
     }
@@ -60,7 +68,7 @@ private fun FirConstructor.getObjCInitMethod(): FirFunction? {
  * mimics FunctionDescriptor.decodeObjCMethodAnnotation()
  */
 private fun FirFunction.decodeObjCMethodAnnotation(): ObjCMethodInfo? {
-    // TODO KT-56030: mimic `assert (this.kind.isReal)`
+    assert(!isSubstitutionOrIntersectionOverride)
     return annotations.getAnnotationByClassId(ClassId.topLevel(objCMethodFqName), moduleData.session)?.toObjCMethodInfo()
 }
 
