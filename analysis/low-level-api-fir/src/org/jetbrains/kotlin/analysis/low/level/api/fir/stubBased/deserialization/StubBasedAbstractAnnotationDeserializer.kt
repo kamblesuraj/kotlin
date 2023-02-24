@@ -50,27 +50,6 @@ abstract class StubBasedAbstractAnnotationDeserializer(
         OTHERS
     }
 
-    fun loadClassAnnotations(classOrObject: KtClassOrObject): List<FirAnnotation> {
-        val ktAnnotations = classOrObject.annotationEntries
-        if (ktAnnotations.isEmpty()) return emptyList()
-        return ktAnnotations.map { deserializeAnnotation(it) }
-    }
-
-    fun loadTypeAliasAnnotations(typeAlias: KtTypeAlias): List<FirAnnotation> {
-        val annotations = typeAlias.annotationEntries
-        if (annotations.isEmpty()) return emptyList()
-        return annotations.map { deserializeAnnotation(it) }
-    }
-
-    open fun loadFunctionAnnotations(
-        ktFunction: KtFunction
-    ): List<FirAnnotation> {
-
-        val annotations = ktFunction.annotationEntries
-        if (annotations.isEmpty()) return emptyList()
-        return annotations.map { deserializeAnnotation(it) }
-    }
-
     open fun loadPropertyAnnotations(
         ktProperty: KtProperty,
         containingClassProto: KtClassOrObject?
@@ -78,18 +57,6 @@ abstract class StubBasedAbstractAnnotationDeserializer(
         val annotations = ktProperty.annotationEntries
         if (annotations.isEmpty()) return emptyList()
         return annotations.map { deserializeAnnotation(it, AnnotationUseSiteTarget.PROPERTY) }
-    }
-
-    open fun loadPropertyBackingFieldAnnotations(
-        propertyProto: KtProperty
-    ): List<FirAnnotation> {
-        return emptyList()
-    }
-
-    open fun loadPropertyDelegatedFieldAnnotations(
-        property: KtProperty
-    ): List<FirAnnotation> {
-        return emptyList()
     }
 
     open fun loadPropertyGetterAnnotations(
@@ -108,36 +75,16 @@ abstract class StubBasedAbstractAnnotationDeserializer(
         return annotations.map { deserializeAnnotation(it, AnnotationUseSiteTarget.PROPERTY_SETTER) }
     }
 
-    open fun loadConstructorAnnotations(
-        constructor: KtConstructor<*>
+    open fun loadAnnotations(
+        constructor: KtAnnotated,
+        useSiteTarget: AnnotationUseSiteTarget? = null
     ): List<FirAnnotation> {
         val annotations = constructor.annotationEntries
         if (annotations.isEmpty()) return emptyList()
         return annotations.map { deserializeAnnotation(it) }
     }
 
-    open fun loadValueParameterAnnotations(
-        valueParameterProto: KtParameter,
-        classProto: KtClassOrObject?,
-        kind: CallableKind,
-        parameterIndex: Int
-    ): List<FirAnnotation> {
-        val annotations = valueParameterProto.annotationEntries
-        if (annotations.isEmpty()) return emptyList()
-        return annotations.map { deserializeAnnotation(it) }
-    }
-
-    open fun loadExtensionReceiverParameterAnnotations(
-        callableProto: KtCallableDeclaration,
-        kind: CallableKind
-    ): List<FirAnnotation> {
-        return emptyList()
-    }
-
     abstract fun loadTypeAnnotations(typeReference: KtTypeReference): List<FirAnnotation>
-
-    open fun loadTypeParameterAnnotations(typeParameterProto: KtTypeParameter) =
-        emptyList<FirAnnotation>()
 
     fun deserializeAnnotation(
         ktAnnotation: KtAnnotationEntry,

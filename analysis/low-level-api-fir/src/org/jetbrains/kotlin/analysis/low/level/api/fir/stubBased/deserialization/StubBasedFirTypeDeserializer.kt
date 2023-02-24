@@ -64,7 +64,7 @@ class StubBasedFirTypeDeserializer(
                     this.containingDeclarationSymbol = containingSymbol ?: error("Top-level type parameter ???")
                     variance = typeParameter.variance
                     isReified = typeParameter.hasModifier(KtTokens.REIFIED_KEYWORD)
-                    annotations += annotationDeserializer.loadTypeParameterAnnotations(typeParameter)
+                    annotations += annotationDeserializer.loadAnnotations(typeParameter)
                 }
             }
 

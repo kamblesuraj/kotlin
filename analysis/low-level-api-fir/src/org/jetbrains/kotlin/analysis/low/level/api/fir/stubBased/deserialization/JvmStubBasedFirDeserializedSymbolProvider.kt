@@ -151,7 +151,7 @@ class JvmStubBasedFirDeserializedSymbolProvider(
             val moduleData = moduleDataProvider.getModuleData(function.containingLibrary()) ?: return@mapNotNull null
             val symbol = FirNamedFunctionSymbol(callableId)
             val createRootContext = StubBasedFirDeserializationContext.createRootContext(session, moduleData, callableId, function, symbol)
-            createRootContext.memberDeserializer.loadFunction(function, null, null, session, symbol).symbol
+            createRootContext.memberDeserializer.loadFunction(function, null, session, symbol).symbol
         }
     }
 

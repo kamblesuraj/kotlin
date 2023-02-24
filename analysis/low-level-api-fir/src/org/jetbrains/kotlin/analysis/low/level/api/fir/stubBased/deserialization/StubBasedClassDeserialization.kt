@@ -143,7 +143,7 @@ fun deserializeClassToSymbol(
         classOrObject.body?.declarations?.forEach { declaration ->
             when (declaration) {
                 is KtConstructor<*> -> addDeclaration(classDeserializer.loadConstructor(declaration, classOrObject, this))
-                is KtNamedFunction -> addDeclaration(classDeserializer.loadFunction(declaration, classOrObject, symbol, session))
+                is KtNamedFunction -> addDeclaration(classDeserializer.loadFunction(declaration, symbol, session))
                 is KtProperty -> addDeclaration(classDeserializer.loadProperty(declaration, classOrObject, symbol))
                 is KtEnumEntry -> {
                     val enumEntryName = declaration.name ?: error("Enum entry doesn't provide name $declaration")
@@ -217,7 +217,7 @@ fun deserializeClassToSymbol(
         valueClassRepresentation = computeValueClassRepresentation(this, session)
 
         replaceAnnotations(
-            context.annotationDeserializer.loadClassAnnotations(classOrObject)
+            context.annotationDeserializer.loadAnnotations(classOrObject)
         )
 
 
