@@ -4,8 +4,6 @@
 // FIR_DUMP
 // DUMP_IR
 
-package a
-
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.annotation.AnnotationTarget.*
 
@@ -39,13 +37,13 @@ class Foo(
 fun box(): String {
     val clazz = Foo::class
 
-    val parameterAnnotations = clazz.constructors.single().parameters.single().annotations.joinToString()
-    val propertyAnnotations = clazz.declaredMemberProperties.single().annotations.joinToString()
-    val fieldAnnotations = Foo::class.java.getDeclaredField("param").annotations.joinToString()
+    val parameterAnnotations = clazz.constructors.single().parameters.single().annotations.joinToString { it.annotationClass.simpleName ?: "" }
+    val propertyAnnotations = clazz.declaredMemberProperties.single().annotations.joinToString { it.annotationClass.simpleName ?: "" }
+    val fieldAnnotations = Foo::class.java.getDeclaredField("param").annotations.joinToString { it.annotationClass.simpleName ?: "" }
 
-    if (parameterAnnotations != "@a.NoTarget(), @a.PropValueField(), @a.ParameterOnly()") return "Parameters:" + parameterAnnotations
-    if (propertyAnnotations != "@a.PropertyOnly(), @a.PropertyOnly2()") return "Property:" + propertyAnnotations
-    if (fieldAnnotations != "@a.FieldOnly()") return "Field:" + fieldAnnotations
+    if (parameterAnnotations != "NoTarget, PropValueField, ParameterOnly") return "Parameters:" + parameterAnnotations
+    if (propertyAnnotations != "PropertyOnly, PropertyOnly2") return "Property:" + propertyAnnotations
+    if (fieldAnnotations != "FieldOnly") return "Field:" + fieldAnnotations
 
     return "OK"
 }

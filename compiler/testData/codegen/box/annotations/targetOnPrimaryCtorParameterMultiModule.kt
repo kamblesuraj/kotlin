@@ -5,8 +5,6 @@
 // MODULE: lib
 // FILE: lib.kt
 
-package a
-
 annotation class NoTarget
 
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FIELD)
@@ -41,13 +39,13 @@ import kotlin.reflect.full.declaredMemberProperties
 fun box(): String {
     val clazz = Foo::class
 
-    val parameterAnnotations = clazz.constructors.single().parameters.single().annotations.joinToString()
-    val propertyAnnotations = clazz.declaredMemberProperties.single().annotations.joinToString()
-    val fieldAnnotations = Foo::class.java.getDeclaredField("param").annotations.joinToString()
+    val parameterAnnotations = clazz.constructors.single().parameters.single().annotations.joinToString { it.annotationClass.simpleName ?: "" }
+    val propertyAnnotations = clazz.declaredMemberProperties.single().annotations.joinToString { it.annotationClass.simpleName ?: "" }
+    val fieldAnnotations = Foo::class.java.getDeclaredField("param").annotations.joinToString { it.annotationClass.simpleName ?: "" }
 
-    if (parameterAnnotations != "@a.NoTarget(), @a.PropValueField(), @a.ParameterOnly()") return "Parameters:" + parameterAnnotations
-    if (propertyAnnotations != "@a.PropertyOnly()") return "Property:" + propertyAnnotations
-    if (fieldAnnotations != "@a.FieldOnly()") return "Field:" + fieldAnnotations
+    if (parameterAnnotations != "NoTarget, PropValueField, ParameterOnly") return "Parameters:" + parameterAnnotations
+    if (propertyAnnotations != "PropertyOnly") return "Property:" + propertyAnnotations
+    if (fieldAnnotations != "FieldOnly") return "Field:" + fieldAnnotations
 
     return "OK"
 }

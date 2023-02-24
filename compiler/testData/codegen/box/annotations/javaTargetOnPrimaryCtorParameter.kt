@@ -5,8 +5,6 @@
 // DUMP_IR
 
 // FILE: NoTarget.java
-package a;
-
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -14,8 +12,6 @@ public @interface NoTarget {
 }
 
 // FILE: PropValueField.java
-package a;
-
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -24,8 +20,6 @@ public @interface PropValueField {
 }
 
 // FILE: ParameterOnly.java
-package a;
-
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -34,8 +28,6 @@ public @interface ParameterOnly {
 }
 
 // FILE: FieldOnly.java
-package a;
-
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -44,8 +36,6 @@ public @interface FieldOnly {
 }
 
 // FILE: test.kt
-package a
-
 import kotlin.reflect.full.declaredMemberProperties
 
 class Foo(
@@ -59,11 +49,11 @@ class Foo(
 fun box(): String {
     val clazz = Foo::class
 
-    val parameterAnnotations = clazz.constructors.single().parameters.single().annotations.joinToString()
-    val fieldAnnotations = Foo::class.java.getDeclaredField("param").annotations.joinToString()
+    val parameterAnnotations = clazz.constructors.single().parameters.single().annotations.joinToString { it.annotationClass.simpleName ?: "" }
+    val fieldAnnotations = Foo::class.java.getDeclaredField("param").annotations.joinToString { it.annotationClass.simpleName ?: "" }
 
-    if (parameterAnnotations != "@a.NoTarget(), @a.PropValueField(), @a.ParameterOnly()") return "Parameters:" + parameterAnnotations
-    if (fieldAnnotations != "@a.FieldOnly()") return "Field:" + fieldAnnotations
+    if (parameterAnnotations != "NoTarget, PropValueField, ParameterOnly") return "Parameters:" + parameterAnnotations
+    if (fieldAnnotations != "FieldOnly") return "Field:" + fieldAnnotations
 
     return "OK"
 }
