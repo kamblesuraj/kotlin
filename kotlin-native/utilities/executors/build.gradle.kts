@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.util.*
 
 buildscript {
     dependencies {
@@ -7,10 +6,8 @@ buildscript {
     }
 }
 
-
 plugins {
     kotlin("jvm")
-    id("org.jetbrains.kotlin.plugin.sam.with.receiver")
 }
 
 repositories {
@@ -18,8 +15,6 @@ repositories {
 }
 
 dependencies {
-    api("org.jetbrains.kotlin:kotlin-stdlib:${project.bootstrapKotlinVersion}")
-
     implementation("com.google.code.gson:gson:2.8.9")
     configurations.all {
         resolutionStrategy.eachDependency {
@@ -42,9 +37,7 @@ java {
     }
 }
 
-val compileKotlin: KotlinCompile by tasks
-
-compileKotlin.apply {
+tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
         freeCompilerArgs += listOf(
                 "-Xskip-prerelease-check",
