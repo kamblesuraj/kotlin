@@ -431,6 +431,7 @@ TEST_F(SpecialRefRegistryTest, StressObjCRefRetainRelease) {
             refs.emplace_back(mm::ObjCBackRef::create(obj));
             refs.back().release();
         }
+        publish();
         std::vector<ScopedThread> mutators;
         mutators.emplace_back([&, this] {
             waiter.wait();
