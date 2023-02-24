@@ -1,6 +1,11 @@
-fun foo(f: () -> Unit): String {
-    f()
-    return "OK"
+fun foo(f: () -> Unit, returnIfOk: String): String {
+    val string = f().toString()
+
+    return if (string == "kotlin.Unit") {
+        returnIfOk
+    } else {
+        "FAIL: $string;"
+    }
 }
 
 class Wrapper(var s: String)
@@ -12,5 +17,11 @@ fun box(): String {
         w?.s = "X"
     }
 
-    return foo(lambda)
+    val w2: Wrapper? = null
+
+    val lambda2 = {
+        w2?.s = "X"
+    }
+
+    return foo(lambda, "O") + foo(lambda2, "K")
 }
