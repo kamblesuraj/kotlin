@@ -67,15 +67,9 @@ fun HierarchicalScope.collectDescriptorsFiltered(
 @Deprecated("Use getContributedProperties instead")
 fun LexicalScope.findLocalVariable(name: Name): VariableDescriptor? {
     return findFirstFromMeAndParent { originalScope ->
-        // Unpacking LexicalScopeWrapper may be important to check that it is not ImportingScope
-        val possiblyUnpackedScope = when (originalScope) {
-            is LexicalScopeWrapper -> originalScope.delegate
-            else -> originalScope
-        }
-
         when {
-            possiblyUnpackedScope !is ImportingScope && possiblyUnpackedScope !is LexicalChainedScope ->
-                possiblyUnpackedScope.getContributedVariables(
+            originalScope !is ImportingScope && originalScope !is LexicalChainedScope ->
+                originalScope.getContributedVariables(
                     name,
                     NoLookupLocation.WHEN_GET_LOCAL_VARIABLE
                 ).singleOrNull() /* todo check this*/
@@ -252,12 +246,16 @@ fun ImportingScope.withParent(newParent: ImportingScope?): ImportingScope {
     }
 }
 
-fun LexicalScope.replaceImportingScopes(importingScopeChain: ImportingScope?): LexicalScope {
-    val newImportingScopeChain = importingScopeChain ?: ImportingScope.Empty
-    if (this is LexicalScopeWrapper) {
-        return LexicalScopeWrapper(this.delegate, newImportingScopeChain)
+fun LexicalScope.withParent(newParent: HierarchicalScope): LexicalScope {
+    return object : LexicalScope by this {
+        override val parent: HierarchicalScope
+            get() = newParent
     }
-    return LexicalScopeWrapper(this, newImportingScopeChain)
+}
+
+fun LexicalScope.replaceImportingScopes(importingScopeChain: ImportingScope?): LexicalScope {
+    val lexicalScopes = generateSequence(this) { it.parent as? LexicalScope }.toList()
+    return chainLexicalScopes(lexicalScopes, importingScopeChain) as LexicalScope
 }
 
 fun LexicalScope.createScopeForDestructuring(newReceiver: ReceiverParameterDescriptor?): LexicalScope {
@@ -268,34 +266,17 @@ fun LexicalScope.createScopeForDestructuring(newReceiver: ReceiverParameterDescr
     )
 }
 
-private class LexicalScopeWrapper(
-    val delegate: LexicalScope,
-    private val newImportingScopeChain: ImportingScope
-) : LexicalScope by delegate {
-    init {
-        assert(delegate !is LexicalScopeWrapper) {
-            "Do not wrap again to avoid performance issues"
-        }
-    }
-
-    override val parent: HierarchicalScope by lazy(LazyThreadSafetyMode.NONE) {
-        assert(delegate !is ImportingScope)
-
-        val parent = delegate.parent
-        if (parent is LexicalScope) {
-            parent.replaceImportingScopes(newImportingScopeChain)
-        } else {
-            newImportingScopeChain
-        }
-    }
-
-    override fun toString() = kind.toString()
-}
-
 fun chainImportingScopes(scopes: List<ImportingScope>, tail: ImportingScope? = null): ImportingScope? {
     return scopes.asReversed()
         .fold(tail) { current, scope ->
             assert(scope.parent == null)
+            scope.withParent(current)
+        }
+}
+
+fun chainLexicalScopes(scopes: List<LexicalScope>, tail: HierarchicalScope? = null): HierarchicalScope {
+    return scopes.asReversed()
+        .fold(tail ?: ImportingScope.Empty) { current, scope ->
             scope.withParent(current)
         }
 }
