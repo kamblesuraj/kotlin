@@ -55,7 +55,7 @@ mm::ExtraObjectData& mm::ExtraObjectData::Install(ObjHeader* object) noexcept {
 void mm::ExtraObjectData::Uninstall() noexcept {
     auto *object = GetBaseObject();
     atomicSetRelease(const_cast<const TypeInfo**>(&object->typeInfoOrMeta_), typeInfo_);
-    RuntimeAssert(!object->has_meta_object(), "Object has metaobject after removing metaobject");
+    RuntimeAssert(!object->has_meta_object(), "Object %p has metaobject %p after removing metaobject %p", object, object->meta_object_or_null(), this);
 
 #ifdef KONAN_OBJC_INTEROP
     Kotlin_ObjCExport_releaseAssociatedObject(associatedObject_);
@@ -80,9 +80,16 @@ void mm::ExtraObjectData::ClearWeakReferenceCounter() noexcept {
 }
 
 mm::ExtraObjectData::~ExtraObjectData() {
-    RuntimeAssert(!HasWeakReferenceCounter(), "Object must have cleared weak references");
+    auto* weakRefForCounter = weakReferenceCounterOrBaseObject_.load(std::memory_order_relaxed);
+    if (hasPointerBits(weakRefForCounter, WEAK_REF_TAG)) {
+        weakRefForCounter = clearPointerBits(weakRefForCounter, WEAK_REF_TAG);
+    } else {
+        weakRefForCounter = nullptr;
+    }
+    RuntimeAssert(weakRefForCounter == nullptr, "ExtraObjectData %p must have cleared weak reference counter %p", this, weakRefForCounter);
 
 #ifdef KONAN_OBJC_INTEROP
-    RuntimeAssert(associatedObject_ == nullptr, "Object must have cleared associated object");
+    auto* associatedObject = associatedObject_.load(std::memory_order_relaxed);
+    RuntimeAssert(associatedObject == nullptr, "ExtraObjectData %p must have cleared associated object %p", this, associatedObject);
 #endif
 }

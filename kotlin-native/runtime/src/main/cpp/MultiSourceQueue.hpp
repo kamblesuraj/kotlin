@@ -79,6 +79,7 @@ public:
             if (node->owner_ == this) {
                 // If we own it, delete it immediately.
                 queue_.erase(node->position_);
+                return;
             }
             // If it's owned by the global queue or some other `Producer`, queue it.
             deletionQueue_.push_back(node);
