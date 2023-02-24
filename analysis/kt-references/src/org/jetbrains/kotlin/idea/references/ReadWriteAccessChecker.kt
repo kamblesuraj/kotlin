@@ -31,7 +31,12 @@ interface ReadWriteAccessChecker {
         val assignment = expression.getAssignmentByLHS()
         if (assignment != null) {
             return when (assignment.operationToken) {
-                KtTokens.EQ -> ReferenceAccess.WRITE to assignment
+                KtTokens.EQ -> {
+                    val operationReference = assignment.operationReference
+                    val functionCall = operationReference.reference?.resolve() as? KtFunction
+                    val refAccess = if (functionCall == null) ReferenceAccess.WRITE else ReferenceAccess.READ
+                    (refAccess to assignment)
+                }
 
                 else -> {
                     (if (useResolveForReadWrite) readWriteAccessWithFullExpressionByResolve(assignment) else null)
