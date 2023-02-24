@@ -374,8 +374,11 @@ GCHandle::GCMarkScope::~GCMarkScope() {
 gc::GCHandle::GCProcessWeaksScope::GCProcessWeaksScope(gc::GCHandle& handle) noexcept : handle_(handle) {}
 
 gc::GCHandle::GCProcessWeaksScope::~GCProcessWeaksScope() {
-    GCLogDebug(handle_.getEpoch(),
-               "Processed special refs in %" PRIu64 " microseconds. %" PRIu64 " are undisposed, %" PRIu64 " are alive, %" PRIu64 " are nulled out", getStageTime(), undisposedCount_, aliveCount_, nulledCount_);
+    GCLogDebug(
+            handle_.getEpoch(),
+            "Processed special refs in %" PRIu64 " microseconds. %" PRIu64 " are undisposed, %" PRIu64 " are alive, %" PRIu64
+            " are nulled out",
+            getStageTime(), undisposedCount_, aliveCount_, nulledCount_);
 }
 
 } // namespace kotlin::gc

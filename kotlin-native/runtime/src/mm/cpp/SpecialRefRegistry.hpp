@@ -91,6 +91,7 @@ class SpecialRefRegistry : private Pinned {
 
     private:
         friend class SpecialRefRegistry;
+        friend class SpecialRefRegistryTest;
 
         std::atomic<ObjHeader*> obj_ = nullptr;
         std::atomic<Rc> rc_ = 0; // When disposed can be disposedMarker.
@@ -140,6 +141,7 @@ public:
 
     private:
         friend class StableRef;
+        friend class SpecialRefRegistryTest;
 
         [[nodiscard("must be manually disposed")]] Node& registerNode(ObjHeader* obj, Node::Rc rc, bool allowFastDeletion) noexcept {
             queue_.emplace_back(obj, rc);
@@ -217,6 +219,7 @@ public:
 
     private:
         friend class SpecialRefRegistry;
+        friend class SpecialRefRegistryTest;
 
         Iterator(SpecialRefRegistry& owner, std_support::list<Node>::iterator iterator) noexcept : owner_(&owner), iterator_(iterator) {}
 
@@ -264,6 +267,7 @@ private:
     friend class ObjCBackRef;
     friend class StableRef;
     friend class WeakRef;
+    friend class SpecialRefRegistryTest;
 
     Node* nextRoot(Node* current, int maxIterations = std::numeric_limits<int>::max()) noexcept;
     void promoteIntoRoots(Node& node) noexcept;

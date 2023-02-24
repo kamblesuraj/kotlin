@@ -55,7 +55,9 @@ mm::ExtraObjectData& mm::ExtraObjectData::Install(ObjHeader* object) noexcept {
 void mm::ExtraObjectData::Uninstall() noexcept {
     auto *object = GetBaseObject();
     atomicSetRelease(const_cast<const TypeInfo**>(&object->typeInfoOrMeta_), typeInfo_);
-    RuntimeAssert(!object->has_meta_object(), "Object %p has metaobject %p after removing metaobject %p", object, object->meta_object_or_null(), this);
+    RuntimeAssert(
+            !object->has_meta_object(), "Object %p has metaobject %p after removing metaobject %p", object, object->meta_object_or_null(),
+            this);
 
 #ifdef KONAN_OBJC_INTEROP
     Kotlin_ObjCExport_releaseAssociatedObject(associatedObject_);

@@ -55,6 +55,14 @@ public:
     // Try incrementing refcount. Will fail if the underlying object is not alive.
     [[nodiscard("refcount change must be processed")]] bool tryRetain() noexcept {
         CalledFromNativeGuard guard;
+        return tryRetainForTests();
+    }
+
+    // Get the underlying object.
+    // The result is only safe to use only with refcount > 0.
+    [[nodiscard("expensive pure function")]] ObjHeader* operator*() noexcept { return node_->ref(); }
+
+    bool tryRetainForTests() noexcept {
         ObjHolder holder;
         if (auto* obj = node_->tryRef(holder.slot())) {
             node_->retainRef();
@@ -62,10 +70,6 @@ public:
         }
         return false;
     }
-
-    // Get the underlying object.
-    // The result is only safe to use only with refcount > 0.
-    [[nodiscard("expensive pure function")]] ObjHeader* operator*() noexcept { return node_->ref(); }
 
 private:
     raw_ptr<SpecialRefRegistry::Node> node_;
