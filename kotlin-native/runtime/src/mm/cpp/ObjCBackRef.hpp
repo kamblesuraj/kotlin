@@ -19,14 +19,14 @@ class ObjCBackRef : private MoveOnly {
 public:
     ObjCBackRef() noexcept = default;
 
-    // Cast `ForeignRefContext` into a back reference.
-    explicit ObjCBackRef(ForeignRefContext context) noexcept : node_(reinterpret_cast<SpecialRefRegistry::Node*>(context)) {}
+    // Cast raw ref into a back reference.
+    explicit ObjCBackRef(RawSpecialRef* raw) noexcept : node_(SpecialRefRegistry::Node::fromRaw(raw)) {}
 
-    // Cast back reference into a `ForeignRefContext`.
-    [[nodiscard("must be manually disposed")]] explicit operator ForeignRefContext() && noexcept {
+    // Cast back reference into a raw ref
+    [[nodiscard("must be manually disposed")]] explicit operator RawSpecialRef*() && noexcept {
         // Make sure to move out from node_.
         auto node = std::move(node_);
-        return reinterpret_cast<ForeignRefContext>(static_cast<SpecialRefRegistry::Node*>(node));
+        return node->asRaw();
     }
 
     // Create new back reference for `obj`.

@@ -149,9 +149,16 @@ ALWAYS_INLINE inline bool isNullOrMarker(const ObjHeader* obj) noexcept {
     return reinterpret_cast<uintptr_t>(obj) <= 1;
 }
 
-class ForeignRefManager;
 struct FrameOverlay;
+
+// Legacy MM only:
+class ForeignRefManager;
 typedef ForeignRefManager* ForeignRefContext;
+
+namespace kotlin::mm {
+// New MM only:
+struct RawSpecialRef;
+}
 
 #ifdef __cplusplus
 extern "C" {

@@ -19,14 +19,14 @@ class WeakRef : private MoveOnly {
 public:
     WeakRef() noexcept = default;
 
-    // Cast raw pointer into a weak reference.
-    explicit WeakRef(void* raw) noexcept : node_(static_cast<SpecialRefRegistry::Node*>(raw)) {}
+    // Cast raw ref into a weak reference.
+    explicit WeakRef(RawSpecialRef* raw) noexcept : node_(SpecialRefRegistry::Node::fromRaw(raw)) {}
 
-    // Cast weak reference into raw pointer.
-    [[nodiscard("must be manually disposed")]] explicit operator void*() && noexcept {
+    // Cast weak reference into raw ref.
+    [[nodiscard("must be manually disposed")]] explicit operator RawSpecialRef*() && noexcept {
         // Make sure to move out from node_.
         auto node = std::move(node_);
-        return static_cast<SpecialRefRegistry::Node*>(node);
+        return node->asRaw();
     }
 
     // Create new weak reference for `obj`.

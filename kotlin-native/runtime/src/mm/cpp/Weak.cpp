@@ -22,7 +22,7 @@ namespace {
 //       to avoid doing this fixed layout hack.
 struct WeakReferenceCounter {
     ObjHeader header;
-    void* weakRef;
+    mm::RawSpecialRef* weakRef;
     void* referred;
 };
 
@@ -45,7 +45,7 @@ OBJ_GETTER(mm::createWeakReferenceCounter, ObjHeader* object) noexcept {
         RETURN_OBJ(counter);
     }
     ObjHolder holder;
-    auto* counter = makeWeakReferenceCounter(static_cast<void*>(mm::WeakRef::create(object)), object, holder.slot());
+    auto* counter = makeWeakReferenceCounter(static_cast<mm::RawSpecialRef*>(mm::WeakRef::create(object)), object, holder.slot());
     auto* setCounter = extraObject.GetOrSetWeakReferenceCounter(object, counter);
     RETURN_OBJ(setCounter);
 }

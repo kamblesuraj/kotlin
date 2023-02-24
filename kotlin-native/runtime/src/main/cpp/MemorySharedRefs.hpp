@@ -36,7 +36,7 @@ class KRefSharedHolder {
   ObjHeader* obj_;
   union {
     ForeignRefContext context_; // Legacy MM.
-    void* stablePointer_; // New MM.
+    kotlin::mm::RawSpecialRef* ref_; // New MM.
   };
 };
 
@@ -73,7 +73,7 @@ class BackRefFromAssociatedObject {
       ForeignRefContext context_;
       volatile int refCount;
     }; // Legacy MM
-    ForeignRefContext foreignRef_; // New MM
+    kotlin::mm::RawSpecialRef* ref_; // New MM
   };
 };
 

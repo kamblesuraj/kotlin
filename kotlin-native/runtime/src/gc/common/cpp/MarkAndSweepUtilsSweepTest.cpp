@@ -254,7 +254,7 @@ public:
         auto& extraObjectData = InstallExtraData(objHeader);
         auto *setHeader = extraObjectData.GetOrSetWeakReferenceCounter(objHeader, weakCounter.header());
         EXPECT_EQ(setHeader,  weakCounter.header());
-        weakCounter->weakRef = static_cast<void*>(specialRefRegistryThreadQueue_.createWeakRef(objHeader));
+        weakCounter->weakRef = static_cast<mm::RawSpecialRef*>(specialRefRegistryThreadQueue_.createWeakRef(objHeader));
         weakCounter->referred = objHeader;
         specialRefRegistryThreadQueue_.publish();
         return weakCounter;

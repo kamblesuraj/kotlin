@@ -451,14 +451,14 @@ extern "C" RUNTIME_NOTHROW void* CreateStablePointer(ObjHeader* object) {
         return nullptr;
 
     AssertThreadState(ThreadState::kRunnable);
-    return static_cast<void*>(mm::StableRef::create(object));
+    return static_cast<mm::RawSpecialRef*>(mm::StableRef::create(object));
 }
 
 extern "C" RUNTIME_NOTHROW void DisposeStablePointer(void* pointer) {
     if (!pointer) return;
 
     // Can be safely called in any thread state.
-    mm::StableRef(pointer).dispose();
+    mm::StableRef(static_cast<mm::RawSpecialRef*>(pointer)).dispose();
 }
 
 extern "C" RUNTIME_NOTHROW void DisposeStablePointerFor(MemoryState* memoryState, void* pointer) {
@@ -466,7 +466,7 @@ extern "C" RUNTIME_NOTHROW void DisposeStablePointerFor(MemoryState* memoryState
         return;
 
     // Can be safely called in any thread state.
-    mm::StableRef(pointer).disposeOn(*mm::FromMemoryState(memoryState)->Get());
+    mm::StableRef(static_cast<mm::RawSpecialRef*>(pointer)).disposeOn(*mm::FromMemoryState(memoryState)->Get());
 }
 
 extern "C" RUNTIME_NOTHROW OBJ_GETTER(DerefStablePointer, void* pointer) {
@@ -474,7 +474,7 @@ extern "C" RUNTIME_NOTHROW OBJ_GETTER(DerefStablePointer, void* pointer) {
         RETURN_OBJ(nullptr);
 
     AssertThreadState(ThreadState::kRunnable);
-    RETURN_OBJ(*mm::StableRef(pointer));
+    RETURN_OBJ(*mm::StableRef(static_cast<mm::RawSpecialRef*>(pointer)));
 }
 
 extern "C" RUNTIME_NOTHROW OBJ_GETTER(AdoptStablePointer, void* pointer) {
@@ -482,7 +482,7 @@ extern "C" RUNTIME_NOTHROW OBJ_GETTER(AdoptStablePointer, void* pointer) {
         RETURN_OBJ(nullptr);
 
     AssertThreadState(ThreadState::kRunnable);
-    mm::StableRef stableRef(pointer);
+    mm::StableRef stableRef(static_cast<mm::RawSpecialRef*>(pointer));
     auto* obj = *stableRef;
     mm::SetStackRef(OBJ_RESULT, obj);
     std::move(stableRef).dispose();

@@ -12,13 +12,13 @@ using namespace kotlin;
 
 void KRefSharedHolder::initLocal(ObjHeader* obj) {
     RuntimeAssert(obj != nullptr, "must not be null");
-    stablePointer_ = nullptr;
+    ref_ = nullptr;
     obj_ = obj;
 }
 
 void KRefSharedHolder::init(ObjHeader* obj) {
     RuntimeAssert(obj != nullptr, "must not be null");
-    stablePointer_ = static_cast<void*>(mm::StableRef::create(obj));
+    ref_ = static_cast<mm::RawSpecialRef*>(mm::StableRef::create(obj));
     obj_ = obj;
 }
 
@@ -35,20 +35,20 @@ template ObjHeader* KRefSharedHolder::ref<ErrorPolicy::kTerminate>() const;
 
 void KRefSharedHolder::dispose() const {
     // Handles the case when it is not initialized. See [KotlinMutableSet/Dictionary dealloc].
-    if (!stablePointer_) {
+    if (!ref_) {
         return;
     }
-    mm::StableRef(stablePointer_).dispose();
+    mm::StableRef(ref_).dispose();
     // obj_ and stablePointer_ are dangling now.
 }
 
 void BackRefFromAssociatedObject::initAndAddRef(ObjHeader* obj) {
-    foreignRef_ = static_cast<ForeignRefContext>(mm::ObjCBackRef::create(obj));
+    ref_ = static_cast<mm::RawSpecialRef*>(mm::ObjCBackRef::create(obj));
 }
 
 template <ErrorPolicy errorPolicy>
 void BackRefFromAssociatedObject::addRef() {
-    mm::ObjCBackRef(foreignRef_).retain();
+    mm::ObjCBackRef(ref_).retain();
 }
 
 template void BackRefFromAssociatedObject::addRef<ErrorPolicy::kThrow>();
@@ -56,14 +56,14 @@ template void BackRefFromAssociatedObject::addRef<ErrorPolicy::kTerminate>();
 
 template <ErrorPolicy errorPolicy>
 bool BackRefFromAssociatedObject::tryAddRef() {
-    return mm::ObjCBackRef(foreignRef_).tryRetain();
+    return mm::ObjCBackRef(ref_).tryRetain();
 }
 
 template bool BackRefFromAssociatedObject::tryAddRef<ErrorPolicy::kThrow>();
 template bool BackRefFromAssociatedObject::tryAddRef<ErrorPolicy::kTerminate>();
 
 void BackRefFromAssociatedObject::releaseRef() {
-    mm::ObjCBackRef(foreignRef_).release();
+    mm::ObjCBackRef(ref_).release();
 }
 
 void BackRefFromAssociatedObject::detach() {
@@ -71,12 +71,12 @@ void BackRefFromAssociatedObject::detach() {
 }
 
 void BackRefFromAssociatedObject::dealloc() {
-    mm::ObjCBackRef(foreignRef_).dispose();
+    mm::ObjCBackRef(ref_).dispose();
 }
 
 template <ErrorPolicy errorPolicy>
 ObjHeader* BackRefFromAssociatedObject::ref() const {
-    return *mm::ObjCBackRef(foreignRef_);
+    return *mm::ObjCBackRef(ref_);
 }
 
 template ObjHeader* BackRefFromAssociatedObject::ref<ErrorPolicy::kDefaultValue>() const;

@@ -16,15 +16,15 @@
 using namespace kotlin;
 
 mm::StableRef mm::SpecialRefRegistry::ThreadQueue::createStableRef(ObjHeader* object) noexcept {
-    return mm::StableRef(&registerNode(object, 1, true));
+    return mm::StableRef(registerNode(object, 1, true).asRaw());
 }
 
 mm::WeakRef mm::SpecialRefRegistry::ThreadQueue::createWeakRef(ObjHeader* object) noexcept {
-    return mm::WeakRef(&registerNode(object, 0, false));
+    return mm::WeakRef(registerNode(object, 0, false).asRaw());
 }
 
 mm::ObjCBackRef mm::SpecialRefRegistry::ThreadQueue::createObjCBackRef(ObjHeader* object) noexcept {
-    return mm::ObjCBackRef(reinterpret_cast<ForeignRefContext>(&registerNode(object, 1, false)));
+    return mm::ObjCBackRef(registerNode(object, 1, false).asRaw());
 }
 
 void mm::SpecialRefRegistry::ThreadQueue::deleteNodeIfLocal(Node& node) noexcept {

@@ -197,7 +197,7 @@ test_support::WeakReferenceCounter& InstallWeakCounter(mm::ThreadData& threadDat
     mm::AllocateObject(&threadData, theWeakReferenceCounterTypeInfo, location);
     auto& weakCounter = test_support::WeakReferenceCounter::FromObjHeader(*location);
     auto& extraObjectData = mm::ExtraObjectData::GetOrInstall(objHeader);
-    weakCounter->weakRef = static_cast<void*>(mm::WeakRef::create(objHeader));
+    weakCounter->weakRef = static_cast<mm::RawSpecialRef*>(mm::WeakRef::create(objHeader));
     weakCounter->referred = objHeader;
     auto *setCounter = extraObjectData.GetOrSetWeakReferenceCounter(objHeader, weakCounter.header());
     EXPECT_EQ(setCounter, weakCounter.header());

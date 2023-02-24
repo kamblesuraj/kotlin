@@ -93,6 +93,9 @@ class SpecialRefRegistry : private Pinned {
             rc_.fetch_sub(1, std::memory_order_relaxed);
         }
 
+        RawSpecialRef* asRaw() noexcept { return reinterpret_cast<RawSpecialRef*>(this); }
+        static Node* fromRaw(RawSpecialRef* ref) noexcept { return reinterpret_cast<Node*>(ref); }
+
     private:
         friend class SpecialRefRegistry;
         friend class SpecialRefRegistryTest;

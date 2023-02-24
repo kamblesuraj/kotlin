@@ -21,14 +21,14 @@ class StableRef : private MoveOnly {
 public:
     StableRef() noexcept = default;
 
-    // Cast raw pointer into a stable reference.
-    explicit StableRef(void* raw) noexcept : node_(static_cast<SpecialRefRegistry::Node*>(raw)) {}
+    // Cast raw ref into a stable reference.
+    explicit StableRef(RawSpecialRef* raw) noexcept : node_(SpecialRefRegistry::Node::fromRaw(raw)) {}
 
-    // Cast stable reference into raw pointer.
-    [[nodiscard("must be manually disposed")]] explicit operator void*() && noexcept {
+    // Cast stable reference into raw ref.
+    [[nodiscard("must be manually disposed")]] explicit operator RawSpecialRef*() && noexcept {
         // Make sure to move out from node_.
         auto node = std::move(node_);
-        return static_cast<SpecialRefRegistry::Node*>(node);
+        return node->asRaw();
     }
 
     // Create new stable reference for `obj`.
