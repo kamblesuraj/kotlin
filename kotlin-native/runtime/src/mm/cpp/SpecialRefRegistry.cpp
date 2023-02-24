@@ -48,6 +48,7 @@ mm::SpecialRefRegistry::Node* mm::SpecialRefRegistry::nextRoot(Node* current, in
         RuntimeAssert(current != nullptr, "current cannot be null");
         RuntimeAssert(current != rootsTail(), "current cannot be tail");
         auto candidate = current->nextRoot_.load(std::memory_order_acquire);
+        RuntimeAssert(candidate != nullptr, "candidate cannot be null");
         if (candidate == rootsTail() || candidate->rc_.load(std::memory_order_acquire) > 0) {
             // Perfectly good node. Stop right there.
             // If someone concurrently inserts something into the head, it's fine:
@@ -65,8 +66,10 @@ mm::SpecialRefRegistry::Node* mm::SpecialRefRegistry::nextRoot(Node* current, in
             // But we don't have that here. Inserts are only in the beginning.
             // Iteration also happens only here.
             auto next = candidate->nextRoot_.load(std::memory_order_acquire);
+            RuntimeAssert(next != nullptr, "candidate's next cannot be null");
             auto actualNext = candidate;
             bool deleted = current->nextRoot_.compare_exchange_strong(actualNext, next, std::memory_order_acq_rel);
+            RuntimeAssert(actualNext != nullptr, "current's next cannot be null");
             if (deleted) {
                 candidate->nextRoot_.store(nullptr, std::memory_order_release);
                 break;
@@ -112,6 +115,7 @@ void mm::SpecialRefRegistry::promoteIntoRoots(Node& node) noexcept {
 
     Node* next = rootsHead()->nextRoot_.load(std::memory_order_acquire);
     do {
+        RuntimeAssert(next != nullptr, "head's next cannot be null");
         node.nextRoot_.store(next, std::memory_order_release);
     } while (!rootsHead()->nextRoot_.compare_exchange_weak(next, &node, std::memory_order_acq_rel));
 }
