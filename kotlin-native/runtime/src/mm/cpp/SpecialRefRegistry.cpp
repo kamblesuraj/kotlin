@@ -114,9 +114,14 @@ void mm::SpecialRefRegistry::promoteIntoRoots(Node& node) noexcept {
     }
 
     Node* next = rootsHead()->nextRoot_.load(std::memory_order_acquire);
+    Node* lastNext = nullptr;
     do {
         RuntimeAssert(next != nullptr, "head's next cannot be null");
-        node.nextRoot_.store(next, std::memory_order_release);
+        if (!node.nextRoot_.compare_exchange_strong(lastNext, next, std::memory_order_acq_rel)) {
+            // Someone else is doing the insertion. Let them.
+            break;
+        }
+        lastNext = next;
     } while (!rootsHead()->nextRoot_.compare_exchange_weak(next, &node, std::memory_order_acq_rel));
 }
 
