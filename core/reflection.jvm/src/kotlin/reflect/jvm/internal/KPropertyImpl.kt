@@ -270,7 +270,7 @@ private fun KPropertyImpl.Accessor<*, *>.computeCallerForAccessor(isGetter: Bool
                     if (property.descriptor.isUnderlyingPropertyOfInlineClass() &&
                         property.descriptor.visibility == DescriptorVisibilities.INTERNAL
                     ) {
-                        val unboxMethod = property.descriptor.containingDeclaration.toInlineClass()?.getInlineCLassUnboxMethod(property.descriptor)
+                        val unboxMethod = property.descriptor.containingDeclaration.toInlineClass()?.getInlineClassUnboxMethod(property.descriptor)
                             ?: throw KotlinReflectionInternalError("Underlying property of inline class $property should have a field")
                         if (isBound) InternalUnderlyingValOfInlineClass.Bound(unboxMethod, boundReceiver)
                         else InternalUnderlyingValOfInlineClass.Unbound(unboxMethod)

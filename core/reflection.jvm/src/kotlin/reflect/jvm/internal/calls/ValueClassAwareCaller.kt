@@ -36,18 +36,21 @@ internal class ValueClassAwareCaller<out M : Member?>(
     private val isDefault: Boolean
 ) : Caller<M> {
 
-    private val caller: Caller<Member?> = run {
+    private val caller: Caller<M> = if (oldCaller is CallerImpl.Method.BoundStatic) {
         val receiverType = (descriptor.extensionReceiverParameter ?: descriptor.dispatchReceiverParameter)?.type
-        if (oldCaller is CallerImpl.Method.BoundStatic && receiverType != null && receiverType.needsMfvcFlattening()) {
+        if (receiverType != null && receiverType.needsMfvcFlattening()) {
             val unboxMethods = getMfvcUnboxMethods(receiverType.asSimpleType())!!
             val boundReceivers = unboxMethods.map { it.invoke(oldCaller.boundReceiver) }.toTypedArray()
-            CallerImpl.Method.BoundStaticMultiFieldValueClass(oldCaller.member, boundReceivers)
+            @Suppress("UNCHECKED_CAST")
+            CallerImpl.Method.BoundStaticMultiFieldValueClass(oldCaller.member, boundReceivers) as Caller<M>
         } else {
             oldCaller
         }
+    } else {
+        oldCaller
     }
 
-    override val member: M = oldCaller.member // not caller because of type M, not member?
+    override val member: M = caller.member
 
 
     override val returnType: Type
@@ -92,7 +95,7 @@ internal class ValueClassAwareCaller<out M : Member?>(
 
         val kotlinParameterTypes: List<KotlinType> = makeKotlinParameterTypes(descriptor) { isValueClass() }
 
-        fun typeSize(type: KotlinType) = getMfvcUnboxMethods(type.asSimpleType())?.size ?: 1
+        fun typeSize(type: KotlinType): Int = getMfvcUnboxMethods(type.asSimpleType())?.size ?: 1
 
         // If the default argument is set,
         // (kotlinParameterTypes.size + Integer.SIZE - 1) / Integer.SIZE masks and one marker are added to the end of the argument.
@@ -116,9 +119,9 @@ internal class ValueClassAwareCaller<out M : Member?>(
     }
 
     private val slices = buildList {
-        var currentOffset = when {
-            caller is CallerImpl.Method.BoundStaticMultiFieldValueClass -> caller.boundReceivers.size
-            caller is CallerImpl.Method.BoundStatic -> 1
+        var currentOffset = when (caller) {
+            is CallerImpl.Method.BoundStaticMultiFieldValueClass -> caller.boundReceivers.size
+            is CallerImpl.Method.BoundStatic -> 1
             else -> 0
         }
         if (currentOffset > 0) {
@@ -131,7 +134,7 @@ internal class ValueClassAwareCaller<out M : Member?>(
         }
     }.toTypedArray()
 
-    fun getRealSlicesOfParameters(index: Int) = when {
+    fun getRealSlicesOfParameters(index: Int): IntRange = when {
         index in slices.indices -> slices[index]
         slices.isEmpty() -> index..index
         else -> {
@@ -147,7 +150,7 @@ internal class ValueClassAwareCaller<out M : Member?>(
 
         val unboxedArguments = if (range.isEmpty()) {
             args.asList()
-        } else buildList {
+        } else buildList(args.size) {
             for (index in 0 until range.first) {
                 add(args[index])
             }
@@ -166,7 +169,18 @@ internal class ValueClassAwareCaller<out M : Member?>(
             }
         }
 
-        val result = caller.call(unboxedArguments.toTypedArray())
+        val unboxArgumentsArray = if (unboxedArguments.size == args.size) { // reuse array
+            @Suppress("UNCHECKED_CAST")
+            val objectsArgs = args as Array<Any?>
+            for (index in unboxedArguments.indices) {
+                objectsArgs[index] = unboxedArguments[index]
+            }
+            objectsArgs
+        } else {
+            unboxedArguments.toTypedArray()
+        }
+
+        val result = caller.call(unboxArgumentsArray)
 
         // box is not null only for inline classes
         return box?.invoke(null, result) ?: result
@@ -204,11 +218,11 @@ internal class ValueClassAwareCaller<out M : Member?>(
     }
 }
 
-internal fun ClassifierDescriptor.toJvmDescriptor() = ClassMapperLite.mapClass(classId!!.asString())
+internal fun ClassifierDescriptor.toJvmDescriptor(): String = ClassMapperLite.mapClass(classId!!.asString())
 
 
 private fun getValueClassUnboxMethods(type: SimpleType, descriptor: CallableMemberDescriptor) =
-    getMfvcUnboxMethods(type) ?: type.toInlineClass()?.getInlineCLassUnboxMethod(descriptor)?.let(::listOf)
+    getMfvcUnboxMethods(type) ?: type.toInlineClass()?.getInlineClassUnboxMethod(descriptor)?.let(::listOf)
 
 internal fun getMfvcUnboxMethods(type: SimpleType): List<Method>? {
     fun getUnboxMethodNameSuffixes(type: SimpleType): List<String>? =
@@ -277,7 +291,7 @@ internal fun <M : Member?> Caller<M>.createValueClassAwareCallerIfNeeded(
 private fun CallableMemberDescriptor.hasValueClassReceiver() =
     expectedReceiverType?.isValueClassType() == true
 
-internal fun Class<*>.getInlineCLassUnboxMethod(descriptor: CallableMemberDescriptor): Method =
+internal fun Class<*>.getInlineClassUnboxMethod(descriptor: CallableMemberDescriptor): Method =
     try {
         getDeclaredMethod("unbox" + JvmAbi.IMPL_SUFFIX_FOR_INLINE_CLASS_MEMBERS)
     } catch (e: NoSuchMethodException) {
@@ -286,7 +300,7 @@ internal fun Class<*>.getInlineCLassUnboxMethod(descriptor: CallableMemberDescri
 
 private fun Class<*>.getBoxMethod(descriptor: CallableMemberDescriptor): Method =
     try {
-        getDeclaredMethod("box" + JvmAbi.IMPL_SUFFIX_FOR_INLINE_CLASS_MEMBERS, getInlineCLassUnboxMethod(descriptor).returnType)
+        getDeclaredMethod("box" + JvmAbi.IMPL_SUFFIX_FOR_INLINE_CLASS_MEMBERS, getInlineClassUnboxMethod(descriptor).returnType)
     } catch (e: NoSuchMethodException) {
         throw KotlinReflectionInternalError("No box method found in inline class: $this (calling $descriptor)")
     }
@@ -326,7 +340,7 @@ internal fun Any?.coerceToExpectedReceiverType(descriptor: CallableMemberDescrip
     if (descriptor is PropertyDescriptor && descriptor.isUnderlyingPropertyOfInlineClass()) return this
 
     val expectedReceiverType = descriptor.expectedReceiverType
-    val unboxMethod = expectedReceiverType?.toInlineClass()?.getInlineCLassUnboxMethod(descriptor) ?: return this
+    val unboxMethod = expectedReceiverType?.toInlineClass()?.getInlineClassUnboxMethod(descriptor) ?: return this
 
     return unboxMethod.invoke(this)
 }
