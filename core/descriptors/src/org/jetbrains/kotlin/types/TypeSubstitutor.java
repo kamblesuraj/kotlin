@@ -374,10 +374,6 @@ public class TypeSubstitutor implements TypeSubstitutorMarker {
 
             switch (conflictType(typeParameter.getVariance(), substitutedTypeArgument.getProjectionKind())) {
                 case NO_CONFLICT:
-                    // if the corresponding type parameter is already co/contra-variant, there's not need for an explicit projection
-                    if (typeParameter.getVariance() != Variance.INVARIANT && !substitutedTypeArgument.isStarProjection()) {
-                        substitutedTypeArgument = new TypeProjectionImpl(Variance.INVARIANT, substitutedTypeArgument.getType());
-                    }
                     break;
                 case OUT_IN_IN_POSITION:
                 case IN_IN_OUT_POSITION:

@@ -132,6 +132,11 @@ public class KlibTextTestCaseGenerated extends AbstractKlibTextTestCase {
             runTest("compiler/testData/ir/irText/classes/enumWithSecondaryCtor.kt");
         }
 
+        @TestMetadata("fakeOverrideAndRedundantVariance.kt")
+        public void testFakeOverrideAndRedundantVariance() throws Exception {
+            runTest("compiler/testData/ir/irText/classes/fakeOverrideAndRedundantVariance.kt");
+        }
+
         @TestMetadata("initBlock.kt")
         public void testInitBlock() throws Exception {
             runTest("compiler/testData/ir/irText/classes/initBlock.kt");

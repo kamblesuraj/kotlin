@@ -155,6 +155,12 @@ public class FirLightTreeIrTextTestGenerated extends AbstractFirLightTreeIrTextT
         }
 
         @Test
+        @TestMetadata("fakeOverrideAndRedundantVariance.kt")
+        public void testFakeOverrideAndRedundantVariance() throws Exception {
+            runTest("compiler/testData/ir/irText/classes/fakeOverrideAndRedundantVariance.kt");
+        }
+
+        @Test
         @TestMetadata("fakeOverridesForJavaNonStaticMembers.kt")
         public void testFakeOverridesForJavaNonStaticMembers() throws Exception {
             runTest("compiler/testData/ir/irText/classes/fakeOverridesForJavaNonStaticMembers.kt");

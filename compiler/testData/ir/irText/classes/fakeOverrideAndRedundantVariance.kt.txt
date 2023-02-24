@@ -1,0 +1,24 @@
+interface Out<out T : Any?> {
+
+}
+
+open class Base<SuperTP : Any?> {
+  constructor() /* primary */ {
+    super/*Any*/()
+    /* <init>() */
+
+  }
+
+  open fun foo(i: Out<out SuperTP>) {
+  }
+
+}
+
+class Derived<SubTP : Any?> : Base<SubTP> {
+  constructor() /* primary */ {
+    super/*Base*/<SubTP>()
+    /* <init>() */
+
+  }
+
+}
