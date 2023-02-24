@@ -53,7 +53,7 @@ val safeCallCheckedSubjectReferenceType = generatedType("", "FirExpressionRef<Fi
 
 val firModuleDataType = type("fir", "FirModuleData")
 val noReceiverExpressionType = generatedType("expressions.impl", "FirNoReceiverExpression", firType = true)
-val implicitTypeRefType = generatedType("types.impl", "FirImplicitTypeRefImpl", firType = true)
+val cachedImplicitTypeRefType = generatedType("types", "CACHED_IMPLICIT_TYPE_REF")
 val firQualifierPartType = type("fir.types", "FirQualifierPart")
 val simpleNamedReferenceType = generatedType("references.impl", "FirSimpleNamedReference")
 val explicitThisReferenceType = generatedType("references.impl", "FirExplicitThisReference", firType = true)

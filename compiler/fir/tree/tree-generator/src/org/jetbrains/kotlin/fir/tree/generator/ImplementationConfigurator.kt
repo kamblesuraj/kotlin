@@ -620,8 +620,8 @@ object ImplementationConfigurator : AbstractFirTreeImplementationConfigurator() 
             implementationPredicate = { it.type !in implementationWithConfigurableTypeRef },
             fieldPredicate = { it.defaultValueInImplementation == null }
         ) {
-            default(it, "FirImplicitTypeRefImpl(null)")
-            useTypes(implicitTypeRefType)
+            default(it, "CACHED_IMPLICIT_TYPE_REF")
+            useTypes(cachedImplicitTypeRefType)
         }
 
         configureFieldInAllImplementations(
@@ -629,8 +629,8 @@ object ImplementationConfigurator : AbstractFirTreeImplementationConfigurator() 
             implementationPredicate = { it.type in "FirVariableAssignmentImpl" },
             fieldPredicate = { it.defaultValueInImplementation == null }
         ) {
-            default(it, "FirImplicitTypeRefImpl(null)")
-            useTypes(implicitTypeRefType)
+            default(it, "CACHED_IMPLICIT_TYPE_REF")
+            useTypes(cachedImplicitTypeRefType)
         }
     }
 

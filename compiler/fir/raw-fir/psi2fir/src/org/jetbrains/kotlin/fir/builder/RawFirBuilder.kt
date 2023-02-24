@@ -905,7 +905,7 @@ open class RawFirBuilder(
                 when {
                     classKind == ClassKind.ENUM_ENTRY && this is KtClass -> delegatedEnumSuperTypeRef ?: implicitAnyType
                     container.superTypeRefs.isEmpty() -> implicitAnyType
-                    else -> buildImplicitTypeRef()
+                    else -> CACHED_IMPLICIT_TYPE_REF
                 }
 
 

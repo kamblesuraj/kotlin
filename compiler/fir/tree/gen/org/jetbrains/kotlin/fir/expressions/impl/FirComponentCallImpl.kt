@@ -17,9 +17,9 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCallOrigin
 import org.jetbrains.kotlin.fir.references.FirNamedReference
 import org.jetbrains.kotlin.fir.references.FirReference
 import org.jetbrains.kotlin.fir.references.impl.FirSimpleNamedReference
+import org.jetbrains.kotlin.fir.types.CACHED_IMPLICIT_TYPE_REF
 import org.jetbrains.kotlin.fir.types.FirTypeProjection
 import org.jetbrains.kotlin.fir.types.FirTypeRef
-import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImpl
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.fir.visitors.*
 import org.jetbrains.kotlin.fir.MutableOrEmptyList
@@ -42,7 +42,7 @@ internal class FirComponentCallImpl(
     override var explicitReceiver: FirExpression,
     override val componentIndex: Int,
 ) : FirComponentCall() {
-    override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(null)
+    override var typeRef: FirTypeRef = CACHED_IMPLICIT_TYPE_REF
     override var calleeReference: FirNamedReference = FirSimpleNamedReference(source, Name.identifier("component$componentIndex"))
     override val origin: FirFunctionCallOrigin = FirFunctionCallOrigin.Operator
 

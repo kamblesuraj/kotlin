@@ -34,9 +34,9 @@ import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.references.FirControlFlowGraphReference
 import org.jetbrains.kotlin.fir.symbols.impl.FirAnonymousFunctionSymbol
+import org.jetbrains.kotlin.fir.types.CACHED_IMPLICIT_TYPE_REF
 import org.jetbrains.kotlin.fir.types.ConeSimpleKotlinType
 import org.jetbrains.kotlin.fir.types.FirTypeRef
-import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImpl
 import org.jetbrains.kotlin.fir.visitors.*
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
 
@@ -68,7 +68,7 @@ class FirAnonymousFunctionBuilder : FirFunctionBuilder, FirAnnotationContainerBu
     var isLambda: Boolean by kotlin.properties.Delegates.notNull<Boolean>()
     var hasExplicitParameterList: Boolean by kotlin.properties.Delegates.notNull<Boolean>()
     val typeParameters: MutableList<FirTypeParameter> = mutableListOf()
-    var typeRef: FirTypeRef = FirImplicitTypeRefImpl(null)
+    var typeRef: FirTypeRef = CACHED_IMPLICIT_TYPE_REF
 
     override fun build(): FirAnonymousFunction {
         return FirAnonymousFunctionImpl(

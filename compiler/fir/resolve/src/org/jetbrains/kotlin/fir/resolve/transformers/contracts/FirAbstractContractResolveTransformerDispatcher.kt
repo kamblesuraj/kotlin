@@ -32,7 +32,7 @@ import org.jetbrains.kotlin.fir.resolve.transformers.body.resolve.FirAbstractBod
 import org.jetbrains.kotlin.fir.resolve.transformers.body.resolve.FirDeclarationsResolveTransformer
 import org.jetbrains.kotlin.fir.resolve.transformers.body.resolve.FirExpressionsResolveTransformer
 import org.jetbrains.kotlin.fir.symbols.impl.FirAnonymousFunctionSymbol
-import org.jetbrains.kotlin.fir.types.builder.buildImplicitTypeRef
+import org.jetbrains.kotlin.fir.types.CACHED_IMPLICIT_TYPE_REF
 import org.jetbrains.kotlin.fir.visitors.transformSingle
 import org.jetbrains.kotlin.name.Name
 
@@ -213,9 +213,9 @@ abstract class FirAbstractContractResolveTransformerDispatcher(
             val effectsBlock = buildAnonymousFunction {
                 moduleData = session.moduleData
                 origin = FirDeclarationOrigin.Source
-                returnTypeRef = buildImplicitTypeRef()
+                returnTypeRef = CACHED_IMPLICIT_TYPE_REF
                 receiverParameter = buildReceiverParameter {
-                    typeRef = buildImplicitTypeRef()
+                    typeRef = CACHED_IMPLICIT_TYPE_REF
                 }
                 symbol = FirAnonymousFunctionSymbol()
                 isLambda = true

@@ -15,9 +15,9 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCallOrigin
 import org.jetbrains.kotlin.fir.expressions.FirImplicitInvokeCall
 import org.jetbrains.kotlin.fir.references.FirNamedReference
 import org.jetbrains.kotlin.fir.references.FirReference
+import org.jetbrains.kotlin.fir.types.CACHED_IMPLICIT_TYPE_REF
 import org.jetbrains.kotlin.fir.types.FirTypeProjection
 import org.jetbrains.kotlin.fir.types.FirTypeRef
-import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImpl
 import org.jetbrains.kotlin.fir.visitors.*
 import org.jetbrains.kotlin.fir.MutableOrEmptyList
 import org.jetbrains.kotlin.fir.builder.toMutableOrEmpty
@@ -39,7 +39,7 @@ internal class FirImplicitInvokeCallImpl(
     override var argumentList: FirArgumentList,
     override var calleeReference: FirNamedReference,
 ) : FirImplicitInvokeCall() {
-    override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(null)
+    override var typeRef: FirTypeRef = CACHED_IMPLICIT_TYPE_REF
     override val origin: FirFunctionCallOrigin = FirFunctionCallOrigin.Operator
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {

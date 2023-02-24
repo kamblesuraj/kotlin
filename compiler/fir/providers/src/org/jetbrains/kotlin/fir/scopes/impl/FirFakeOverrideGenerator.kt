@@ -23,7 +23,6 @@ import org.jetbrains.kotlin.fir.symbols.ConeClassLikeLookupTag
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.*
-import org.jetbrains.kotlin.fir.types.builder.buildImplicitTypeRef
 import org.jetbrains.kotlin.fir.types.builder.buildResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
 import org.jetbrains.kotlin.name.CallableId
@@ -269,7 +268,7 @@ object FirFakeOverrideGenerator {
         }
 
         if (fakeOverrideSubstitution != null) {
-            returnTypeRef = buildImplicitTypeRef()
+            returnTypeRef = CACHED_IMPLICIT_TYPE_REF
             attributes.fakeOverrideSubstitution = fakeOverrideSubstitution
         } else {
             returnTypeRef = baseFunction.returnTypeRef.withReplacedReturnType(newReturnType)
@@ -467,7 +466,7 @@ object FirFakeOverrideGenerator {
         }
 
         if (fakeOverrideSubstitution != null) {
-            returnTypeRef = buildImplicitTypeRef()
+            returnTypeRef = CACHED_IMPLICIT_TYPE_REF
             attributes.fakeOverrideSubstitution = fakeOverrideSubstitution
         } else {
             returnTypeRef = baseProperty.returnTypeRef.withReplacedReturnType(newReturnType)

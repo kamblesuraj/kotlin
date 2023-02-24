@@ -12,9 +12,9 @@ import org.jetbrains.kotlin.fir.diagnostics.ConeDiagnostic
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirErrorResolvedQualifier
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
+import org.jetbrains.kotlin.fir.types.CACHED_IMPLICIT_TYPE_REF
 import org.jetbrains.kotlin.fir.types.FirTypeProjection
 import org.jetbrains.kotlin.fir.types.FirTypeRef
-import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImpl
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.fir.visitors.*
@@ -37,7 +37,7 @@ internal class FirErrorResolvedQualifierImpl(
     override var typeArguments: MutableOrEmptyList<FirTypeProjection>,
     override val diagnostic: ConeDiagnostic,
 ) : FirErrorResolvedQualifier() {
-    override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(null)
+    override var typeRef: FirTypeRef = CACHED_IMPLICIT_TYPE_REF
     override val classId: ClassId? get() = relativeClassFqName?.let {
     ClassId(packageFqName, it, false)
 }

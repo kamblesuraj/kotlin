@@ -12,8 +12,8 @@ import org.jetbrains.kotlin.fir.FirImplementationDetail
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.expressions.FirStatement
+import org.jetbrains.kotlin.fir.types.CACHED_IMPLICIT_TYPE_REF
 import org.jetbrains.kotlin.fir.types.FirTypeRef
-import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImpl
 import org.jetbrains.kotlin.fir.visitors.*
 import org.jetbrains.kotlin.fir.MutableOrEmptyList
 import org.jetbrains.kotlin.fir.builder.toMutableOrEmpty
@@ -27,7 +27,7 @@ class FirEmptyExpressionBlock : FirBlock() {
     override val source: KtSourceElement? get() = null
     override val annotations: List<FirAnnotation> get() = emptyList()
     override val statements: List<FirStatement> get() = emptyList()
-    override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(null)
+    override var typeRef: FirTypeRef = CACHED_IMPLICIT_TYPE_REF
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         typeRef.accept(visitor, data)

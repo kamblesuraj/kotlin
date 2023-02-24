@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.fir.types
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.render
 import org.jetbrains.kotlin.fir.types.impl.FirImplicitBuiltinTypeRef
+import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImpl
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.types.ConstantValueKind
@@ -150,3 +151,5 @@ val FirIntersectionTypeRef.isLeftValidForDefinitelyNotNullable
     get() = leftType.coneType.let { it is ConeTypeParameterType && it.canBeNull && !it.isMarkedNullable }
 
 val FirIntersectionTypeRef.isRightValidForDefinitelyNotNullable get() = rightType.coneType.isAny
+
+val CACHED_IMPLICIT_TYPE_REF: FirImplicitTypeRef = FirImplicitTypeRefImpl(null)

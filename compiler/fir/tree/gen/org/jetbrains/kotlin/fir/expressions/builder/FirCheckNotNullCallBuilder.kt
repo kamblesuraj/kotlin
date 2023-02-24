@@ -19,8 +19,8 @@ import org.jetbrains.kotlin.fir.expressions.builder.FirExpressionBuilder
 import org.jetbrains.kotlin.fir.expressions.impl.FirCheckNotNullCallImpl
 import org.jetbrains.kotlin.fir.references.FirReference
 import org.jetbrains.kotlin.fir.references.impl.FirStubReference
+import org.jetbrains.kotlin.fir.types.CACHED_IMPLICIT_TYPE_REF
 import org.jetbrains.kotlin.fir.types.FirTypeRef
-import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImpl
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.fir.visitors.*
 @FirBuilderDsl
 class FirCheckNotNullCallBuilder : FirAnnotationContainerBuilder, FirExpressionBuilder {
     override var source: KtSourceElement? = null
-    override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(null)
+    override var typeRef: FirTypeRef = CACHED_IMPLICIT_TYPE_REF
     override val annotations: MutableList<FirAnnotation> = mutableListOf()
     lateinit var argumentList: FirArgumentList
     var calleeReference: FirReference = FirStubReference
