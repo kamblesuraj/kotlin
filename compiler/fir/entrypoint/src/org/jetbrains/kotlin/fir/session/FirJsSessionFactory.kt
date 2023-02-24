@@ -14,8 +14,8 @@ import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
 import org.jetbrains.kotlin.fir.java.FirProjectSessionProvider
 import org.jetbrains.kotlin.fir.resolve.calls.ConeCallConflictResolverFactory
 import org.jetbrains.kotlin.fir.resolve.providers.impl.*
-import org.jetbrains.kotlin.fir.scopes.FirIntersectionScopeOverrideChecker
 import org.jetbrains.kotlin.fir.scopes.FirKotlinScopeProvider
+import org.jetbrains.kotlin.fir.scopes.FirOverrideChecker
 import org.jetbrains.kotlin.fir.scopes.FirPlatformClassMapper
 import org.jetbrains.kotlin.fir.scopes.impl.FirStandardOverrideChecker
 import org.jetbrains.kotlin.incremental.components.LookupTracker
@@ -45,12 +45,7 @@ object FirJsSessionFactory : FirAbstractSessionFactory() {
                 registerExtraComponents(session)
             },
             registerExtraCheckers = { it.registerJsCheckers() },
-            createKotlinScopeProvider = {
-                FirKotlinScopeProvider(
-                    FirStandardOverrideChecker(sessionProvider.getSession(moduleData)!!)
-                )
-                { _, declaredMemberScope, _, _ -> declaredMemberScope }
-            },
+            createKotlinScopeProvider = { FirKotlinScopeProvider { _, declaredMemberScope, _, _ -> declaredMemberScope } },
             createProviders = { _, _, symbolProvider, generatedSymbolsProvider, syntheticFunctionInterfaceProvider, dependencies ->
                 listOfNotNull(
                     symbolProvider,
@@ -78,12 +73,7 @@ object FirJsSessionFactory : FirAbstractSessionFactory() {
             it.registerJsSpecificResolveComponents()
             registerExtraComponents(it)
         },
-        createKotlinScopeProvider = {
-            FirKotlinScopeProvider(
-                FirIntersectionScopeOverrideChecker(sessionProvider.getSession(moduleDataProvider.allModuleData.single())!!)
-            )
-            { _, declaredMemberScope, _, _ -> declaredMemberScope }
-        },
+        createKotlinScopeProvider = { FirKotlinScopeProvider { _, declaredMemberScope, _, _ -> declaredMemberScope } },
         createProviders = { session, builtinsModuleData, kotlinScopeProvider ->
             listOf(
                 KlibBasedSymbolProvider(session, moduleDataProvider, kotlinScopeProvider, resolvedLibraries),
@@ -102,5 +92,6 @@ object FirJsSessionFactory : FirAbstractSessionFactory() {
         register(ConeCallConflictResolverFactory::class, JsCallConflictResolverFactory)
         register(FirPlatformClassMapper::class, FirPlatformClassMapper.Default)
         register(FirOverridesBackwardCompatibilityHelper::class, FirOverridesBackwardCompatibilityHelper.Default())
+        register(FirOverrideChecker::class, FirStandardOverrideChecker(this))
     }
 }
