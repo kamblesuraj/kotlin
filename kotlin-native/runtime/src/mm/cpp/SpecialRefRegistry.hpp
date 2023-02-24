@@ -39,8 +39,10 @@ class SpecialRefRegistry : private Pinned {
         }
 
         ~Node() {
-            auto rc = rc_.load(std::memory_order_relaxed);
-            RuntimeAssert(rc == disposedMarker, "Deleting StableRef@%p with rc %d", this, rc);
+            if (compiler::runtimeAssertsEnabled()) {
+                auto rc = rc_.load(std::memory_order_relaxed);
+                RuntimeAssert(rc == disposedMarker, "Deleting StableRef@%p with rc %d", this, rc);
+            }
         }
 
         void dispose() noexcept {
@@ -56,8 +58,10 @@ class SpecialRefRegistry : private Pinned {
             AssertThreadState(ThreadState::kRunnable);
             // This can only be called when rc > 0 or if the object is in the roots
             // in some other way. rc = 0 is possible with virtual call Kt->ObjC->Kt.
-            auto rc = rc_.load(std::memory_order_relaxed);
-            RuntimeAssert(rc >= 0, "Dereferencing StableRef@%p with rc %d", this, rc);
+            if (compiler::runtimeAssertsEnabled()) {
+                auto rc = rc_.load(std::memory_order_relaxed);
+                RuntimeAssert(rc >= 0, "Dereferencing StableRef@%p with rc %d", this, rc);
+            }
             // So, GC could not have nulled out obj_.
             auto* obj = obj_.load(std::memory_order_relaxed);
             RuntimeAssert(obj != nullptr, "Dereferencing StableRef@%p with cleaned up object", this);
