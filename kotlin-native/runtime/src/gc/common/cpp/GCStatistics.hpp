@@ -93,6 +93,21 @@ public:
         }
     };
 
+    class GCProcessWeaksScope : GCStageScopeUsTimer, Pinned {
+        GCHandle& handle_;
+        uint64_t undisposedCount_ = 0;
+        uint64_t aliveCount_ = 0;
+        uint64_t nulledCount_ = 0;
+
+    public:
+        explicit GCProcessWeaksScope(GCHandle& handle) noexcept;
+        ~GCProcessWeaksScope();
+
+        void addUndisposed() noexcept { ++undisposedCount_; }
+        void addAlive() noexcept { ++aliveCount_; }
+        void addNulled() noexcept { ++nulledCount_; }
+    };
+
 private:
     uint64_t epoch_;
     explicit GCHandle(uint64_t epoch) : epoch_(epoch) {}
@@ -123,6 +138,7 @@ public:
     GCGlobalRootSetScope collectGlobalRoots() { return GCGlobalRootSetScope(*this); }
     GCThreadRootSetScope collectThreadRoots(mm::ThreadData& threadData) { return GCThreadRootSetScope(*this, threadData); }
     GCMarkScope mark() { return GCMarkScope(*this); }
+    GCProcessWeaksScope processWeaks() noexcept { return GCProcessWeaksScope(*this); }
 
     MemoryUsage getMarked();
 };

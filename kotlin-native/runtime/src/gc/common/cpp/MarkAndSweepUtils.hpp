@@ -213,21 +213,25 @@ void collectRootSet(GCHandle handle, typename Traits::MarkQueue& markQueue, F&& 
 
 template <typename Traits>
 void processWeaks(GCHandle gcHandle, mm::SpecialRefRegistry& registry) noexcept {
+    auto handle = gcHandle.processWeaks();
     for (auto& object : registry.lockForIter()) {
         // This loop is the only place where we modify object. And it's only ever
         // executed on a single thread.
         auto* obj = object.load(std::memory_order_relaxed);
         if (!obj) {
             // We already processed it at some point.
+            handle.addUndisposed();
             continue;
         }
         if (obj->permanent() || Traits::IsMarked(obj)) {
             // TODO: Let's not put permanent objects in here at all?
             // Object is alive. Nothing to do.
+            handle.addAlive();
             continue;
         }
         // Object is not alive. Clear it out.
         object.store(nullptr, std::memory_order_release);
+        handle.addNulled();
     }
 }
 
