@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.fir.resolve.transformers.plugin
 
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.containingClassLookupTag
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.builder.buildPropertyAccessExpression
@@ -24,6 +25,8 @@ import org.jetbrains.kotlin.fir.resolve.transformers.body.resolve.FirAbstractBod
 import org.jetbrains.kotlin.fir.resolve.transformers.body.resolve.FirDeclarationsResolveTransformer
 import org.jetbrains.kotlin.fir.resolve.transformers.body.resolve.FirExpressionsResolveTransformer
 import org.jetbrains.kotlin.fir.symbols.impl.FirEnumEntrySymbol
+import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.StandardClassIds
 
 open class FirAnnotationArgumentsResolveTransformer(
     session: FirSession,
@@ -263,6 +266,11 @@ abstract class AbstractFirExpressionsResolveTransformerForAnnotations(transforme
     }
 }
 
+/**
+ *  Set of enum class IDs that are resolved in COMPILER_REQUIRED_ANNOTATIONS phase that need to be rechecked here.
+ */
+private val classIdsToCheck: Set<ClassId> = setOf(StandardClassIds.DeprecationLevel, StandardClassIds.AnnotationTarget)
+
 private class FirExpressionsResolveTransformerForSpecificAnnotations(transformer: FirAbstractBodyResolveTransformerDispatcher) :
     AbstractFirExpressionsResolveTransformerForAnnotations(transformer) {
 
@@ -271,8 +279,10 @@ private class FirExpressionsResolveTransformerForSpecificAnnotations(transformer
         data: ResolutionMode
     ): FirStatement {
         val calleeReference = qualifiedAccessExpression.calleeReference
-        if (calleeReference is FirResolvedNamedReference && calleeReference.resolvedSymbol is FirEnumEntrySymbol && qualifiedAccessExpression is FirPropertyAccessExpression) {
-            // Expression was resolved in COMPILER_REQUIRED_ANNOTATIONS phase. Resolve again and verify it resolves to the same symbol.
+        if (calleeReference is FirResolvedNamedReference &&
+            calleeReference.resolvedSymbol.let { it is FirEnumEntrySymbol && it.containingClassLookupTag()?.classId in classIdsToCheck } &&
+            qualifiedAccessExpression is FirPropertyAccessExpression
+        ) {
             val symbolFromCompilerPhase = calleeReference.resolvedSymbol
 
             (qualifiedAccessExpression.explicitReceiver as? FirResolvedQualifier)?.let {
