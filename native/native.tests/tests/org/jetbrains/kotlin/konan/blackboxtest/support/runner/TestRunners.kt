@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.konan.blackboxtest.support.settings.Settings
 import org.jetbrains.kotlin.konan.blackboxtest.support.settings.Timeouts
 import org.jetbrains.kotlin.executors.Executor
 import org.jetbrains.kotlin.executors.EmulatorExecutor
-import org.jetbrains.kotlin.executors.WasmExecutor
 import org.jetbrains.kotlin.executors.XcodeSimulatorExecutor
 import org.jetbrains.kotlin.konan.target.*
 import org.jetbrains.kotlin.test.services.JUnit5Assertions.fail
@@ -33,7 +32,6 @@ internal object TestRunners {
 
                 val executor = cached(
                     when {
-                        configurables is WasmConfigurables -> WasmExecutor(configurables)
                         configurables is ConfigurablesWithEmulator -> EmulatorExecutor(configurables)
                         configurables is AppleConfigurables && configurables.targetTriple.isSimulator ->
                             XcodeSimulatorExecutor(configurables)
