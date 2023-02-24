@@ -22,7 +22,13 @@ public abstract class KotlinPackageProvider {
      * So, a package [FqName] is determined by Kotlin files package directive.
      */
     public abstract fun doKotlinPackageExists(packageFqName: FqName): Boolean
-    public abstract fun getKotlinSubPackageFqNames(packageFqName: FqName): Set<Name>
+
+    /**
+     * Returns the list of subpackages for a given package, which satisfy [nameFilter].
+     *
+     * Returned list of sub-packages contain all packages which kotlin is able to see (e.g., for Kotlin/JVM, it should include Java packages)
+     */
+    public abstract fun getSubPackageFqNames(packageFqName: FqName, nameFilter: (Name) -> Boolean): Set<Name>
 }
 
 public abstract class KotlinPackageProviderFactory {
