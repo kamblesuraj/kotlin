@@ -70,7 +70,6 @@ fun FirSession.registerCommonComponents(languageVersionSettings: LanguageVersion
     register(FirSamConstructorStorage::class, FirSamConstructorStorage(this))
     register(FirOverrideService::class, FirOverrideService(this))
     register(FirDynamicMembersStorage::class, FirDynamicMembersStorage(this))
-    register(FirEnumEntriesSupport::class, FirEnumEntriesSupport(this))
 }
 
 @OptIn(SessionConfiguration::class)
