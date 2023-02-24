@@ -653,7 +653,6 @@ class DeclarationsConverter(
                     contextReceivers.addAll(convertContextReceivers(classNode))
                 }.also {
                     it.delegateFieldsMap = delegatedFieldsMap
-                    it.hasEnumEntriesAttr = true
                 }
             }
         }.also {

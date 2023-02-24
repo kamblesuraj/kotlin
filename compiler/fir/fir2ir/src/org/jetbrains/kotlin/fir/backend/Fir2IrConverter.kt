@@ -373,7 +373,8 @@ class Fir2IrConverter(
                 )
             }
             is FirProperty -> {
-                if (declaration.isEnumEntries &&
+                if (containingClass != null &&
+                    declaration.isEnumEntries(containingClass) &&
                     !session.languageVersionSettings.supportsFeature(LanguageFeature.EnumEntries)
                 ) {
                     // Note: we have to do it, because backend without the feature

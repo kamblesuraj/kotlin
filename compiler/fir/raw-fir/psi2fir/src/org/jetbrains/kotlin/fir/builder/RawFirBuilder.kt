@@ -1325,7 +1325,6 @@ open class RawFirBuilder(
                         contextReceivers.addAll(convertContextReceivers(classOrObject.contextReceivers))
                     }.also {
                         it.delegateFieldsMap = delegatedFieldsMap
-                        it.hasEnumEntriesAttr = true
                     }
                 }
             }.also {

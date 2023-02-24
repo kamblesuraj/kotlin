@@ -40,7 +40,7 @@ class FirClassDeclaredMemberScopeImpl(
                 val name = when (declaration) {
                     is FirConstructor -> SpecialNames.INIT
                     is FirVariable -> when {
-                        declaration.isSynthetic || declaration.isEnumEntries && !klass.supportsEnumEntries -> continue@loop
+                        declaration.isSynthetic || declaration.isEnumEntries(klass) && !klass.supportsEnumEntries -> continue@loop
                         else -> declaration.name
                     }
                     is FirSimpleFunction -> declaration.name

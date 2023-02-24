@@ -245,7 +245,9 @@ fun deserializeClassToSymbol(
             configure(classId)
         }
 
-        hasEnumEntriesAttr = Flags.HAS_ENUM_ENTRIES.get(flags)
+        if (!Flags.HAS_ENUM_ENTRIES.get(flags)) {
+            hasNoEnumEntriesAttr = true
+        }
     }
 }
 
