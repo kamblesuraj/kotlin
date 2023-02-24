@@ -1,12 +1,11 @@
 /*
- * Copyright 2010-2022 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2023 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.fir.symbols.impl
 
 import org.jetbrains.kotlin.config.ApiVersion
-import org.jetbrains.kotlin.fir.FirAnnotationContainer
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.lazyResolveToPhase
@@ -67,7 +66,12 @@ abstract class FirCallableSymbol<D : FirCallableDeclaration> : FirBasedSymbol<D>
         get() = callableId.callableName
 
     fun getDeprecation(apiVersion: ApiVersion): DeprecationsPerUseSite? {
-        lazyResolveToPhase(FirResolvePhase.STATUS)
+        if (this is FirEnumEntrySymbol) {
+            lazyResolveToPhase(FirResolvePhase.COMPILER_REQUIRED_ANNOTATIONS)
+        } else {
+            lazyResolveToPhase(FirResolvePhase.STATUS)
+        }
+
         return fir.deprecationsProvider.getDeprecationsInfo(apiVersion)
     }
 
@@ -78,6 +82,7 @@ abstract class FirCallableSymbol<D : FirCallableDeclaration> : FirBasedSymbol<D>
             else -> lazyResolveToPhase(FirResolvePhase.TYPES)
         }
     }
+
     override fun toString(): String = "${this::class.simpleName} $callableId"
 }
 
