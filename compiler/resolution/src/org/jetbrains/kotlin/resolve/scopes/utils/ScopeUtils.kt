@@ -67,9 +67,15 @@ fun HierarchicalScope.collectDescriptorsFiltered(
 @Deprecated("Use getContributedProperties instead")
 fun LexicalScope.findLocalVariable(name: Name): VariableDescriptor? {
     return findFirstFromMeAndParent { originalScope ->
+        // Unpacking LexicalScopeWithParent may be important to check that it is not ImportingScope
+        val possiblyUnpackedScope = when (originalScope) {
+            is LexicalScopeWithParent -> originalScope.delegate
+            else -> originalScope
+        }
+
         when {
-            originalScope !is ImportingScope && originalScope !is LexicalChainedScope ->
-                originalScope.getContributedVariables(
+            possiblyUnpackedScope !is ImportingScope && possiblyUnpackedScope !is LexicalChainedScope ->
+                possiblyUnpackedScope.getContributedVariables(
                     name,
                     NoLookupLocation.WHEN_GET_LOCAL_VARIABLE
                 ).singleOrNull() /* todo check this*/
@@ -246,11 +252,18 @@ fun ImportingScope.withParent(newParent: ImportingScope?): ImportingScope {
     }
 }
 
+private class LexicalScopeWithParent(
+    val delegate: LexicalScope,
+    private val newParent: HierarchicalScope,
+) : LexicalScope by delegate {
+    override val parent: HierarchicalScope
+        get() = newParent
+}
+
 fun LexicalScope.withParent(newParent: HierarchicalScope): LexicalScope {
-    return object : LexicalScope by this {
-        override val parent: HierarchicalScope
-            get() = newParent
-    }
+    if (parent === newParent) return this
+    val originalScope = if (this is LexicalScopeWithParent) delegate else this
+    return LexicalScopeWithParent(originalScope, newParent)
 }
 
 fun LexicalScope.replaceImportingScopes(importingScopeChain: ImportingScope?): LexicalScope {
